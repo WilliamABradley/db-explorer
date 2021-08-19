@@ -2,7 +2,6 @@
 <html>
 
 <head>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
   <style>
     html,
@@ -17,15 +16,49 @@
       width: 100%;
     }
   </style>
-  <style id="dynamic">
-  </style>
 </head>
 
 <body>
-  hey
-  <div id="container" onkeydown="keyDown(event)"></div>
+  <p>Editor:</p>
+  <div id="container"></div>
 
-  <script src="./monaco-editor/min/vs/loader.js"></script>
+  <script>
+    function postMessage(type, message) {
+      const container = document.getElementById("container");
+      container.innerText = JSON.stringify({ type, message });
+      __REACT_WEB_VIEW_BRIDGE.postMessage(JSON.stringify({ type, message }));
+    }
+
+    function log(level, log) {
+      postMessage('console', { level, log });
+    }
+    console = {
+      log: (msg) => log('log', msg),
+      debug: (msg) => log('debug', msg),
+      info: (msg) => log('info', msg),
+      warn: (msg) => log('warn', msg),
+      error: (msg) => log('error', msg),
+    };
+
+    window.addEventListener('message', function (payload) {
+      var dataPayload;
+      try {
+        dataPayload = JSON.parse(payload.data);
+      } catch (e) {
+        throw new Error('Invalid Parent Message');
+      }
+
+      if (dataPayload) {
+        console.log(`[Parent] ${dataPayload.type}`);
+        switch (dataPayload.type) {
+        }
+      }
+    });
+
+    console.log('frame connected');
+  </script>
+
+  <!-- <script src="ms-appx-web:///editor/monaco-editor/min/vs/loader.js"></script>
 
   <script>
     var editor;
@@ -34,59 +67,53 @@
     var decorations = [];
     var modifingSelection = false; // Supress updates to selection when making edits.
 
-    Debug.log("Starting Monaco Load");
-    require.config({ paths: { 'vs': './monaco-editor/monaco-editor/min/vs' } });
-    require(['vs/editor/editor.main'], function () {
-      Debug.log("Grabbing Monaco Options");
+    console.log("loading editor");
+    function loadEditor() {
+      console.log("Starting Monaco Load");
+      require.config({ paths: { 'vs': 'ms-appx-web:///editor/monaco-editor/min/vs' } });
+      require(['vs/editor/editor.main'], function () {
+        console.log("Creating Editor...");
+        editor = monaco.editor.create(document.getElementById('container'), {
+          value: [
+            'function x() {',
+            '\tconsole.log("Hello world!");',
+            '}'
+          ].join('\n'),
+          language: 'javascript'
+        });
+        model = editor.getModel();
 
-      let opt = getOptions();
-      //opt["value"] = Parent.getValue("Text");
+        // Listen for Content Changes
+        model.onDidChangeContent((event) => {
+          //Parent.setValue("Text", model.getValue());
+          console.log("buffers: " + JSON.stringify(model._buffer._pieceTree._buffers));
+          console.log("commandMgr: " + JSON.stringify(model._commandManager));
+          console.log("viewState:" + JSON.stringify(editor.saveViewState()));
+        });
 
-      editor = monaco.editor.create(document.getElementById('container'), opt);
-      model = editor.getModel();
+        // Listen for Selection Changes
+        editor.onDidChangeCursorSelection((event) => {
+          if (!modifingSelection) {
+            console.log(event.source);
+            //Parent.setValue("SelectedText", model.getValueInRange(event.selection));
+            //Parent.setValue("SelectedRange", JSON.stringify(event.selection), "Selection");
+          }
+        });
 
-      // Listen for Content Changes
-      model.onDidChangeContent((event) => {
-        //Parent.setValue("Text", model.getValue());
-        console.log("buffers: " + JSON.stringify(model._buffer._pieceTree._buffers));
-        console.log("commandMgr: " + JSON.stringify(model._commandManager));
-        console.log("viewState:" + JSON.stringify(editor.saveViewState()));
+        // Update Monaco Size when we receive a window resize event
+        window.addEventListener("resize", () => {
+          editor.layout();
+        });
+
+        // Disable WebView Scrollbar so Monaco Scrollbar can do heavy lifting
+        document.body.style.overflow = 'hidden';
+
+        // Callback to Parent that we're loaded
+        console.log("Loaded Monaco");
+        //Parent.callAction("Loaded");
       });
-
-      // Listen for Selection Changes
-      editor.onDidChangeCursorSelection((event) => {
-        if (!modifingSelection) {
-          console.log(event.source);
-          //Parent.setValue("SelectedText", model.getValueInRange(event.selection));
-          //Parent.setValue("SelectedRange", JSON.stringify(event.selection), "Selection");
-        }
-      })
-
-      // Set theme
-      /*       let theme = Parent.getJsonValue("RequestedTheme");
-            theme = {
-              "0": "Default",
-              "1": "Light",
-              "2": "Dark"
-            }[theme];
-            if (theme == "Default") {
-              theme = Theme.currentThemeName.toString();
-            }
-            changeTheme(theme, Theme.isHighContrast.toString()); */
-
-      // Update Monaco Size when we receive a window resize event
-      window.addEventListener("resize", () => {
-        editor.layout();
-      });
-
-      // Disable WebView Scrollbar so Monaco Scrollbar can do heavy lifting
-      document.body.style.overflow = 'hidden';
-
-      // Callback to Parent that we're loaded
-      Debug.log("Loaded Monaco");
-      //Parent.callAction("Loaded");
-    });
-  </script>
+    }
+  </script> -->
 </body>
 
 </html>
