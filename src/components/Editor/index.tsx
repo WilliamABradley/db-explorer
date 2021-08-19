@@ -3,6 +3,7 @@ import {Platform, StyleSheet, View, Text, Button} from 'react-native';
 import WebView, {WebViewMessageEvent} from 'react-native-webview';
 
 export default function Editor(): JSX.Element {
+  const [message, setMessage] = React.useState('guh');
   const viewRef = React.useRef<WebView>(null);
 
   let editorBaseUri: string;
@@ -27,12 +28,27 @@ export default function Editor(): JSX.Element {
       switch (dataPayload.type) {
         case 'console':
           const consoleInfo: {
-            level: keyof typeof console;
+            level: string;
             log: string;
           } = dataPayload.message;
-          console[consoleInfo.level](
+          (console as any)[consoleInfo.level](
             `[Editor:${consoleInfo.level}] ${consoleInfo.log}`,
           );
+          break;
+
+        case 'event':
+          switch (dataPayload.message) {
+            case 'LoadFailed':
+              setMessage('uh oh!');
+              break;
+
+            default:
+              break;
+          }
+          break;
+
+        default:
+          console.log(dataPayload);
           break;
       }
     }
@@ -44,11 +60,8 @@ export default function Editor(): JSX.Element {
 
   return (
     <View style={styles.webview}>
-      <Text>guh</Text>
-      <Button
-        title="Send Message"
-        onPress={() => sendMessage('response', 'ok')}
-      />
+      <Text>{message}</Text>
+      <Button title="Send Message" onPress={() => sendMessage('reload')} />
       <WebView
         ref={viewRef}
         source={{

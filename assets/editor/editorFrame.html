@@ -23,14 +23,26 @@
   <div id="container"></div>
 
   <script>
+    var editor;
+    var model;
+    var contexts = {};
+    var decorations = [];
+    var modifingSelection = false; // Supress updates to selection when making edits.
+
     function postMessage(type, message) {
-      const container = document.getElementById("container");
-      container.innerText = JSON.stringify({ type, message });
       __REACT_WEB_VIEW_BRIDGE.postMessage(JSON.stringify({ type, message }));
     }
 
+    function setValue(name, value) {
+      postMessage('setValue', { name, value });
+    }
+
+    function sendEvent(name) {
+      postMessage('event', name);
+    }
+
     function log(level, log) {
-      postMessage('console', { level, log });
+      postMessage('console', { level, log: typeof log === 'string' ? log : JSON.stringify(log) });
     }
     console = {
       log: (msg) => log('log', msg),
@@ -51,6 +63,9 @@
       if (dataPayload) {
         console.log(`[Parent] ${dataPayload.type}`);
         switch (dataPayload.type) {
+          case 'reload':
+            loadEditor();
+            break;
         }
       }
     });
@@ -58,21 +73,15 @@
     console.log('frame connected');
   </script>
 
-  <!-- <script src="ms-appx-web:///editor/monaco-editor/min/vs/loader.js"></script>
+  <script src="ms-appx-web:///editor/monaco-editor/min/vs/loader.js"></script>
 
   <script>
-    var editor;
-    var model;
-    var contexts = {};
-    var decorations = [];
-    var modifingSelection = false; // Supress updates to selection when making edits.
-
     console.log("loading editor");
     function loadEditor() {
       console.log("Starting Monaco Load");
       require.config({ paths: { 'vs': 'ms-appx-web:///editor/monaco-editor/min/vs' } });
-      require(['vs/editor/editor.main'], function () {
-        console.log("Creating Editor...");
+      require(['vs/editor/editor.main.js'], function () {
+        log("info", "Creating Editor...");
         editor = monaco.editor.create(document.getElementById('container'), {
           value: [
             'function x() {',
@@ -85,7 +94,7 @@
 
         // Listen for Content Changes
         model.onDidChangeContent((event) => {
-          //Parent.setValue("Text", model.getValue());
+          setValue("Text", model.getValue());
           console.log("buffers: " + JSON.stringify(model._buffer._pieceTree._buffers));
           console.log("commandMgr: " + JSON.stringify(model._commandManager));
           console.log("viewState:" + JSON.stringify(editor.saveViewState()));
@@ -95,8 +104,8 @@
         editor.onDidChangeCursorSelection((event) => {
           if (!modifingSelection) {
             console.log(event.source);
-            //Parent.setValue("SelectedText", model.getValueInRange(event.selection));
-            //Parent.setValue("SelectedRange", JSON.stringify(event.selection), "Selection");
+            setValue("SelectedText", model.getValueInRange(event.selection));
+            setValue("SelectedRange", JSON.stringify(event.selection), "Selection");
           }
         });
 
@@ -110,10 +119,14 @@
 
         // Callback to Parent that we're loaded
         console.log("Loaded Monaco");
-        //Parent.callAction("Loaded");
+        sendEvent("Loaded");
+      }, function (err) {
+        console.error(err);
+        sendEvent("LoadFailed");
       });
     }
-  </script> -->
+    loadEditor();
+  </script>
 </body>
 
 </html>
