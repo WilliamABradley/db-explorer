@@ -7,15 +7,15 @@
   IgnorableNamespaces="uap mp">
 
   <Identity
-    Name="6e6b66e7-b440-4272-beb7-32108ebbbc51"
+    Name="513688a8-d9e4-42cb-96bb-68d1add60cf2"
     Publisher="CN=Willi"
     Version="1.0.0.0" />
 
-  <mp:PhoneIdentity PhoneProductId="6e6b66e7-b440-4272-beb7-32108ebbbc51" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="513688a8-d9e4-42cb-96bb-68d1add60cf2" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>DB Explorer</DisplayName>
-    <PublisherDisplayName>William Bradley</PublisherDisplayName>
+    <DisplayName>db_explorer</DisplayName>
+    <PublisherDisplayName>Willi</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -33,10 +33,10 @@
       Executable="$targetnametoken$.exe"
       EntryPoint="db_explorer.App">
       <uap:VisualElements
-        DisplayName="DB Explorer"
+        DisplayName="db_explorer"
         Square150x150Logo="Assets\Square150x150Logo.png"
         Square44x44Logo="Assets\Square44x44Logo.png"
-        Description="Database Explorer"
+        Description="db_explorer"
         BackgroundColor="transparent">
         <uap:DefaultTile Wide310x150Logo="Assets\Wide310x150Logo.png"/>
         <uap:SplashScreen Image="Assets\SplashScreen.png" />

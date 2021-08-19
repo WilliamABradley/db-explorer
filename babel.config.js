@@ -6,9 +6,9 @@ module.exports = {
       {
         extensions: ['.tsx', '.ts', '.js', '.json'],
         alias: {
-          '~': ['./src']
-        }
-      }
-    ]
-  ]
+          '~': ['./src'],
+        },
+      },
+    ],
+  ],
 };
