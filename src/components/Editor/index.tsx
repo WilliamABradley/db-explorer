@@ -1,16 +1,23 @@
 import * as React from 'react';
-import {Platform, StyleSheet, View, Text, Button} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import WebView, {WebViewMessageEvent} from 'react-native-webview';
 
 export default function Editor(): JSX.Element {
-  const [message, setMessage] = React.useState('guh');
   const [isVisible, setIsVisible] = React.useState(false);
   const viewRef = React.useRef<WebView>(null);
 
   let editorBaseUri: string;
   switch (Platform.OS) {
     case 'windows':
-      editorBaseUri = 'ms-appx-web:///editor';
+      editorBaseUri = 'ms-appx-web:///';
+      break;
+
+    case 'android':
+      editorBaseUri = 'file:///android_asset/';
+      break;
+
+    case 'ios':
+      editorBaseUri = '';
       break;
 
     default:
@@ -59,6 +66,7 @@ export default function Editor(): JSX.Element {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sendMessage = (type: string, data?: any) => {
     viewRef.current?.postMessage(JSON.stringify({type, data}));
   };
@@ -69,19 +77,18 @@ export default function Editor(): JSX.Element {
 
   return (
     <View style={styles.container}>
-      <Text>{message}</Text>
-      <Button title="Send Message" onPress={() => sendMessage('reload')} />
       <WebView
         ref={viewRef}
         style={viewStyle}
         source={{
-          uri: `${editorBaseUri}/index.html`,
+          uri: `${editorBaseUri}editor.bundle/index.html`,
         }}
         onMessage={onMessage}
-        onLoad={() => {
-          console.log('loaded!');
+        onError={e => {
+          throw new Error(
+            `Editor Failed to Load with Code: ${e.nativeEvent.code}`,
+          );
         }}
-        onError={() => console.error('error!')}
       />
     </View>
   );

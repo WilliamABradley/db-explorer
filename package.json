@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "postinstall": "npm run action:monaco",
-    "action:monaco": "copyfiles -u 1 -s \"node_modules/monaco-editor/**\" assets/editor",
+    "action:monaco": "cd assets/editor.bundle && yarn",
     "action:nodify": "npx rn-nodeify --install events,stream,process,util,assert,fs,path,dns,dgram,crypto,url,net --hack",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -16,7 +16,6 @@
   "dependencies": {
     "assert": "^1.1.1",
     "dns.js": "^1.0.1",
-    "monaco-editor": "0.20.0",
     "path-browserify": "^0.0.0",
     "react": "^17.0.2",
     "react-native": "0.65.0-rc.2",
