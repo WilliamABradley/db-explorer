@@ -48,6 +48,7 @@ export default function Editor(): JSX.Element {
           switch (dataPayload.message) {
             case 'Loaded':
               setIsVisible(true);
+              viewRef.current?.requestFocus();
               break;
 
             case 'LoadFailed':
@@ -86,6 +87,7 @@ export default function Editor(): JSX.Element {
         }}
         allowUniversalAccessFromFileURLs={true}
         allowFileAccessFromFileURLs={true}
+        focusable={true}
         onMessage={onMessage}
         onError={e => {
           throw new Error(
