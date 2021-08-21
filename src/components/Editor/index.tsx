@@ -4,6 +4,7 @@ import WebView, {WebViewMessageEvent} from 'react-native-webview';
 
 export default function Editor(): JSX.Element {
   const [message, setMessage] = React.useState('guh');
+  const [isVisible, setIsVisible] = React.useState(false);
   const viewRef = React.useRef<WebView>(null);
 
   let editorBaseUri: string;
@@ -38,6 +39,10 @@ export default function Editor(): JSX.Element {
 
         case 'event':
           switch (dataPayload.message) {
+            case 'Loaded':
+              setIsVisible(true);
+              break;
+
             case 'LoadFailed':
               setMessage('uh oh!');
               break;
@@ -54,16 +59,21 @@ export default function Editor(): JSX.Element {
     }
   };
 
-  const sendMessage = (type: string, data: any) => {
+  const sendMessage = (type: string, data?: any) => {
     viewRef.current?.postMessage(JSON.stringify({type, data}));
   };
 
+  const viewStyle = {
+    opacity: isVisible ? 1 : 0,
+  };
+
   return (
-    <View style={styles.webview}>
+    <View style={styles.container}>
       <Text>{message}</Text>
       <Button title="Send Message" onPress={() => sendMessage('reload')} />
       <WebView
         ref={viewRef}
+        style={viewStyle}
         source={{
           uri: `${editorBaseUri}/editorFrame.html`,
         }}
@@ -78,7 +88,7 @@ export default function Editor(): JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  webview: {
+  container: {
     width: 600,
     height: 300,
     overflow: 'hidden',
