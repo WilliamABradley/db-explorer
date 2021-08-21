@@ -10,6 +10,7 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
+      background-color: red;
     }
 
     /* Just have Monaco Fill All Available Space within control */
@@ -25,14 +26,16 @@
 <body>
   <div id="container"></div>
 
+  <!-- https://stackoverflow.com/a/53483434/5001796 -->
+  <script src="./whatwg-fetch.js"></script>
   <script src="./interop.js"></script>
   <script src="./interactions.js"></script>
   <script src="./monaco-editor/min/vs/loader.js"></script>
 
   <script>
     var editor;
+    console.log('Loading Monaco');
     require.config({ paths: { vs: './monaco-editor/min/vs' } });
-
     require(['vs/editor/editor.main'], function () {
       editor = monaco.editor.create(document.getElementById('container'), {
         value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),

@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
-const handle = window.__REACT_WEB_VIEW_BRIDGE || {
-  postMessage: () => {},
-};
+function getHandle() {
+  return window.ReactNativeWebView || window.__REACT_WEB_VIEW_BRIDGE;
+}
 
 function sendMessage(type, message) {
   const payload = {type, message};
@@ -16,7 +16,9 @@ function sendMessage(type, message) {
   if (type !== 'console') {
     _log(`Sending ${encoded} message`);
   }
-  handle.postMessage(encoded);
+
+  const handle = getHandle();
+  handle && handle.postMessage(encoded);
 }
 
 function sendValue(name, value) {
@@ -46,9 +48,13 @@ console = {
 window.addEventListener('message', function (payload) {
   var dataPayload;
   try {
+    // Ignore vscode messages.
+    if (typeof payload.data === 'object' && payload.data.vscodeSetImmediateId) {
+      return;
+    }
     dataPayload = JSON.parse(payload.data);
   } catch (e) {
-    throw new Error('Invalid Parent Message');
+    throw new Error(`Invalid Parent Message: ${JSON.stringify(payload.data)}`);
   }
 
   if (dataPayload) {

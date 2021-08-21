@@ -37,10 +37,10 @@ export default function Editor(): JSX.Element {
         case 'console':
           const consoleInfo: {
             level: string;
-            log: string;
+            message: string;
           } = dataPayload.message;
           (console as any)[consoleInfo.level](
-            `[Editor:${consoleInfo.level}] ${consoleInfo.log}`,
+            `[Editor:${consoleInfo.level}] ${consoleInfo.message}`,
           );
           break;
 
@@ -82,7 +82,10 @@ export default function Editor(): JSX.Element {
         style={viewStyle}
         source={{
           uri: `${editorBaseUri}editor.bundle/index.html`,
+          baseUrl: editorBaseUri,
         }}
+        allowUniversalAccessFromFileURLs={true}
+        allowFileAccessFromFileURLs={true}
         onMessage={onMessage}
         onError={e => {
           throw new Error(
@@ -96,7 +99,7 @@ export default function Editor(): JSX.Element {
 
 const styles = StyleSheet.create({
   container: {
-    width: 600,
+    width: '100%',
     height: 300,
     overflow: 'hidden',
   },
