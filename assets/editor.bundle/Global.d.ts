@@ -1,4 +1,7 @@
-/// <reference path="./node_modules/monaco-editor/monaco.d.ts" />
+/// <reference path="./monaco-editor/monaco.d.ts" />
+
+declare function sendMessage(type: string, message: string): void;
+declare function receiveMessage(type: string, message: string): void;
 
 declare function sendValue(name: string, value: any): void;
 
