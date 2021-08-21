@@ -8,18 +8,22 @@
     body {
       height: 100%;
       margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: red;
     }
 
     /* Just have Monaco Fill All Available Space within control */
     #container {
-      height: 100%;
+      height: 100vh;
       width: 100%;
+      margin: 0;
+      padding: 0;
     }
   </style>
 </head>
 
 <body>
-  <p>Editor:</p>
   <div id="container"></div>
 
   <script>
@@ -29,20 +33,38 @@
     var decorations = [];
     var modifingSelection = false; // Supress updates to selection when making edits.
 
-    function postMessage(type, message) {
-      __REACT_WEB_VIEW_BRIDGE.postMessage(JSON.stringify({ type, message }));
+    const handle = window.__REACT_WEB_VIEW_BRIDGE || {
+      postMessage: () => { },
+    };
+
+    function sendMessage(type, message) {
+      const payload = { type, message };
+      let encoded;
+      try {
+        encoded = JSON.stringify(payload);
+      } catch (e) {
+        console.error(`Failed to Stringify ${type} Message!`);
+        return;
+      }
+
+      if (type !== 'console') {
+        _log(`Sending ${encoded} message`);
+      }
+      handle.postMessage(encoded);
     }
 
-    function setValue(name, value) {
-      postMessage('setValue', { name, value });
+    function sendValue(name, value) {
+      sendMessage('sendValue', { name, value });
     }
 
     function sendEvent(name) {
-      postMessage('event', name);
+      sendMessage('event', name);
     }
 
+    var _log = console.log;
     function log(level, log) {
-      postMessage('console', { level, log: typeof log === 'string' ? log : JSON.stringify(log) });
+      _log(log);
+      sendMessage('console', { level, log: typeof log === 'string' ? log : JSON.stringify(log) });
     }
     console = {
       log: (msg) => log('log', msg),
@@ -70,62 +92,61 @@
       }
     });
 
+    window.onerror = function (message, source, lineno, colno, error) {
+      sendMessage('fatal', {
+        message,
+        source,
+        lineno,
+        colno,
+        error
+      });
+    }
+
     console.log('frame connected');
   </script>
 
   <script src="ms-appx-web:///editor/monaco-editor/min/vs/loader.js"></script>
 
   <script>
-    console.log("loading editor");
-    function loadEditor() {
-      console.log("Starting Monaco Load");
-      require.config({ paths: { 'vs': 'ms-appx-web:///editor/monaco-editor/min/vs' } });
-      require(['vs/editor/editor.main.js'], function () {
-        log("info", "Creating Editor...");
-        editor = monaco.editor.create(document.getElementById('container'), {
-          value: [
-            'function x() {',
-            '\tconsole.log("Hello world!");',
-            '}'
-          ].join('\n'),
-          language: 'javascript'
-        });
-        model = editor.getModel();
+    require.config({ paths: { vs: 'ms-appx-web:///editor/monaco-editor/min/vs' } });
 
-        // Listen for Content Changes
-        model.onDidChangeContent((event) => {
-          setValue("Text", model.getValue());
-          console.log("buffers: " + JSON.stringify(model._buffer._pieceTree._buffers));
-          console.log("commandMgr: " + JSON.stringify(model._commandManager));
-          console.log("viewState:" + JSON.stringify(editor.saveViewState()));
-        });
-
-        // Listen for Selection Changes
-        editor.onDidChangeCursorSelection((event) => {
-          if (!modifingSelection) {
-            console.log(event.source);
-            setValue("SelectedText", model.getValueInRange(event.selection));
-            setValue("SelectedRange", JSON.stringify(event.selection), "Selection");
-          }
-        });
-
-        // Update Monaco Size when we receive a window resize event
-        window.addEventListener("resize", () => {
-          editor.layout();
-        });
-
-        // Disable WebView Scrollbar so Monaco Scrollbar can do heavy lifting
-        document.body.style.overflow = 'hidden';
-
-        // Callback to Parent that we're loaded
-        console.log("Loaded Monaco");
-        sendEvent("Loaded");
-      }, function (err) {
-        console.error(err);
-        sendEvent("LoadFailed");
+    require(['vs/editor/editor.main'], function () {
+      editor = monaco.editor.create(document.getElementById('container'), {
+        value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
+        language: 'javascript'
       });
-    }
-    loadEditor();
+
+      model = editor.getModel();
+
+      // Listen for Content Changes
+      model.onDidChangeContent((event) => {
+        sendValue("Text", model.getValue());
+        //console.log("buffers: " + JSON.stringify(model._buffer._pieceTree._buffers));
+        //console.log("commandMgr: " + JSON.stringify(model._commandManager));
+        //console.log("viewState:" + JSON.stringify(editor.saveViewState()));
+      });
+
+      // Listen for Selection Changes
+      editor.onDidChangeCursorSelection((event) => {
+        if (!modifingSelection) {
+          console.log(event.source);
+          sendValue("SelectedText", model.getValueInRange(event.selection));
+          sendValue("SelectedRange", JSON.stringify(event.selection), "Selection");
+        }
+      });
+
+      // Update Monaco Size when we receive a window resize event
+      window.addEventListener("resize", () => {
+        editor.layout();
+      });
+
+      // Callback to Parent that we're loaded
+      console.log("Loaded Monaco");
+      sendEvent("Loaded");
+    }, function (err) {
+      console.error(err);
+      sendEvent("LoadFailed");
+    });
   </script>
 </body>
 
