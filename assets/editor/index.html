@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+  <style>
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* Just have Monaco Fill All Available Space within control */
+    #container {
+      height: 100vh;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container"></div>
+
+  <script src="./interop.js"></script>
+  <script src="./interactions.js"></script>
+  <script src="./monaco-editor/min/vs/loader.js"></script>
+
+  <script>
+    var editor;
+    require.config({ paths: { vs: './monaco-editor/min/vs' } });
+
+    require(['vs/editor/editor.main'], function () {
+      editor = monaco.editor.create(document.getElementById('container'), {
+        value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
+        language: 'javascript'
+      });
+
+      // from ./interactions.js
+      connectInteractions();
+
+      // Update Monaco Size when we receive a window resize event
+      window.addEventListener("resize", () => {
+        editor.layout();
+      });
+
+      // Callback to Parent that we're loaded
+      console.log("Loaded Monaco");
+      sendEvent("Loaded");
+    }, function (err) {
+      console.error(err);
+      sendEvent("LoadFailed");
+    });
+  </script>
+</body>
+
+</html>

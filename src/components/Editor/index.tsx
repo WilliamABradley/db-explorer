@@ -75,7 +75,7 @@ export default function Editor(): JSX.Element {
         ref={viewRef}
         style={viewStyle}
         source={{
-          uri: `${editorBaseUri}/editorFrame.html`,
+          uri: `${editorBaseUri}/index.html`,
         }}
         onMessage={onMessage}
         onLoad={() => {
