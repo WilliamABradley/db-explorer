@@ -40,7 +40,10 @@
     require(['vs/editor/editor.main'], function () {
       editor = monaco.editor.create(document.getElementById('container'), {
         value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
-        language: 'javascript'
+        language: 'javascript',
+        minimap: {
+          enabled: false
+        },
       });
 
       // from ./interactions.js

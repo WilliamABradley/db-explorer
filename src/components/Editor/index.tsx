@@ -24,52 +24,43 @@ export default function Editor(): JSX.Element {
       throw new Error('Not Implemented');
   }
 
-  const onMessage = (payload: WebViewMessageEvent) => {
-    let dataPayload;
-    try {
-      dataPayload = JSON.parse(payload.nativeEvent.data);
-    } catch (e) {
-      throw new Error('Invalid Editor Message');
-    }
-
-    if (dataPayload) {
-      switch (dataPayload.type) {
-        case 'console':
-          const consoleInfo: {
-            level: string;
-            message: string;
-          } = dataPayload.message;
-          (console as any)[consoleInfo.level](
-            `[Editor:${consoleInfo.level}] ${consoleInfo.message}`,
-          );
-          break;
-
-        case 'event':
-          switch (dataPayload.message) {
-            case 'Loaded':
-              setIsVisible(true);
-              viewRef.current?.requestFocus();
-              break;
-
-            case 'LoadFailed':
-              setMessage('uh oh!');
-              break;
-
-            default:
-              break;
-          }
-          break;
-
-        default:
-          console.log(dataPayload);
-          break;
-      }
-    }
-  };
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sendMessage = (type: string, data?: any) => {
     viewRef.current?.postMessage(JSON.stringify({type, data}));
+  };
+
+  const receiveMessage = (type: string, message: any) => {
+    switch (type) {
+      case 'console':
+        const consoleInfo: {
+          level: string;
+          message: string;
+        } = message;
+        (console as any)[consoleInfo.level](
+          `[Editor:${consoleInfo.level}] ${consoleInfo.message}`,
+        );
+        break;
+
+      case 'event':
+        switch (message) {
+          case 'Loaded':
+            setIsVisible(true);
+            viewRef.current?.requestFocus();
+            break;
+
+          case 'LoadFailed':
+            throw new Error(`Editor Failed to Load View`);
+
+          default:
+            console.warn(`Unknown Editor Event Type: ${message}`);
+            break;
+        }
+        break;
+
+      default:
+        console.warn(`Unknown Editor Message Type: ${type}`);
+        break;
+    }
   };
 
   const viewStyle = {
@@ -89,7 +80,18 @@ export default function Editor(): JSX.Element {
         allowUniversalAccessFromFileURLs={true}
         allowFileAccessFromFileURLs={true}
         focusable={true}
-        onMessage={onMessage}
+        onMessage={e => {
+          let dataPayload;
+          try {
+            dataPayload = JSON.parse(e.nativeEvent.data);
+          } catch (e) {
+            throw new Error('Invalid Editor Message');
+          }
+
+          if (dataPayload) {
+            receiveMessage(dataPayload.type, dataPayload.message);
+          }
+        }}
         onError={e => {
           throw new Error(
             `Editor Failed to Load with Code: ${e.nativeEvent.code}`,

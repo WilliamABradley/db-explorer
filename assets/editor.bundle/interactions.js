@@ -1,3 +1,4 @@
+/// <reference path="./Global.d.ts" />
 /* eslint-disable no-undef */
 // Supress updates to selection when making edits.
 var modifyingSelection = false;
@@ -21,4 +22,16 @@ function connectInteractions() {
       sendValue('SelectedRange', JSON.stringify(event.selection), 'Selection');
     }
   });
+}
+
+function receiveMessage(type, message) {
+  switch (type) {
+    case 'UpdateOptions':
+      editor.updateOptions(message);
+      break;
+
+    default:
+      console.warn(`Unknown Message Type: ${type}`);
+      break;
+  }
 }
