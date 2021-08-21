@@ -85,6 +85,7 @@ export default function Editor(): JSX.Element {
           uri: `${editorBaseUri}editor.bundle/index.html`,
           baseUrl: editorBaseUri,
         }}
+        originWhitelist={['*']}
         allowUniversalAccessFromFileURLs={true}
         allowFileAccessFromFileURLs={true}
         focusable={true}
