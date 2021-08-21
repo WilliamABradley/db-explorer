@@ -7,9 +7,12 @@ module.exports = {
       node: {
         paths: ['src'],
         alias: {
-          '~': './src'
+          '~': './src',
         },
       },
     },
+  },
+  rules: {
+    'no-catch-shadow': false,
   },
 };

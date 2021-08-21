@@ -1,9 +1,15 @@
 import * as React from 'react';
-import {Platform, StyleSheet, View} from 'react-native';
-import WebView, {WebViewMessageEvent} from 'react-native-webview';
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import WebView from 'react-native-webview';
 
 export default function Editor(): JSX.Element {
-  const [isVisible, setIsVisible] = React.useState(false);
+  const [isVisible, setIsVisible] = React.useState(true);
   const viewRef = React.useRef<WebView>(null);
 
   let editorBaseUri: string;
@@ -41,11 +47,18 @@ export default function Editor(): JSX.Element {
         );
         break;
 
+      case 'fatal':
+        console.error(message);
+        break;
+
       case 'event':
         switch (message) {
           case 'Loaded':
             setIsVisible(true);
-            viewRef.current?.requestFocus();
+            sendMessage('');
+            if (typeof viewRef.current?.requestFocus === 'function') {
+              viewRef.current.requestFocus();
+            }
             break;
 
           case 'LoadFailed':
@@ -58,7 +71,7 @@ export default function Editor(): JSX.Element {
         break;
 
       default:
-        console.warn(`Unknown Editor Message Type: ${type}`);
+        console.warn(`Unknown Editor Message Type: ${type}`, message);
         break;
     }
   };
@@ -69,6 +82,9 @@ export default function Editor(): JSX.Element {
 
   return (
     <View style={styles.container}>
+      {/*       <TouchableWithoutFeedback onLongPress={e => console.log('Long Press', e)}>
+        <Text>Test Touch</Text>
+      </TouchableWithoutFeedback> */}
       <WebView
         ref={viewRef}
         style={viewStyle}

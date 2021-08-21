@@ -16,7 +16,7 @@ fs.copyFileSync(
   path.resolve(destDir, definitionFile),
 );
 
-function copyDir(dir) {
+function copyDir(dir, rewrite = true) {
   const copySourceDir = path.resolve(sourceDir, dir);
   const copyDestDir = path.resolve(destDir, dir);
   fs.mkdirSync(copyDestDir, {recursive: true});
@@ -26,13 +26,13 @@ function copyDir(dir) {
     const fsInfo = fs.statSync(fullEntryPath);
 
     if (fsInfo.isDirectory()) {
-      copyDir(path.join(dir, entry));
+      copyDir(path.join(dir, entry), rewrite);
     } else {
       const destPath = path.resolve(copyDestDir, entry);
       console.log(`Processing: ${fullEntryPath} > ${destPath}`);
 
       // Make the js compatible with the Android Webview.
-      if (entry.endsWith('.js') && entry !== 'loader.js') {
+      if (rewrite && entry.endsWith('.js') && entry !== 'loader.js') {
         console.log('Transpiling');
         const res = babel.transformFileSync(fullEntryPath, {
           babelrc: false,
@@ -70,4 +70,5 @@ function copyDir(dir) {
   }
 }
 
+copyDir('dev/vs', false);
 copyDir('min/vs');
