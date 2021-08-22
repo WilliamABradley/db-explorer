@@ -21,10 +21,6 @@ function sendMessage(type, message) {
   handle && handle.postMessage(encoded);
 }
 
-function sendValue(name, value) {
-  sendMessage('sendValue', {name, value});
-}
-
 var _log = console.log;
 function log(level, message) {
   _log(message);

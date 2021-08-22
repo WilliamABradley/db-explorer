@@ -9,19 +9,39 @@ var modifyingSelection = false;
 var overrideContextMenu = true;
 
 /**
- *
- * @param {HTMLElement} element
- * @returns {monaco.editor.IEditor}
+ * @param {string} type
+ * @param {any|undefined} message
  */
-function init(element) {
-  editor = monaco.editor.create(element, {
-    value: `var info = ${JSON.stringify(_monacoInfo, null, 2)}`,
-    language: 'javascript',
-    minimap: {
-      enabled: false,
-    },
-    contextmenu: !overrideContextMenu,
-  });
+function receiveMessage(type, message) {
+  switch (type) {
+    case 'init':
+      init(message);
+      break;
+
+    case 'updateOptions':
+      /** @type {Parameters<monaco.editor.IStandaloneCodeEditor['updateOptions']>[0]} */
+      const updateOptions = message;
+      editor.updateOptions(updateOptions);
+      if (updateOptions.contextmenu !== undefined) {
+        overrideContextMenu = !updateOptions.contextmenu;
+      }
+      break;
+
+    case 'setValue':
+      editor.setValue(message);
+      break;
+
+    default:
+      console.warn(`Unknown Message Type: ${type}`);
+      break;
+  }
+}
+
+/**
+ * @param {monaco.editor.IStandaloneEditorConstructionOptions} options
+ */
+function init(options) {
+  editor = monaco.editor.create(document.getElementById('container'), options);
 
   // Update Monaco Size when we receive a window resize event
   window.addEventListener('resize', () => {
@@ -35,14 +55,14 @@ function init(element) {
 
   // Listen for Content Changes
   model.onDidChangeContent(event => {
-    sendValue('Text', model.getValue());
+    sendMessage('setValue', model.getValue());
   });
 
   // Listen for Selection Changes
   editor.onDidChangeCursorSelection(event => {
     if (!modifyingSelection) {
-      sendValue('SelectedText', model.getValueInRange(event.selection));
-      sendValue('SelectedRange', JSON.stringify(event.selection));
+      sendMessage('selectedText', model.getValueInRange(event.selection));
+      sendMessage('selectedRange', JSON.stringify(event.selection));
     }
   });
 
@@ -51,26 +71,5 @@ function init(element) {
     event.event.stopPropagation();
   });
 
-  return editor;
-}
-
-/**
- * @param {string} type
- * @param {any|undefined} message
- */
-function receiveMessage(type, message) {
-  switch (type) {
-    case 'updateOptions':
-      /** @type {Parameters<monaco.editor.IStandaloneCodeEditor['updateOptions']>[0]} */
-      const options = message;
-      editor.updateOptions(options);
-      if (options.contextmenu !== undefined) {
-        overrideContextMenu = !options.contextmenu;
-      }
-      break;
-
-    default:
-      console.warn(`Unknown Message Type: ${type}`);
-      break;
-  }
+  sendMessage('initialised');
 }

@@ -1,19 +1,25 @@
 import * as React from 'react';
-import {useState, useEffect} from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {useState} from 'react';
+import {StyleSheet, View, Text, Button} from 'react-native';
 import Editor from './components/Editor';
 
 export default function App() {
-  const [result, setResult] = useState<number | undefined>();
-
-  useEffect(() => {
-    setResult(3 * 7);
-  }, []);
+  const [sql, setSQL] = useState('SELECT * FROM INFORMATION_SCHEMA.TABLES;');
+  const [results, setResults] = useState('');
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
-      <Editor />
+      <Button
+        title="Run"
+        onPress={() => {
+          setResults(sql);
+        }}
+      />
+      <Editor value={sql} onChange={setSQL} />
+      <Text>SQL:</Text>
+      <Text>{sql}</Text>
+      <Text>Results:</Text>
+      <Text>{results}</Text>
     </View>
   );
 }

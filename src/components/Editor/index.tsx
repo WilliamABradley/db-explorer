@@ -1,42 +1,44 @@
 /// <reference path="../../../node_modules/monaco-editor/monaco.d.ts" />
 
 import * as React from 'react';
-import {Platform, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import WebView from 'react-native-webview';
+import {platformAssetsUri} from '../../utils';
 import {openContextMenu} from '../../utils/contextMenu';
 
-export default function Editor(): JSX.Element {
-  const [isVisible, setIsVisible] = React.useState(true);
+export type EditorProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
+
+export default function Editor({value, onChange}: EditorProps): JSX.Element {
+  const [isLoaded, setIsLoaded] = React.useState(false);
   const containerRef = React.useRef<View>(null);
   const viewRef = React.useRef<WebView>(null);
 
-  let editorBaseUri: string;
-  switch (Platform.OS) {
-    case 'windows':
-      editorBaseUri = 'ms-appx-web:///';
-      break;
+  let _lastSetValue: string | undefined;
 
-    case 'android':
-      editorBaseUri = 'file:///android_asset/';
-      break;
-
-    case 'ios':
-      editorBaseUri = '';
-      break;
-
-    default:
-      throw new Error('Not Implemented');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const sendMessage = (type: string, message?: any) => {
     viewRef.current?.postMessage(JSON.stringify({type, message}));
+  };
+
+  const init = (
+    options: monaco.editor.IStandaloneEditorConstructionOptions,
+  ) => {
+    sendMessage('init', options);
   };
 
   const updateOptions: monaco.editor.IStandaloneCodeEditor['updateOptions'] =
     options => {
       sendMessage('updateOptions', options);
     };
+
+  const setValue = (value: string) => {
+    _lastSetValue = value;
+    if (_lastSetValue !== value) {
+      sendMessage('setValue', value);
+    }
+  };
 
   const receiveMessage = (type: string, message: any) => {
     switch (type) {
@@ -54,12 +56,26 @@ export default function Editor(): JSX.Element {
         console.error(message);
         break;
 
+      // Scripts Loaded, initialise the editor.
       case 'loaded':
-        updateOptions({
+        init({
           contextmenu: false,
-          lineNumbers: 'off',
+          minimap: {
+            enabled: false,
+          },
+          language: 'pgsql',
+          value,
         });
-        setIsVisible(true);
+        break;
+
+      // Editor initialised
+      case 'initialised':
+        setIsLoaded(true);
+
+        // Just in case we had more than one update since we initialised.
+        if (_lastSetValue !== value) {
+          setValue(value);
+        }
 
         if (typeof viewRef.current?.requestFocus === 'function') {
           viewRef.current.requestFocus();
@@ -69,7 +85,12 @@ export default function Editor(): JSX.Element {
       case 'loadFailed':
         throw new Error(`Editor Failed to Load View`);
 
-      case 'sendValue':
+      case 'setValue':
+        onChange?.(message);
+        break;
+
+      case 'selectedText':
+      case 'selectedRange':
         break;
 
       case 'contextMenu':
@@ -89,8 +110,15 @@ export default function Editor(): JSX.Element {
     }
   };
 
+  // Handle update events once we are loaded.
+  React.useEffect(() => {
+    if (isLoaded) {
+      setValue(value);
+    }
+  }, [value, isLoaded]);
+
   const viewStyle = {
-    opacity: isVisible ? 1 : 0,
+    opacity: isLoaded ? 1 : 0,
   };
 
   return (
@@ -99,8 +127,7 @@ export default function Editor(): JSX.Element {
         ref={viewRef}
         style={viewStyle}
         source={{
-          uri: `${editorBaseUri}editor.bundle/index.html`,
-          baseUrl: editorBaseUri,
+          uri: `${platformAssetsUri}editor.bundle/index.html`,
         }}
         originWhitelist={['*']}
         allowUniversalAccessFromFileURLs={true}
