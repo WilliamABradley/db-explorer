@@ -6,7 +6,7 @@
 
 // Supress updates to selection when making edits.
 var modifyingSelection = false;
-var overrideContextMenu = false;
+var overrideContextMenu = true;
 
 /**
  *
@@ -15,11 +15,12 @@ var overrideContextMenu = false;
  */
 function init(element) {
   editor = monaco.editor.create(element, {
-    value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
+    value: `var info = ${JSON.stringify(_monacoInfo, null, 2)}`,
     language: 'javascript',
     minimap: {
       enabled: false,
     },
+    contextmenu: !overrideContextMenu,
   });
 
   // Update Monaco Size when we receive a window resize event
@@ -45,33 +46,34 @@ function init(element) {
     if (!modifyingSelection) {
       console.log(event.source);
       sendValue('SelectedText', model.getValueInRange(event.selection));
-      sendValue('SelectedRange', JSON.stringify(event.selection), 'Selection');
+      sendValue('SelectedRange', JSON.stringify(event.selection));
     }
   });
 
-  /*   editor.onContextMenu(event => {
+  editor.onContextMenu(event => {
     if (overrideContextMenu) {
       sendMessage('contextMenu', event);
       event.event.stopPropagation();
     }
-  }); */
+  });
 
   return editor;
 }
 
 /**
  * @param {string} type
- * @param {any} message
+ * @param {any|undefined} message
  */
 function receiveMessage(type, message) {
   switch (type) {
-    case 'UpdateOptions':
-      editor.updateOptions(message);
+    case 'updateOptions':
+      /** @type {Parameters<monaco.editor.IStandaloneCodeEditor['updateOptions']>[0]} */
+      const options = message;
+      editor.updateOptions(options);
+      if (options.contextmenu !== undefined) {
+        overrideContextMenu = !options.contextmenu;
+      }
       break;
-
-    /*     case 'OverrideContextMenu':
-      overrideContextMenu = message == 'true';
-      break; */
 
     default:
       console.warn(`Unknown Message Type: ${type}`);

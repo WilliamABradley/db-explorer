@@ -31,11 +31,12 @@
   <script src="./whatwg-fetch.js"></script>
   <script src="./interop.js"></script>
   <script src="./interface.js"></script>
+  <script src="./monaco-editor/info.js"></script>
   <script src="./monaco-editor/min/vs/loader.js"></script>
 
   <script>
     var editor;
-    console.log('Loading Monaco');
+    console.log(`Loading Monaco: ${_monacoInfo.version}`);
     require.config({ paths: { vs: './monaco-editor/min/vs' } });
     require(['vs/editor/editor.main'], function () {
 
@@ -44,11 +45,11 @@
 
       // Callback to Parent that we're loaded
       console.log("Loaded Monaco");
-      sendEvent("Loaded");
+      sendMessage("loaded");
 
     }, function (err) {
       console.error(err);
-      sendEvent("LoadFailed");
+      sendMessage("loadFailed");
     });
   </script>
 </body>

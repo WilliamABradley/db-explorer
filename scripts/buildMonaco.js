@@ -8,6 +8,11 @@ const bundleDir = 'assets/editor.bundle';
 const destDir = `${bundleDir}/monaco-editor`;
 const definitionFile = 'monaco.d.ts';
 
+const packageInfo = JSON.parse(
+  fs.readFileSync(path.resolve(sourceDir, 'package.json'), 'utf-8'),
+);
+console.log(`Monaco Version: ${packageInfo.version}`);
+
 rimraf.sync(destDir);
 fs.mkdirSync(destDir);
 
@@ -72,3 +77,8 @@ function copyDir(dir, rewrite = true) {
 
 //copyDir('dev/vs', false);
 copyDir('min/vs', false);
+
+fs.writeFileSync(
+  path.resolve(destDir, 'info.js'),
+  `var _monacoInfo = ${JSON.stringify(packageInfo, null, 2)};`,
+);

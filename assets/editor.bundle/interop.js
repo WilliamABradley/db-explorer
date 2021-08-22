@@ -25,10 +25,6 @@ function sendValue(name, value) {
   sendMessage('sendValue', {name, value});
 }
 
-function sendEvent(name) {
-  sendMessage('event', name);
-}
-
 var _log = console.log;
 function log(level, message) {
   _log(message);

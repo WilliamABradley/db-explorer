@@ -1,11 +1,7 @@
+/// <reference path="../../../node_modules/monaco-editor/monaco.d.ts" />
+
 import * as React from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import {Platform, StyleSheet, View} from 'react-native';
 import WebView from 'react-native-webview';
 
 export default function Editor(): JSX.Element {
@@ -31,9 +27,14 @@ export default function Editor(): JSX.Element {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const sendMessage = (type: string, data?: any) => {
-    viewRef.current?.postMessage(JSON.stringify({type, data}));
+  const sendMessage = (type: string, message?: any) => {
+    viewRef.current?.postMessage(JSON.stringify({type, message}));
   };
+
+  const updateOptions: monaco.editor.IStandaloneCodeEditor['updateOptions'] =
+    options => {
+      sendMessage('updateOptions', options);
+    };
 
   const receiveMessage = (type: string, message: any) => {
     switch (type) {
@@ -51,23 +52,24 @@ export default function Editor(): JSX.Element {
         console.error(message);
         break;
 
-      case 'event':
-        switch (message) {
-          case 'Loaded':
-            setIsVisible(true);
-            sendMessage('');
-            if (typeof viewRef.current?.requestFocus === 'function') {
-              viewRef.current.requestFocus();
-            }
-            break;
+      case 'loaded':
+        setIsVisible(true);
+        updateOptions({
+          contextmenu: true,
+        });
 
-          case 'LoadFailed':
-            throw new Error(`Editor Failed to Load View`);
-
-          default:
-            console.warn(`Unknown Editor Event Type: ${message}`);
-            break;
+        if (typeof viewRef.current?.requestFocus === 'function') {
+          viewRef.current.requestFocus();
         }
+        break;
+
+      case 'loadFailed':
+        throw new Error(`Editor Failed to Load View`);
+
+      case 'sendValue':
+        break;
+
+      case 'contextMenu':
         break;
 
       default:
