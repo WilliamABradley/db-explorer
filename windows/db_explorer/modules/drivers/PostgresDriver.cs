@@ -30,6 +30,7 @@ namespace db_explorer.modules.drivers
             {
                 Host = options["host"],
                 Port = Convert.ToInt32(options["port"]),
+                SslMode = options["ssl"] == "true" ? SslMode.Require : SslMode.Disable,
             };
 
             if(options.TryGetValue("username", out string username))

@@ -1,6 +1,7 @@
 export type DatabaseConnectionInfo = {
   host: string;
   port: string;
+  ssl: boolean;
   username?: string;
   password?: string;
   database?: string;
@@ -12,7 +13,7 @@ export default abstract class DatabaseDriver {
   }
 
   public connectionInfo: DatabaseConnectionInfo;
-  public connected: boolean;
+  public connected: boolean = false;
 
   // Database Internal functions
   protected abstract _connect(): Promise<void>;

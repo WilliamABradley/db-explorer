@@ -9,6 +9,7 @@ const driver = new PostgresDriver({
   port: '5432',
   username: 'postgres',
   database: 'api',
+  ssl: false,
 });
 
 export default function App() {

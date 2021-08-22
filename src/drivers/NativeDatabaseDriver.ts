@@ -13,32 +13,39 @@ export default abstract class NativeDriver extends DatabaseDriver {
     this.#driverName = this.constructor.name;
     this.#driver = driver;
 
-    /*     if (!driver) {
+    if (!driver) {
       throw new Error(
         `Native Module for ${this.#driverName} is not registered`,
       );
     }
 
+    const _connectionInfo: Partial<
+      Record<keyof DatabaseConnectionInfo, string>
+    > = {
+      ...connectionInfo,
+      ssl: connectionInfo.ssl.toString(),
+    };
+
     // Handle hot flush.
     if (__DEV__ && !flushDictionary.includes(this.#driverName)) {
       console.log(`Flushing ${this.#driverName}`);
       const flush = this.#driver.flush();
-      this.#instance = flush.then(() => this.#driver.init(connectionInfo));
+      this.#instance = flush.then(() => this.#driver.init(_connectionInfo));
       flushDictionary.push(this.#driverName);
     } else {
-      this.#instance = this.#driver.init(connectionInfo);
+      this.#instance = this.#driver.init(_connectionInfo);
     }
 
     this.#instance.then(id => {
       this.#instanceId = id;
       console.log(`Native ${this.#driverName} Instance: `, id);
-    }); */
+    });
   }
 
   #driverName: string;
   #driver: INativeDatabaseDriver;
   #instance: Promise<number>;
-  #instanceId: number;
+  #instanceId: number = -1;
 
   protected override async _connect(): Promise<void> {
     await this.#instance;
