@@ -53,10 +53,11 @@ export default function Editor(): JSX.Element {
         break;
 
       case 'loaded':
-        setIsVisible(true);
         updateOptions({
-          contextmenu: true,
+          contextmenu: false,
+          lineNumbers: 'off',
         });
+        setIsVisible(true);
 
         if (typeof viewRef.current?.requestFocus === 'function') {
           viewRef.current.requestFocus();
