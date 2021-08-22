@@ -3,9 +3,11 @@
 import * as React from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import WebView from 'react-native-webview';
+import {openContextMenu} from '../../utils/contextMenu';
 
 export default function Editor(): JSX.Element {
   const [isVisible, setIsVisible] = React.useState(true);
+  const containerRef = React.useRef<View>(null);
   const viewRef = React.useRef<WebView>(null);
 
   let editorBaseUri: string;
@@ -71,6 +73,14 @@ export default function Editor(): JSX.Element {
         break;
 
       case 'contextMenu':
+        containerRef.current?.measure(
+          (_x, _y, _width, _height, pageX, pageY) => {
+            openContextMenu(
+              pageX + message.event.pos.x,
+              pageY + message.event.pos.y,
+            );
+          },
+        );
         break;
 
       default:
@@ -84,10 +94,7 @@ export default function Editor(): JSX.Element {
   };
 
   return (
-    <View style={styles.container}>
-      {/*       <TouchableWithoutFeedback onLongPress={e => console.log('Long Press', e)}>
-        <Text>Test Touch</Text>
-      </TouchableWithoutFeedback> */}
+    <View ref={containerRef} style={styles.container}>
       <WebView
         ref={viewRef}
         style={viewStyle}

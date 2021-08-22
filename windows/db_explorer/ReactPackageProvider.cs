@@ -1,4 +1,5 @@
 using Microsoft.ReactNative;
+using Microsoft.ReactNative.Managed;
 
 namespace db_explorer
 {
@@ -6,6 +7,7 @@ namespace db_explorer
     {
         public void CreatePackage(IReactPackageBuilder packageBuilder)
         {
+            packageBuilder.AddAttributedModules();
             CreatePackageImplementation(packageBuilder);
         }
 
