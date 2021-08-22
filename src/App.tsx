@@ -16,7 +16,9 @@ export default function App() {
         title="Run"
         onPress={() => {
           driver
-            .connect('Username=postgres;Host=localhost;Port=5432;Database=api;')
+            .connect(
+              'Username=postgres;Host=192.168.1.10;Port=5432;Database=api;',
+            )
             .then(() => {
               driver
                 .execute(sql)
