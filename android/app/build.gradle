@@ -1,4 +1,5 @@
 apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
 
 import com.android.build.OutputFile
 
@@ -126,7 +127,10 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     sourceSets { 
-        main { assets.srcDirs = ['../../assets'] } 
+        main {
+            java.srcDirs += 'src/main/kotlin'
+            assets.srcDirs = ['../../assets'] 
+        } 
     }
 
     defaultConfig {
@@ -183,6 +187,8 @@ android {
 }
 
 dependencies {
+    implementation 'androidx.core:core-ktx:1.3.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDynamicVersion
     implementation "com.facebook.react:react-native:+"  // From node_modules

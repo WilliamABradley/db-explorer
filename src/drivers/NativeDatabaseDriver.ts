@@ -13,7 +13,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
     this.#driverName = this.constructor.name;
     this.#driver = driver;
 
-    if (!driver) {
+    /*     if (!driver) {
       throw new Error(
         `Native Module for ${this.#driverName} is not registered`,
       );
@@ -32,7 +32,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
     this.#instance.then(id => {
       this.#instanceId = id;
       console.log(`Native ${this.#driverName} Instance: `, id);
-    });
+    }); */
   }
 
   #driverName: string;
