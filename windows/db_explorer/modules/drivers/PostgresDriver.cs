@@ -23,14 +23,44 @@ namespace db_explorer.modules.drivers
             throw new NullReferenceException($"Connection {id} doesn't exist");
         }
 
+        [ReactMethod("init")]
+        public Task<int> Init(Dictionary<string, string> options)
+        {
+            var connectionStringBuilder = new NpgsqlConnectionStringBuilder
+            {
+                Host = options["host"],
+                Port = Convert.ToInt32(options["port"]),
+            };
+
+            if(options.TryGetValue("username", out string username))
+            {
+                connectionStringBuilder.Username = username;
+            }
+
+            if (options.TryGetValue("password", out string password))
+            {
+                connectionStringBuilder.Password = password;
+            }
+
+            if (options.TryGetValue("database", out string database))
+            {
+                connectionStringBuilder.Database = database;
+            }
+
+            var connection = new NpgsqlConnection(connectionStringBuilder.ToString());
+
+            var id = Instances.Count;
+            Instances.Add(id, connection);
+            return Task.FromResult(id);
+        }
+
         [ReactMethod("connect")]
-        public Task Connect(int id, string connectionString)
+        public Task Connect(int id)
         {
             return Task.Run(async () =>
             {
-                var connection = new NpgsqlConnection(connectionString);
+                var connection = GetConnection(id);
                 await connection.OpenAsync();
-                Instances.Add(id, connection);
             });
         }
 
@@ -72,13 +102,20 @@ namespace db_explorer.modules.drivers
             });
         }
 
-        public void Dispose()
+        [ReactMethod("flush")]
+        public Task Flush()
         {
             foreach (var instance in Instances)
             {
                 instance.Value.Dispose();
                 Instances.Remove(instance.Key);
             }
+            return Task.CompletedTask;
+        }
+
+        public void Dispose()
+        {
+            Flush();
         }
     }
 }

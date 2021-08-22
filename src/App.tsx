@@ -4,7 +4,12 @@ import {StyleSheet, View, Text, Button, ScrollView} from 'react-native';
 import Editor from './components/Editor';
 import PostgresDriver from './drivers/postgres';
 
-const driver = new PostgresDriver();
+const driver = new PostgresDriver({
+  host: '192.168.1.10',
+  port: '5432',
+  username: 'postgres',
+  database: 'api',
+});
 
 export default function App() {
   const [sql, setSQL] = useState('SELECT * FROM INFORMATION_SCHEMA.TABLES;');
@@ -15,17 +20,13 @@ export default function App() {
       <Button
         title="Run"
         onPress={() => {
-          driver
-            .connect(
-              'Username=postgres;Host=192.168.1.10;Port=5432;Database=api;',
-            )
-            .then(() => {
-              driver
-                .execute(sql)
-                .then(results =>
-                  setResults(JSON.stringify(JSON.parse(results), null, 4)),
-                );
-            });
+          driver.connect().then(() => {
+            driver
+              .execute(sql)
+              .then(results =>
+                setResults(JSON.stringify(JSON.parse(results), null, 4)),
+              );
+          });
         }}
       />
       <Editor value={sql} onChange={setSQL} />

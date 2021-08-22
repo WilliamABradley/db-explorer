@@ -12,7 +12,8 @@ export type EditorProps = {
 };
 
 export default function Editor({value, onChange}: EditorProps): JSX.Element {
-  const [isLoaded, setIsLoaded] = React.useState(false);
+  // Show frame at startup in dev.
+  const [isLoaded, setIsLoaded] = React.useState(__DEV__);
   const containerRef = React.useRef<View>(null);
   const viewRef = React.useRef<WebView>(null);
 
