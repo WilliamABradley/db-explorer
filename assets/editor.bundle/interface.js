@@ -1,11 +1,18 @@
+/* eslint-disable no-undef */
+// @ts-check
 /// <reference path="./Global.d.ts" />
 /// <reference path="./monaco-editor/monaco.d.ts" />
+/// <reference lib="dom" />
 
-/* eslint-disable no-undef */
 // Supress updates to selection when making edits.
 var modifyingSelection = false;
 var overrideContextMenu = false;
 
+/**
+ *
+ * @param {HTMLElement} element
+ * @returns {monaco.editor.IEditor}
+ */
 function init(element) {
   editor = monaco.editor.create(element, {
     value: ['function x() {', '\tconsole.log("Hello world!");', '}'].join('\n'),
@@ -20,7 +27,10 @@ function init(element) {
     editor.layout();
   });
 
-  model = editor.getModel();
+  const _model = editor.getModel();
+  if (_model) {
+    model = _model;
+  }
 
   // Listen for Content Changes
   model.onDidChangeContent(event => {
@@ -49,6 +59,10 @@ function init(element) {
   return editor;
 }
 
+/**
+ * @param {string} type
+ * @param {any} message
+ */
 function receiveMessage(type, message) {
   switch (type) {
     case 'UpdateOptions':

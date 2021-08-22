@@ -6,4 +6,4 @@ declare function receiveMessage(type: string, message: string): void;
 declare function sendValue(name: string, value: any): void;
 
 declare var editor: monaco.editor.IStandaloneCodeEditor;
-declare var model: monaco.editor.IEditorModel;
+declare var model: monaco.editor.ITextModel;

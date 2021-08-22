@@ -70,5 +70,5 @@ function copyDir(dir, rewrite = true) {
   }
 }
 
-copyDir('dev/vs', false);
-copyDir('min/vs');
+//copyDir('dev/vs', false);
+copyDir('min/vs', false);
