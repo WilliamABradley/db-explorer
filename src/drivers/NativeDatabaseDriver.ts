@@ -26,11 +26,16 @@ export default abstract class NativeDriver extends DatabaseDriver {
       ssl: connectionInfo.ssl.toString(),
     };
 
+    console.debug(`Aquiring Native ${this.#driverName} Instance`);
+
     // Handle hot flush.
     if (__DEV__ && !flushDictionary.includes(this.#driverName)) {
-      console.log(`Flushing ${this.#driverName}`);
+      console.debug(`Flushing ${this.#driverName}`);
       const flush = this.#driver.flush();
-      this.#instance = flush.then(() => this.#driver.init(_connectionInfo));
+      this.#instance = flush.then(() => {
+        console.debug(`Initialising ${this.#driverName}`);
+        return this.#driver.init(_connectionInfo);
+      });
       flushDictionary.push(this.#driverName);
     } else {
       this.#instance = this.#driver.init(_connectionInfo);
@@ -38,7 +43,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
 
     this.#instance.then(id => {
       this.#instanceId = id;
-      console.log(`Native ${this.#driverName} Instance: `, id);
+      console.debug(`Native ${this.#driverName} Instance: `, id);
     });
   }
 
@@ -49,17 +54,24 @@ export default abstract class NativeDriver extends DatabaseDriver {
 
   protected override async _connect(): Promise<void> {
     await this.#instance;
-    return this.#driver.connect(this.#instanceId);
+    console.debug(`Connecting ${this.#driverName}: ${this.#instanceId}`);
+    await this.#driver.connect(this.#instanceId);
+    console.debug(`Connected ${this.#driverName}: ${this.#instanceId}`);
   }
 
   protected override async _close(): Promise<void> {
-    return this.#driver.close(this.#instanceId);
+    console.debug(`Closing ${this.#driverName}: ${this.#instanceId}`);
+    await this.#driver.close(this.#instanceId);
+    console.debug(`Closed ${this.#driverName}: ${this.#instanceId}`);
   }
 
   protected override async _execute(
     sql: string,
     variables?: Record<string, any>,
   ): Promise<string> {
-    return this.#driver.execute(this.#instanceId, sql, variables);
+    console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
+    const result = await this.#driver.execute(this.#instanceId, sql, variables);
+    console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
+    return result;
   }
 }

@@ -4,112 +4,109 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
-import org.jooq.impl.DSL
+import com.github.jasync.sql.db.Connection
+import com.github.jasync.sql.db.postgresql.PostgreSQLConnectionBuilder
+import com.google.gson.GsonBuilder
 import java.lang.NullPointerException
-import java.sql.Connection
-import java.sql.DriverManager
 import java.util.*
-import java.util.concurrent.CompletableFuture
 import kotlin.collections.HashMap
-
-class JDBCData(connectionString: String, properties: Properties) {
-  var connectionString: String = connectionString;
-  var properties: Properties = properties;
-}
-
-var ConnectionInfo: HashMap<Int, JDBCData> = HashMap();
-var Instances: HashMap<Int, Connection> = HashMap();
-
-fun getConnection(id: Int): Connection {
-  if(Instances.containsKey(id)) {
-    return Instances[id] as Connection;
-  }
-  throw NullPointerException("Connection $id doesn't exist");
-}
 
 class PostgresDriver(context: ReactApplicationContext): NativeDatabaseDriver(context) {
   override fun getName(): String {
     return "PostgresDriver";
   }
 
+  private var instances: HashMap<Int, Connection> = HashMap();
+
+  fun getConnection(id: Int): Connection {
+    if(instances.containsKey(id)) {
+      return instances[id] as Connection;
+    }
+    throw NullPointerException("Connection $id doesn't exist");
+  }
+
   // Bindings.
   @ReactMethod
   override fun init(connectionInfo: ReadableMap, promise: Promise) {
-    super.init(connectionInfo, promise)
+    try {
+      var getConfig = fun (key: String): String? {
+        if (connectionInfo.hasKey(key)) {
+          return connectionInfo.getString(key);
+        }
+        return null;
+      };
+
+      var connectionString = "jdbc:postgresql://${getConfig("host")}:${getConfig("port")}/${getConfig("database") ?: "postgres"}";
+      var properties = Properties();
+      properties.setProperty("ssl", getConfig("ssl"));
+      if(connectionInfo.hasKey("username")) {
+        properties.setProperty("user", getConfig("username"));
+      }
+      if(connectionInfo.hasKey("password")) {
+        properties.setProperty("password", getConfig("password"));
+      }
+
+      var id = instances.count();
+      instances[id] = PostgreSQLConnectionBuilder.createConnectionPool(connectionString);
+      promise.resolve(id);
+    } catch (e: Throwable) {
+      promise.reject(e);
+    }
   }
+
   @ReactMethod
   override fun connect(id: Int, promise: Promise) {
-    super.connect(id, promise)
+    getConnection(id)
+      .connect()
+      .thenAccept{
+        promise.resolve(null);
+      }
+      .exceptionally {
+        promise.reject(it);
+        null
+      }
   }
+
   @ReactMethod
   override fun close(id: Int, promise: Promise) {
-    super.close(id, promise)
+    getConnection(id)
+      .disconnect()
+      .thenAccept{
+        promise.resolve(null);
+      }
+      .exceptionally {
+        promise.reject(it);
+        null
+      }
   }
+
   @ReactMethod
   override fun execute(id: Int, sql: String, variables: ReadableMap?, promise: Promise) {
-    super.execute(id, sql, variables, promise)
+    var connection = getConnection(id);
+    var results = connection.sendPreparedStatement(sql);
+
+    results
+      .thenAccept {
+        val json = GsonBuilder().create();
+        promise.resolve(json.toJson(it.rows));
+      }
+      .exceptionally {
+        promise.reject(it);
+        null
+      }
   }
 
   @ReactMethod
-  override fun flush(promise: Promise) {
-    super.flush(promise)
-  }
+  override fun flush(promise: Promise?) {
+    try {
+      instances.forEach {
+        it.value.disconnect()
+      }
+      instances.clear();
 
-  override fun driverInit(connectionInfo: HashMap<String, String>): CompletableFuture<Int> {
-    Class.forName("org.postgresql.Driver").newInstance();
-    var connectionString = "jdbc:postgresql://${connectionInfo["host"]}:${connectionInfo["port"]}/${connectionInfo.getOrDefault("database", "postgres")}";
-    var properties = Properties();
-    properties.setProperty("ssl", connectionInfo["ssl"]);
-    if(connectionInfo.containsKey("username")) {
-      properties.setProperty("user", connectionInfo["username"]);
+      promise?.resolve(null);
+    } catch (e: Throwable) {
+      promise?.reject(e);
     }
-    if(connectionInfo.containsKey("password")) {
-      properties.setProperty("password", connectionInfo["password"]);
-    }
-
-    var id = ConnectionInfo.count();
-    ConnectionInfo[id] = JDBCData(connectionString, properties);
-    return CompletableFuture.completedFuture(id);
-  }
-
-  override fun driverConnect(id: Int): CompletableFuture<Unit> {
-    var connectionInfo = ConnectionInfo[id];
-    if(connectionInfo == null) {
-      throw NullPointerException("Connection $id doesn't exist");
-    }
-    var connection = DriverManager.getConnection(connectionInfo.connectionString, connectionInfo.properties);
-    Instances[id] = connection;
-    return CompletableFuture();
-  }
-
-  override fun driverClose(id: Int): CompletableFuture<Unit> {
-    getConnection(id)
-      .close();
-    return CompletableFuture();
-  }
-
-  override fun driverExecute(
-    id: Int,
-    sql: String,
-    variables: HashMap<String, String>
-  ): CompletableFuture<String> {
-    var connection = getConnection(id);
-    var statement = connection.createStatement();
-    var results = statement.executeQuery(sql);
-
-    var response = DSL.using(connection)
-      .fetch(results)
-      .formatJSON();
-
-    return CompletableFuture
-      .completedFuture(response);
-  }
-
-  override fun driverFlush() {
-    Instances.forEach {
-      it.value.close();
-    }
-    Instances.clear();
-    ConnectionInfo.clear();
   }
 }

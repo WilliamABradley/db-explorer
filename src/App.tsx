@@ -26,13 +26,21 @@ export default function App() {
             });
           }
 
-          driver.connect().then(() => {
-            driver
-              .execute(sql)
-              .then(results =>
-                setResults(JSON.stringify(JSON.parse(results), null, 4)),
-              );
-          });
+          driver
+            .connect()
+            .then(() => {
+              driver
+                .execute(sql)
+                .then(results =>
+                  setResults(JSON.stringify(JSON.parse(results), null, 4)),
+                )
+                .catch(e => {
+                  console.error(e);
+                });
+            })
+            .catch(e => {
+              console.error(e);
+            });
         }}
       />
       <Editor value={sql} onChange={setSQL} />
