@@ -1,6 +1,9 @@
 package com.db_explorer.modules.drivers
 
+import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.ReadableMap
 import org.jooq.impl.DSL
 import java.lang.NullPointerException
 import java.sql.Connection
@@ -24,9 +27,32 @@ fun getConnection(id: Int): Connection {
   throw NullPointerException("Connection $id doesn't exist");
 }
 
-class PostgresDriver(context: ReactApplicationContext) : NativeDatabaseDriver(context) {
+class PostgresDriver(context: ReactApplicationContext): NativeDatabaseDriver(context) {
   override fun getName(): String {
     return "PostgresDriver";
+  }
+
+  // Bindings.
+  @ReactMethod
+  override fun init(connectionInfo: ReadableMap, promise: Promise) {
+    super.init(connectionInfo, promise)
+  }
+  @ReactMethod
+  override fun connect(id: Int, promise: Promise) {
+    super.connect(id, promise)
+  }
+  @ReactMethod
+  override fun close(id: Int, promise: Promise) {
+    super.close(id, promise)
+  }
+  @ReactMethod
+  override fun execute(id: Int, sql: String, variables: ReadableMap?, promise: Promise) {
+    super.execute(id, sql, variables, promise)
+  }
+
+  @ReactMethod
+  override fun flush(promise: Promise) {
+    super.flush(promise)
   }
 
   override fun driverInit(connectionInfo: HashMap<String, String>): CompletableFuture<Int> {

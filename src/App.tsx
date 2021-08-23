@@ -2,15 +2,10 @@ import * as React from 'react';
 import {useState} from 'react';
 import {StyleSheet, View, Text, Button, ScrollView} from 'react-native';
 import Editor from './components/Editor';
+import DatabaseDriver from './drivers/DatabaseDriver';
 import PostgresDriver from './drivers/postgres';
 
-const driver = new PostgresDriver({
-  host: '192.168.1.10',
-  port: '5432',
-  username: 'postgres',
-  database: 'api',
-  ssl: false,
-});
+let driver: DatabaseDriver;
 
 export default function App() {
   const [sql, setSQL] = useState('SELECT * FROM INFORMATION_SCHEMA.TABLES;');
@@ -21,6 +16,16 @@ export default function App() {
       <Button
         title="Run"
         onPress={() => {
+          if (!driver) {
+            driver = new PostgresDriver({
+              host: '192.168.1.10',
+              port: '5432',
+              username: 'postgres',
+              database: 'api',
+              ssl: false,
+            });
+          }
+
           driver.connect().then(() => {
             driver
               .execute(sql)

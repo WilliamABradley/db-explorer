@@ -13,7 +13,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
     this.#driverName = this.constructor.name;
     this.#driver = driver;
 
-    if (!driver) {
+    if (typeof driver === 'undefined') {
       throw new Error(
         `Native Module for ${this.#driverName} is not registered`,
       );

@@ -8,26 +8,24 @@ import com.facebook.react.*
 import android.webkit.WebView
 
 class MainApplication : Application(), ReactApplication {
-    private val mReactNativeHost: ReactNativeHost = object : ReactNativeHost(this) {
-        override fun getUseDeveloperSupport(): Boolean {
-            return BuildConfig.DEBUG;
-        }
-
-        override fun getPackages(): MutableList<ReactPackage> {
-            var packages = PackageList(this).packages;
-            // Packages that cannot be autolinked yet can be added manually here, for example:
-            // packages.add(new MyReactNativePackage());
-            packages.add(ReactPackageProvider());
-            return packages;
-        }
-
-        override fun getJSMainModuleName(): String {
-            return "index";
-        }
-    }
-
     override fun getReactNativeHost(): ReactNativeHost {
-        return mReactNativeHost;
+        return object : ReactNativeHost(this) {
+            override fun getUseDeveloperSupport(): Boolean {
+                return BuildConfig.DEBUG;
+            }
+
+            override fun getPackages(): MutableList<ReactPackage> {
+                var initPackages = PackageList(this).packages;
+                // Packages that cannot be autolinked yet can be added manually here, for example:
+                // packages.add(MyReactNativePackage());
+                initPackages.add(ReactPackageProvider());
+                return initPackages;
+            }
+
+            override fun getJSMainModuleName(): String {
+                return "index";
+            }
+        };
     }
 
     override fun onCreate() {
@@ -36,7 +34,7 @@ class MainApplication : Application(), ReactApplication {
             WebView.setWebContentsDebuggingEnabled(true)
         }
         SoLoader.init(this,  /* native exopackage */false)
-        initializeFlipper(this, reactNativeHost.getReactInstanceManager())
+        initializeFlipper(this, reactNativeHost.reactInstanceManager)
     }
 
     companion object {

@@ -16,29 +16,25 @@ fun <T> futureToPromise(future: CompletableFuture<T>, promise: Promise) {
 }
 
 abstract class NativeDatabaseDriver(context: ReactApplicationContext) : ReactContextBaseJavaModule(context), INativeDatabaseDriver {
-    @ReactMethod
-    fun init(connectionInfo: ReadableMap, promise: Promise): Unit {
+    open fun init(connectionInfo: ReadableMap, promise: Promise): Unit {
         futureToPromise(driverInit(connectionInfo.toHashMap() as HashMap<String, String>), promise);
     }
 
-    @ReactMethod
-    fun connect(id: Int, promise: Promise): Unit {
+    open fun connect(id: Int, promise: Promise): Unit {
         futureToPromise(driverConnect(id), promise);
     }
 
-    @ReactMethod
-    fun close(id: Int, promise: Promise): Unit {
+    open fun close(id: Int, promise: Promise): Unit {
         futureToPromise(driverClose(id), promise);
     }
 
-    @ReactMethod
-    fun execute(id: Int, sql: String, variables: ReadableMap?, promise: Promise): Unit {
+    open fun execute(id: Int, sql: String, variables: ReadableMap?, promise: Promise): Unit {
         futureToPromise(driverExecute(id, sql, variables?.toHashMap() as HashMap<String, String>), promise);
     }
 
-    @ReactMethod
-    fun flush(): Unit {
+    open fun flush(promise: Promise): Unit {
         driverFlush();
+        promise.resolve(null);
     }
 
     override fun invalidate() {

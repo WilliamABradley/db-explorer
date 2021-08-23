@@ -101,7 +101,7 @@ function copyDir(source, dest, transpile = true) {
   }
 }
 
-copyDir('monaco-editor/min/vs', 'min/vs', false);
+copyDir('monaco-editor/min/vs', 'min/vs', true);
 
 fs.writeFileSync(
   path.resolve(destDir, 'info.js'),
