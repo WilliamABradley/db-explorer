@@ -1,9 +1,13 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {StyleSheet, View, Text, Button, ScrollView} from 'react-native';
+import {StyleSheet, View, Text, Button, ScrollView, NativeModules, Platform} from 'react-native';
 import Editor from './components/Editor';
 import DatabaseDriver from './drivers/DatabaseDriver';
 import PostgresDriver from './drivers/postgres';
+
+if(__DEV__ && Platform.OS === 'windows') { 
+  console.log(`Registered Native Modules: ${Object.entries(NativeModules)}`);
+}
 
 let driver: DatabaseDriver;
 
@@ -54,6 +58,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
+    marginTop: 80,
     width: '100%',
     height: '100%',
   },

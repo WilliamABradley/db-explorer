@@ -1,4 +1,4 @@
-import DatabaseDriver, {DatabaseConnectionInfo} from './DatabaseDriver';
+import DatabaseDriver, { DatabaseConnectionInfo } from './DatabaseDriver';
 import INativeDatabaseDriver from './interfaces/INativeDatabaseDriver';
 
 // Logic to ensure hot reload doesn't leave connections open.
@@ -13,7 +13,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
     this.#driverName = this.constructor.name;
     this.#driver = driver;
 
-    if (typeof driver === 'undefined') {
+    if (driver === undefined || driver === null) {
       throw new Error(
         `Native Module for ${this.#driverName} is not registered`,
       );
@@ -29,7 +29,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
     console.debug(`Aquiring Native ${this.#driverName} Instance`);
 
     // Handle hot flush.
-    if (__DEV__ && !flushDictionary.includes(this.#driverName)) {
+    if (false && __DEV__ && !flushDictionary.includes(this.#driverName)) {
       console.debug(`Flushing ${this.#driverName}`);
       const flush = this.#driver.flush();
       this.#instance = flush.then(() => {
