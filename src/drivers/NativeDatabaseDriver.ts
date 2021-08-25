@@ -29,7 +29,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
     console.debug(`Aquiring Native ${this.#driverName} Instance`);
 
     // Handle hot flush.
-    if (false && __DEV__ && !flushDictionary.includes(this.#driverName)) {
+    if (__DEV__ && !flushDictionary.includes(this.#driverName)) {
       console.debug(`Flushing ${this.#driverName}`);
       const flush = this.#driver.flush();
       this.#instance = flush.then(() => {

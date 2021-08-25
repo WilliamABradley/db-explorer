@@ -32,16 +32,9 @@ export default function App() {
 
           driver
             .connect()
-            .then(() => {
-              driver
-                .execute(sql)
-                .then(results =>
-                  setResults(JSON.stringify(JSON.parse(results), null, 4)),
-                )
-                .catch(e => {
-                  console.error(e);
-                });
-            })
+            .then(() => driver.execute(sql))
+            .then(results => setResults(JSON.stringify(JSON.parse(results), null, 4)))
+            .then(() => driver.close())
             .catch(e => {
               console.error(e);
             });
