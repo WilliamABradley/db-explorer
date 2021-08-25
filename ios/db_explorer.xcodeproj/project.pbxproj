@@ -9,7 +9,10 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* db_explorerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* db_explorerTests.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		2171219E26D529ED009D382C /* drivers in Resources */ = {isa = PBXBuildFile; fileRef = 2171219D26D529ED009D382C /* drivers */; };
+		21519ABF26D66555003B0409 /* NativeDatabaseDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519ABB26D66555003B0409 /* NativeDatabaseDriver.swift */; };
+		21519AC026D66555003B0409 /* NativeDatabaseDriverProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519ABC26D66555003B0409 /* NativeDatabaseDriverProtocol.swift */; };
+		21519AC126D66555003B0409 /* PostgresDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519ABD26D66555003B0409 /* PostgresDriver.swift */; };
+		21519AC326D66633003B0409 /* PostgresDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 21519AC226D66633003B0409 /* PostgresDriver.m */; };
 		21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B708B926D5123700A27C5B /* AppDelegate.swift */; };
 		21F6AB3A26D147D00093BEC5 /* editor.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 21F6AB3926D147D00093BEC5 /* editor.bundle */; };
 		6C6679D22FB5287CC158E06C /* libPods-db_explorer-db_explorerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEFA357FBE069344366D11E1 /* libPods-db_explorer-db_explorerTests.a */; };
@@ -35,7 +38,10 @@
 		13B07F961A680F5B00A75B9A /* db_explorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = db_explorer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = db_explorer/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = db_explorer/Info.plist; sourceTree = "<group>"; };
-		2171219D26D529ED009D382C /* drivers */ = {isa = PBXFileReference; lastKnownFileType = folder; name = drivers; path = db_explorer/drivers; sourceTree = "<group>"; };
+		21519ABB26D66555003B0409 /* NativeDatabaseDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeDatabaseDriver.swift; sourceTree = "<group>"; };
+		21519ABC26D66555003B0409 /* NativeDatabaseDriverProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeDatabaseDriverProtocol.swift; sourceTree = "<group>"; };
+		21519ABD26D66555003B0409 /* PostgresDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgresDriver.swift; sourceTree = "<group>"; };
+		21519AC226D66633003B0409 /* PostgresDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostgresDriver.m; sourceTree = "<group>"; };
 		21B708B926D5123700A27C5B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = db_explorer/AppDelegate.swift; sourceTree = "<group>"; };
 		21B708BB26D5126000A27C5B /* db_explorer-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "db_explorer-Bridging-Header.h"; path = "db_explorer/db_explorer-Bridging-Header.h"; sourceTree = "<group>"; };
 		21F6AB3926D147D00093BEC5 /* editor.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = editor.bundle; path = ../assets/editor.bundle; sourceTree = "<group>"; };
@@ -88,7 +94,7 @@
 		13B07FAE1A68108700A75B9A /* db_explorer */ = {
 			isa = PBXGroup;
 			children = (
-				2171219D26D529ED009D382C /* drivers */,
+				21519AB926D66555003B0409 /* drivers */,
 				21B708BB26D5126000A27C5B /* db_explorer-Bridging-Header.h */,
 				21F6AB3926D147D00093BEC5 /* editor.bundle */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -97,6 +103,18 @@
 				21B708B926D5123700A27C5B /* AppDelegate.swift */,
 			);
 			name = db_explorer;
+			sourceTree = "<group>";
+		};
+		21519AB926D66555003B0409 /* drivers */ = {
+			isa = PBXGroup;
+			children = (
+				21519ABB26D66555003B0409 /* NativeDatabaseDriver.swift */,
+				21519ABC26D66555003B0409 /* NativeDatabaseDriverProtocol.swift */,
+				21519AC226D66633003B0409 /* PostgresDriver.m */,
+				21519ABD26D66555003B0409 /* PostgresDriver.swift */,
+			);
+			name = drivers;
+			path = db_explorer/drivers;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -247,7 +265,6 @@
 			files = (
 				21F6AB3A26D147D00093BEC5 /* editor.bundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				2171219E26D529ED009D382C /* drivers in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -416,6 +433,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */,
+				21519ABF26D66555003B0409 /* NativeDatabaseDriver.swift in Sources */,
+				21519AC126D66555003B0409 /* PostgresDriver.swift in Sources */,
+				21519AC026D66555003B0409 /* NativeDatabaseDriverProtocol.swift in Sources */,
+				21519AC326D66633003B0409 /* PostgresDriver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

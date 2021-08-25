@@ -27,7 +27,7 @@ class PostgresDriver(context: ReactApplicationContext): NativeDatabaseDriver(con
 
   // Bindings.
   @ReactMethod
-  override fun init(connectionInfo: ReadableMap, promise: Promise) {
+  override fun create(connectionInfo: ReadableMap, promise: Promise) {
     try {
       var getConfig = fun (key: String): String? {
         if (connectionInfo.hasKey(key)) {

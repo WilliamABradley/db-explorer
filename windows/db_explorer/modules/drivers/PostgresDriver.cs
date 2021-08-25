@@ -23,8 +23,8 @@ namespace db_explorer.modules.drivers
             throw new NullReferenceException($"Connection {id} doesn't exist");
         }
 
-        [ReactMethod("init")]
-        public Task<int> Init(Dictionary<string, string> options)
+        [ReactMethod("create")]
+        public Task<int> Create(Dictionary<string, string> options)
         {
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder
             {

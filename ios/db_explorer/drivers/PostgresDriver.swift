@@ -5,13 +5,22 @@ enum PostgresDriverError : Error {
 }
 
 @objc(PostgresDriver)
-class PostgresDriver : NativeDatabaseDriver, NativeDatabaseDriverProtocol {
-  @objc func test() {
-    RCTLogInfo("test")
+class PostgresDriver : NSObject {
+  @objc static func requiresMainQueueSetup() -> Bool {
+      return false
   }
-    
-  func driverInit(connectionInfo: NSDictionary) throws -> Int {
-    throw PostgresDriverError.TestError
+  
+  @objc func create(_ connectionInfo: NSDictionary, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    do {
+      let id = try driverCreate(connectionInfo: connectionInfo)
+      resolve(id)
+    } catch {
+      reject("native_driver_create", error.localizedDescription, error)
+    }
+  }
+  
+  func driverCreate(connectionInfo: NSDictionary) throws -> Int {
+    return -1
   }
   
   func driverConnect(id: Int) throws {

@@ -5,18 +5,16 @@ class NativeDatabaseDriver : NSObject {
   // Expect subclass to implement the protocol
   var driver: NativeDatabaseDriverProtocol = self as Any as! NativeDatabaseDriverProtocol
   
-  @objc
-  func `init`(connectionInfo: NSDictionary, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func create(connectionInfo: NSDictionary, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     do {
-      let id = try driver.driverInit(connectionInfo: connectionInfo)
+      let id = try driver.driverCreate(connectionInfo: connectionInfo)
       resolve(id)
     } catch {
-      reject("native_driver_init", error.localizedDescription, error)
+      reject("native_driver_create", error.localizedDescription, error)
     }
   }
   
-  @objc
-  func connect(id: NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func connect(id: NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     do {
       try driver.driverConnect(id: id)
       resolve(nil)
@@ -25,8 +23,7 @@ class NativeDatabaseDriver : NSObject {
     }
   }
   
-  @objc
-  func close(id: NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func close(id: NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     do {
       try driver.driverClose(id: id)
       resolve(nil)
@@ -35,8 +32,7 @@ class NativeDatabaseDriver : NSObject {
     }
   }
   
-  @objc
-  func execute(id: NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func execute(id: NSInteger, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     do {
       try driver.driverClose(id: id)
       resolve(nil)
@@ -45,8 +41,7 @@ class NativeDatabaseDriver : NSObject {
     }
   }
   
-  @objc
-  func flush(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+  @objc func flush(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
     do {
       try driver.driverFlush()
       resolve(nil)

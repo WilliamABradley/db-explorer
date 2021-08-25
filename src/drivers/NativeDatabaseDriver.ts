@@ -34,11 +34,11 @@ export default abstract class NativeDriver extends DatabaseDriver {
       const flush = this.#driver.flush();
       this.#instance = flush.then(() => {
         console.debug(`Initialising ${this.#driverName}`);
-        return this.#driver.init(_connectionInfo);
+        return this.#driver.create(_connectionInfo);
       });
       flushDictionary.push(this.#driverName);
     } else {
-      this.#instance = this.#driver.init(_connectionInfo);
+      this.#instance = this.#driver.create(_connectionInfo);
     }
 
     this.#instance.then(id => {

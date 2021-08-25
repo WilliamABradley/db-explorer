@@ -6,7 +6,7 @@ namespace db_explorer.modules.drivers
 {
     public interface INativeDatabaseDriver : IDisposable
     {
-        Task<int> Init(Dictionary<string, string> connectionInfo);
+        Task<int> Create(Dictionary<string, string> connectionInfo);
         Task Connect(int id);
         Task Close(int id);
         Task<string> Execute(int id, string sql, Dictionary<string, object> variables = null);
