@@ -1,5 +1,7 @@
-import DatabaseDriver, { DatabaseConnectionInfo } from './DatabaseDriver';
+import DatabaseConnectionInfo from './models/DatabaseConnectionInfo';
+import DatabaseDriver from './DatabaseDriver';
 import INativeDatabaseDriver from './interfaces/INativeDatabaseDriver';
+import DatabaseQueryResult from './models/DatabaseQueryResult';
 
 // Logic to ensure hot reload doesn't leave connections open.
 const flushDictionary: string[] = [];
@@ -68,7 +70,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
   protected override async _execute(
     sql: string,
     variables?: Record<string, any>,
-  ): Promise<string> {
+  ): Promise<DatabaseQueryResult> {
     console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
     const result = await this.#driver.execute(this.#instanceId, sql, variables);
     console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);

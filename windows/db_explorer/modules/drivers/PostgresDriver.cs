@@ -1,10 +1,11 @@
-﻿using Microsoft.ReactNative.Managed;
-using Newtonsoft.Json;
+﻿using db_explorer.modules.drivers.models;
+using Microsoft.ReactNative.Managed;
 using Npgsql;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Threading.Tasks;
+using System.Linq;
+using Newtonsoft.Json;
 
 namespace db_explorer.modules.drivers
 {
@@ -76,9 +77,9 @@ namespace db_explorer.modules.drivers
         }
 
         [ReactMethod("execute")]
-        public Task<string> Execute(int id, string sql, Dictionary<string, object> variables = null)
+        public Task<DatabaseQueryResult> Execute(int id, string sql, Dictionary<string, object> variables = null)
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 var connection = GetConnection(id);
 
@@ -92,13 +93,53 @@ namespace db_explorer.modules.drivers
                         }
                     }
 
-                    var dataSet = new DataSet();
-                    var dataAdapter = new NpgsqlDataAdapter(command);
-                    dataSet.Reset();
-                    dataAdapter.Fill(dataSet);
+                    command.AllResultTypesAreUnknown = true;
+                    var reader = await command.ExecuteReaderAsync();
+                    using(reader)
+                    {
+                        var columnInfo = await reader.GetColumnSchemaAsync();
+                        var columns = columnInfo.Select(column =>
+                        {
+                            return new DatabaseColumnInfo
+                            {
+                                name = column.ColumnName,
+                                dataType = column.PostgresType.InternalName,
+                            };
+                        });
 
-                    DataTable dataTable = dataSet.Tables[0];
-                    return JsonConvert.SerializeObject(dataTable);
+                        var rows = new List<string[]>();
+                        while (await reader.ReadAsync())
+                        {
+                            var row = new string[reader.FieldCount];
+                            for (int i = 0; i < reader.FieldCount; i++)
+                            {
+                                // Should be string as AllResultTypesAreUnknown=true
+                                //var value = reader.GetValue(i);
+                                string resultValue = null;
+                                //if (value is string valueString)
+                                //{
+                                //    resultValue = valueString;
+                                //}
+                                //else if (value is DBNull)
+                                //{
+                                //    resultValue = null;
+                                //}
+                                //else
+                                //{
+                                //    throw new Exception($"Unknown Value Type: {value.GetType().Name}");
+                                //}
+                                row[i] = resultValue;
+                            }
+                            rows.Add(row);
+                        }
+
+                        return new DatabaseQueryResult
+                        {
+                            columns = columns.ToArray(),
+                            affectedRows = reader.RecordsAffected,
+                            rows = new string[][] { new string[] { "wow" } },
+                        };
+                    }
                 }
             });
         }
