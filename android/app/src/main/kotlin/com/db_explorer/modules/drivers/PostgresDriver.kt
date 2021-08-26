@@ -1,12 +1,12 @@
 package com.db_explorer.modules.drivers
 
+import com.db_explorer.modules.drivers.models.DatabaseQueryResult
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.ReadableMap
 import com.github.jasync.sql.db.Connection
 import com.github.jasync.sql.db.postgresql.PostgreSQLConnectionBuilder
-import com.google.gson.GsonBuilder
 import java.lang.NullPointerException
 import java.util.*
 import kotlin.collections.HashMap
@@ -87,8 +87,13 @@ class PostgresDriver(context: ReactApplicationContext): NativeDatabaseDriver(con
 
     results
       .thenAccept {
-        val json = GsonBuilder().create();
-        promise.resolve(json.toJson(it.rows));
+        it.rows[0].getAs<String>(0);
+        val result = DatabaseQueryResult(
+          _rowsAffected = it.rowsAffected,
+          _columns = arrayOf(),
+          _rows = arrayOf(),
+        )
+        promise.resolve(result);
       }
       .exceptionally {
         promise.reject(it);
