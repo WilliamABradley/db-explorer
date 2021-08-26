@@ -6,6 +6,6 @@ namespace db_explorer.modules.drivers.models
     {
         public DatabaseColumnInfo[] columns { get;  set; }
         public string[][] rows { get; set; }
-        public int affectedRows { get; set; }
+        public long affectedRows { get; set; }
     }
 }

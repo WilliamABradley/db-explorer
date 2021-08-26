@@ -35,6 +35,9 @@ namespace db_explorer
             PackageProviders.Add(new Microsoft.ReactNative.Managed.ReactPackageProvider());
             PackageProviders.Add(new ReactPackageProvider());
 
+            // Link native driver manager.
+            PackageProviders.Add(new driver_manager.ReactPackageProvider());
+
             InitializeComponent();
         }
 
