@@ -1,0 +1,18 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["dylib", "staticlib", "cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+###########
+# ANDROID #
+###########
+
+[target.'cfg(target_os="android")'.dependencies]
+jni = { version = "0.19", default-features = false }
