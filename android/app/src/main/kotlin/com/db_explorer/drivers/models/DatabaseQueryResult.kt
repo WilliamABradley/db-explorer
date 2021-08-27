@@ -1,4 +1,4 @@
-package com.db_explorer.modules.drivers.models
+package com.db_explorer.drivers.models
 
 class DatabaseQueryResult(
     _rowsAffected: Long,

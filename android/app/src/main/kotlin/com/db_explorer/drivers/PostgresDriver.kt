@@ -1,6 +1,6 @@
-package com.db_explorer.modules.drivers
+package com.db_explorer.drivers
 
-import com.db_explorer.modules.drivers.models.DatabaseQueryResult
+import com.db_explorer.drivers.models.DatabaseQueryResult
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactMethod

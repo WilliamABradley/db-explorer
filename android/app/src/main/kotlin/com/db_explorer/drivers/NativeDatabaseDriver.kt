@@ -1,4 +1,4 @@
-package com.db_explorer.modules.drivers
+package com.db_explorer.drivers
 
 import com.facebook.react.bridge.*
 import java.util.concurrent.CompletableFuture
