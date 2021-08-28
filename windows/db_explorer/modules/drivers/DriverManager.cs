@@ -7,13 +7,13 @@ namespace db_explorer.modules.drivers
     [ReactModule(nameof(DriverManager))]
     public class DriverManager
     {
-        [ReactMethod("greet")]
-        public Task<string> Greet(string person)
+        [ReactMethod("sendMessage")]
+        public Task<string> SendMessage(string data)
         {
-           return Task.Run(() => SayHello(person));
+           return Task.Run(() => send_message(data));
         }
 
-        [DllImport("shared.dll", EntryPoint = "say_hello")]
-        private static extern string SayHello(string person);
+        [DllImport("shared.dll", EntryPoint = "send_message")]
+        private static extern string send_message(string data);
     }
 }

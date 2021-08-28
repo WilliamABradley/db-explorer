@@ -6,9 +6,9 @@ class DriverManager : NSObject {
       return false
   }
   
-  @objc func greet(_ person: NSString, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    let input = String(person)
-    let response = say_hello(input)
+  @objc func sendMessage(_ data: NSString, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+    let input = String(data)
+    let response = send_message(input)
     let result = String(cString: response!)
     free(UnsafeMutablePointer(mutating: response))
     resolve(result)

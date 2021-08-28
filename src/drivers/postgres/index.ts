@@ -1,9 +1,8 @@
-import { NativeModules } from 'react-native';
 import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
-import NativeDatabaseDriver from '../NativeDatabaseDriver';
+import NativeMessageDatabaseDriver from '../NativeMessageDatabaseDriver';
 
-export default class PostgresDriver extends NativeDatabaseDriver {
+export default class PostgresDriver extends NativeMessageDatabaseDriver {
   constructor(connectionInfo: DatabaseConnectionInfo) {
-    super(NativeModules.NVPostgresDriver, connectionInfo);
+    super('postgres', connectionInfo);
   }
 }

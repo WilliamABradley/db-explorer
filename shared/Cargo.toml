@@ -9,6 +9,8 @@ crate-type = ["dylib", "staticlib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+json = "0.12.4"
+sqlx = { version = "0.5", features = [ "runtime-async-std-native-tls" ] }
 
 [build-dependencies]
 cargo-lipo = "3.1.1"

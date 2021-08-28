@@ -9,22 +9,16 @@ pub mod android {
   use std::ffi::CString;
 
   #[no_mangle]
-  pub unsafe extern "C" fn Java_com_db_1explorer_DriverManager_sayHello(
+  pub unsafe extern "C" fn Java_com_db_1explorer_DriverManager_send_message(
     env: JNIEnv,
     _: JClass,
-    person: JString,
+    data: JString,
   ) -> jstring {
-    // Our Java companion code might pass-in "world" as a string, hence the name.
-    let world = say_hello(
-      env
-        .get_string(person)
-        .expect("invalid pattern string")
-        .as_ptr(),
-    );
+    let result = send_message(env.get_string(data).expect("Invalid message data").as_ptr());
     // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
-    let world_ptr = CString::from_raw(world);
+    let result_ptr = CString::from_raw(result);
     let output = env
-      .new_string(world_ptr.to_str().unwrap())
+      .new_string(result_ptr.to_str().unwrap())
       .expect("Couldn't create java string!");
 
     output.into_inner()
