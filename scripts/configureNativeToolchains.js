@@ -17,6 +17,7 @@ switch (isWindows) {
     break;
 
   case false:
+    addTargets(platforms.ios);
     break;
 }
 

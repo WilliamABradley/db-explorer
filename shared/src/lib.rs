@@ -10,7 +10,7 @@ pub extern "C" fn say_hello(to: *const c_char) -> *mut c_char {
         Ok(string) => string,
     };
 
-    CString::new("Wow ".to_owned() + recipient)
+    return CString::new("Wow ".to_owned() + recipient)
         .unwrap()
-        .into_raw()
+        .into_raw();
 }

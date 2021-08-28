@@ -8,8 +8,9 @@ const isWindows = os.platform() === 'win32';
 
 const sharedDir = path.resolve(rootDir, 'shared');
 const rustDir = sharedDir;
-const androidDir = path.resolve(rootDir, 'android');
 const windowsDir = path.resolve(rootDir, 'windows');
+const androidDir = path.resolve(rootDir, 'android');
+const iosDir = path.resolve(rootDir, 'ios');
 
 const rust = {
   dir: rustDir,
@@ -47,6 +48,13 @@ const platforms = {
         abi: 'x86_64',
       }
     }
+  },
+  ios: {
+    dir: iosDir,
+    targets: {
+      'aarch64-apple-ios': {},
+      'x86_64-apple-ios': {},
+    },
   },
 };
 

@@ -10,6 +10,9 @@ crate-type = ["dylib", "staticlib"]
 
 [dependencies]
 
+[build-dependencies]
+cargo-lipo = "3.1.1"
+
 ###########
 # ANDROID #
 ###########

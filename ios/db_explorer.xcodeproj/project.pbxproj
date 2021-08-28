@@ -9,10 +9,11 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* db_explorerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* db_explorerTests.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		21519AC126D66555003B0409 /* PostgresDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519ABD26D66555003B0409 /* PostgresDriver.swift */; };
-		21519AC326D66633003B0409 /* PostgresDriver.m in Sources */ = {isa = PBXBuildFile; fileRef = 21519AC226D66633003B0409 /* PostgresDriver.m */; };
 		21519AC526D673DD003B0409 /* NativeDatabaseDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */; };
-		21519AC826D67BF3003B0409 /* PostgresNIO in Frameworks */ = {isa = PBXBuildFile; productRef = 21519AC726D67BF3003B0409 /* PostgresNIO */; };
+		21519ACB26DA0033003B0409 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 21519ACA26DA0018003B0409 /* libresolv.tbd */; };
+		21519ACC26DA0049003B0409 /* libshared.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21519AC926D9FFEE003B0409 /* libshared.a */; };
+		21519ACF26DA0155003B0409 /* DriverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519ACE26DA0155003B0409 /* DriverManager.swift */; };
+		21519AD326DA0472003B0409 /* DriverManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 21519AD226DA0472003B0409 /* DriverManager.m */; };
 		21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B708B926D5123700A27C5B /* AppDelegate.swift */; };
 		21F6AB3A26D147D00093BEC5 /* editor.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 21F6AB3926D147D00093BEC5 /* editor.bundle */; };
 		6C6679D22FB5287CC158E06C /* libPods-db_explorer-db_explorerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEFA357FBE069344366D11E1 /* libPods-db_explorer-db_explorerTests.a */; };
@@ -38,9 +39,12 @@
 		13B07F961A680F5B00A75B9A /* db_explorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = db_explorer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = db_explorer/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = db_explorer/Info.plist; sourceTree = "<group>"; };
-		21519ABD26D66555003B0409 /* PostgresDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostgresDriver.swift; sourceTree = "<group>"; };
-		21519AC226D66633003B0409 /* PostgresDriver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PostgresDriver.m; sourceTree = "<group>"; };
 		21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeDatabaseDriver.swift; sourceTree = "<group>"; };
+		21519AC926D9FFEE003B0409 /* libshared.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libshared.a; path = ../shared/target/universal/release/libshared.a; sourceTree = "<group>"; };
+		21519ACA26DA0018003B0409 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
+		21519ACD26DA007F003B0409 /* shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shared.h; path = ../shared/src/shared.h; sourceTree = "<group>"; };
+		21519ACE26DA0155003B0409 /* DriverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverManager.swift; sourceTree = "<group>"; };
+		21519AD226DA0472003B0409 /* DriverManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DriverManager.m; sourceTree = "<group>"; };
 		21B708B926D5123700A27C5B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = db_explorer/AppDelegate.swift; sourceTree = "<group>"; };
 		21B708BB26D5126000A27C5B /* db_explorer-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "db_explorer-Bridging-Header.h"; path = "db_explorer/db_explorer-Bridging-Header.h"; sourceTree = "<group>"; };
 		21F6AB3926D147D00093BEC5 /* editor.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = editor.bundle; path = ../assets/editor.bundle; sourceTree = "<group>"; };
@@ -66,8 +70,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21519AC826D67BF3003B0409 /* PostgresNIO in Frameworks */,
 				86A518C732D10507BE4318F0 /* libPods-db_explorer.a in Frameworks */,
+				21519ACC26DA0049003B0409 /* libshared.a in Frameworks */,
+				21519ACB26DA0033003B0409 /* libresolv.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,8 +114,8 @@
 			isa = PBXGroup;
 			children = (
 				21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */,
-				21519AC226D66633003B0409 /* PostgresDriver.m */,
-				21519ABD26D66555003B0409 /* PostgresDriver.swift */,
+				21519ACE26DA0155003B0409 /* DriverManager.swift */,
+				21519AD226DA0472003B0409 /* DriverManager.m */,
 			);
 			name = drivers;
 			path = db_explorer/drivers;
@@ -119,6 +124,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				21519ACA26DA0018003B0409 /* libresolv.tbd */,
+				21519AC926D9FFEE003B0409 /* libshared.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				0C5A06D5ACBF0013027866A0 /* libPods-db_explorer.a */,
 				DEFA357FBE069344366D11E1 /* libPods-db_explorer-db_explorerTests.a */,
@@ -136,6 +143,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				21519ACD26DA007F003B0409 /* shared.h */,
 				13B07FAE1A68108700A75B9A /* db_explorer */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* db_explorerTests */,
@@ -210,9 +218,6 @@
 			dependencies = (
 			);
 			name = db_explorer;
-			packageProductDependencies = (
-				21519AC726D67BF3003B0409 /* PostgresNIO */,
-			);
 			productName = db_explorer;
 			productReference = 13B07F961A680F5B00A75B9A /* db_explorer.app */;
 			productType = "com.apple.product-type.application";
@@ -243,9 +248,6 @@
 				Base,
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
-			packageReferences = (
-				21519AC626D67BF3003B0409 /* XCRemoteSwiftPackageReference "postgres-nio" */,
-			);
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -437,10 +439,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				21519AD326DA0472003B0409 /* DriverManager.m in Sources */,
 				21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */,
+				21519ACF26DA0155003B0409 /* DriverManager.swift in Sources */,
 				21519AC526D673DD003B0409 /* NativeDatabaseDriver.swift in Sources */,
-				21519AC126D66555003B0409 /* PostgresDriver.swift in Sources */,
-				21519AC326D66633003B0409 /* PostgresDriver.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,6 +523,45 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/FBReactNativeSpec\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Boost-iOSX\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Fmt\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Folly\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-Glog\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-PeerTalk\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Flipper-RSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/FlipperKit\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCTTypeSafety\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-Core\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-CoreModules\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTAnimation\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTBlob\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTImage\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTLinking\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTNetwork\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTSettings\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTText\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTVibration\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsi\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsiexecutor\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsinspector\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-perflogger\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Yoga\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/YogaKit\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/fmt\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/glog\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/libevent\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-webview\"",
+					"$(PROJECT_DIR)/../shared/target/universal/release",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -546,6 +587,37 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/DoubleConversion\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/FBReactNativeSpec\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCT-Folly\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/RCTTypeSafety\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-Core\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-CoreModules\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTAnimation\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTBlob\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTImage\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTLinking\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTNetwork\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTSettings\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTText\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-RCTVibration\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-cxxreact\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsi\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsiexecutor\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-jsinspector\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/React-perflogger\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/ReactCommon\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Yoga\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/YogaKit\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/fmt\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/glog\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/libevent\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/react-native-webview\"",
+					"$(PROJECT_DIR)/../shared/target/universal/release",
 				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -616,7 +688,6 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
-					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -675,7 +746,6 @@
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
-					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -717,25 +787,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		21519AC626D67BF3003B0409 /* XCRemoteSwiftPackageReference "postgres-nio" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/vapor/postgres-nio.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.6.1;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		21519AC726D67BF3003B0409 /* PostgresNIO */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 21519AC626D67BF3003B0409 /* XCRemoteSwiftPackageReference "postgres-nio" */;
-			productName = PostgresNIO;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 83CBB9F71A601CBA00E9B192 /* Project object */;
 }

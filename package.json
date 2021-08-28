@@ -9,6 +9,7 @@
     "windows": "react-native run-windows --arch x64",
     "preandroid": "node scripts/buildSharedAndroid",
     "android": "react-native run-android",
+    "preios": "node scripts/buildSharedIOS",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
