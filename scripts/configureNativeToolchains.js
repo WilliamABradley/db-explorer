@@ -1,10 +1,22 @@
-const { exec, allTargets } = require('./utils');
+const { exec, platforms, isWindows } = require('./utils');
 const ndk = require('./utils/ndk');
 
-console.log('Ensuring Rust Targets');
-for (const target of allTargets) {
-  exec(`rustup target add ${target}`);
+const addTargets = (platform) => {
+  for (const target of Object.keys(platform.targets)) {
+    exec(`rustup target add ${target}`);
+  }
+};
+
+switch (isWindows) {
+  case true:
+    addTargets(platforms.windows);
+    addTargets(platforms.android);
+
+    console.log();
+    ndk.prepareNDK();
+    break;
+
+  case false:
+    break;
 }
 
-console.log();
-ndk.prepareNDK();

@@ -38,17 +38,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReactNativeWebView", "..\no
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WebViewBridgeComponent", "..\node_modules\react-native-webview\windows\WebViewBridgeComponent\WebViewBridgeComponent.vcxproj", "{FCB612AD-FACC-410C-828C-24B5940B2762}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "driver_manager_shared", "..\cpp\driver_manager_shared.vcxitems", "{8B67C06B-C7B5-4E64-AB17-AFD6F6673510}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "driver_manager", "driver_manager\driver_manager.vcxproj", "{BA538570-EF82-49F8-96CD-570C313CA78E}"
-EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\node_modules\react-native-windows\Shared\Shared.vcxitems*{2049dbe9-8d13-42c9-ae4b-413ae38fffd0}*SharedItemsImports = 9
 		..\node_modules\react-native-windows\Microsoft.ReactNative.Cxx\Microsoft.ReactNative.Cxx.vcxitems*{729d9af8-cd9e-4427-9f6c-fb757e287729}*SharedItemsImports = 4
 		..\node_modules\react-native-windows\Mso\Mso.vcxitems*{84e05bfa-cbaf-4f0d-bfb6-4ce85742a57e}*SharedItemsImports = 9
-		..\cpp\driver_manager_shared.vcxitems*{8b67c06b-c7b5-4e64-ab17-afd6f6673510}*SharedItemsImports = 9
-		..\cpp\driver_manager_shared.vcxitems*{ba538570-ef82-49f8-96cd-570c313ca78e}*SharedItemsImports = 4
 		..\node_modules\react-native-windows\Chakra\Chakra.vcxitems*{c38970c0-5fbf-4d69-90d8-cbac225ae895}*SharedItemsImports = 9
 		..\node_modules\react-native-windows\Microsoft.ReactNative.Cxx\Microsoft.ReactNative.Cxx.vcxitems*{da8b35b3-da00-4b02-bde6-6a397b3fd46b}*SharedItemsImports = 9
 		..\node_modules\react-native-windows\include\Include.vcxitems*{ef074ba1-2d54-4d49-a28e-5e040b47cd2e}*SharedItemsImports = 9
@@ -222,22 +216,6 @@ Global
 		{FCB612AD-FACC-410C-828C-24B5940B2762}.Release|x64.Build.0 = Release|x64
 		{FCB612AD-FACC-410C-828C-24B5940B2762}.Release|x86.ActiveCfg = Release|Win32
 		{FCB612AD-FACC-410C-828C-24B5940B2762}.Release|x86.Build.0 = Release|Win32
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|ARM.ActiveCfg = Debug|ARM
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|ARM.Build.0 = Debug|ARM
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|ARM64.Build.0 = Debug|ARM64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|x64.ActiveCfg = Debug|x64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|x64.Build.0 = Debug|x64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|x86.ActiveCfg = Debug|Win32
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Debug|x86.Build.0 = Debug|Win32
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|ARM.ActiveCfg = Release|ARM
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|ARM.Build.0 = Release|ARM
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|ARM64.ActiveCfg = Release|ARM64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|ARM64.Build.0 = Release|ARM64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|x64.ActiveCfg = Release|x64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|x64.Build.0 = Release|x64
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|x86.ActiveCfg = Release|Win32
-		{BA538570-EF82-49F8-96CD-570C313CA78E}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

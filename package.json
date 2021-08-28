@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "postinstall": "echo posthook",
-    "action:monaco": "node scripts/buildMonaco",
-    "action:nodify": "npx rn-nodeify --install events,stream,process,util,assert,fs,path,dns,dgram,crypto,url,net --hack",
+    "config:toolchains": "node scripts/configureNativeToolchains",
+    "postinstall": "node scripts/buildMonaco",
+    "prewindows": "node scripts/buildSharedWindows",
+    "windows": "react-native run-windows --arch x64",
     "preandroid": "node scripts/buildSharedAndroid",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "windows": "react-native run-windows",
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint ."

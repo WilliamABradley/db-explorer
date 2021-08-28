@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { copy, optExtension, platforms: { android: androidConfig }, sharedDir } = require('.');
+const { copy, optExtension, platforms: { android: androidConfig } } = require('.');
 
 function prepareNDK() {
   const ndkHome = process.env.NDK;

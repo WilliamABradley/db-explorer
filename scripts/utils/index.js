@@ -9,6 +9,7 @@ const isWindows = os.platform() === 'win32';
 const sharedDir = path.resolve(rootDir, 'shared');
 const rustDir = sharedDir;
 const androidDir = path.resolve(rootDir, 'android');
+const windowsDir = path.resolve(rootDir, 'windows');
 
 const rust = {
   dir: rustDir,
@@ -16,23 +17,30 @@ const rust = {
 };
 
 const platforms = {
+  windows: {
+    dir: windowsDir,
+    targets: {
+      'x86_64-pc-windows-msvc': {
+        platform: 'x64',
+      },
+      'aarch64-pc-windows-msvc': {
+        platform: 'ARM64',
+      }
+    },
+  },
   android: {
     dir: androidDir,
     gradle: {
       root: path.resolve(androidDir, 'build.gradle')
     },
     targets: {
-      'aarch64-linux-android': {
-        ndkName: 'aarch64-linux-android',
-        abi: 'arm64-v8a',
-      },
       'armv7-linux-androideabi': {
         ndkName: 'armv7a-linux-androideabi',
         abi: 'armeabi-v7a',
       },
-      'i686-linux-android': {
-        ndkName: 'i686-linux-android',
-        abi: 'x86',
+      'aarch64-linux-android': {
+        ndkName: 'aarch64-linux-android',
+        abi: 'arm64-v8a',
       },
       'x86_64-linux-android': {
         ndkName: 'x86_64-linux-android',

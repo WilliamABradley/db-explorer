@@ -5,11 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
-using Newtonsoft.Json;
 
 namespace db_explorer.modules.drivers
 {
-    [ReactModule("PostgresDriver")]
+    [ReactModule(nameof(PostgresDriver))]
     public class PostgresDriver : INativeDatabaseDriver
     {
         public Dictionary<int, NpgsqlConnection> Instances = new Dictionary<int, NpgsqlConnection>();
