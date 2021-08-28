@@ -9,6 +9,7 @@ gradlew
 gradlew.bat
 local.properties
 .cxx/
+app/src/main/jniLibs
 
 # eclipse
 *.pydevproject
