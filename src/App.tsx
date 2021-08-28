@@ -1,12 +1,14 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { StyleSheet, View, Text, Button, ScrollView, NativeModules, Platform } from 'react-native';
+import { StyleSheet, View, Text, Button, ScrollView, NativeModules } from 'react-native';
 import Editor from './components/Editor';
 import DatabaseDriver from './drivers/DatabaseDriver';
 import PostgresDriver from './drivers/postgres';
 
 let driver: DatabaseDriver;
 let driverConnect: Promise<void> | undefined;
+
+NativeModules.DriverManager.greet("world").then(console.log);
 
 export default function App() {
   const [sql, setSQL] = useState('SELECT * FROM INFORMATION_SCHEMA.TABLES;');

@@ -6,6 +6,7 @@
     "postinstall": "echo posthook",
     "action:monaco": "node scripts/buildMonaco",
     "action:nodify": "npx rn-nodeify --install events,stream,process,util,assert,fs,path,dns,dgram,crypto,url,net --hack",
+    "preandroid": "node scripts/buildSharedAndroid",
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "windows": "react-native run-windows",

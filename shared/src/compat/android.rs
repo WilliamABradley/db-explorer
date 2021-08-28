@@ -1,4 +1,3 @@
-#[cfg(target_os = "android")]
 #[allow(non_snake_case)]
 pub mod android {
   extern crate jni;
@@ -6,7 +5,8 @@ pub mod android {
   use self::jni::objects::{JClass, JString};
   use self::jni::sys::jstring;
   use self::jni::JNIEnv;
-  use super::*;
+  use crate::*;
+  use std::ffi::CString;
 
   #[no_mangle]
   pub unsafe extern "C" fn Java_com_db_1explorer_DriverManager_sayHello(

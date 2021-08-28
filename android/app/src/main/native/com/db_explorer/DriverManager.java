@@ -5,6 +5,7 @@ import androidx.annotation.NonNull;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.Promise;
 
 public class DriverManager extends ReactContextBaseJavaModule {
   DriverManager(ReactApplicationContext context) {
@@ -12,18 +13,18 @@ public class DriverManager extends ReactContextBaseJavaModule {
   }
 
   static {
-    System.loadLibrary("native");
+    System.loadLibrary("shared");
   }
 
   @NonNull
   @Override
   public String getName() {
-    return "com.db_explorer.DriverManager";
+    return "DriverManager";
   }
 
   @ReactMethod
-  public String greet(final String person) {
-    return DriverManager.sayHello(person);
+  public void greet(final String person, Promise promise) {
+    promise.resolve(DriverManager.sayHello(person));
   }
 
   private static native String sayHello(final String person);
