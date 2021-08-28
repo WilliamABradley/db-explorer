@@ -1,11 +1,5 @@
-export type DatabaseConnectionInfo = {
-  host: string;
-  port: string;
-  ssl: boolean;
-  username?: string;
-  password?: string;
-  database?: string;
-};
+import DatabaseConnectionInfo from './models/DatabaseConnectionInfo';
+import DatabaseQueryResult from './models/DatabaseQueryResult';
 
 export default abstract class DatabaseDriver {
   constructor(connectionInfo: DatabaseConnectionInfo) {
@@ -21,7 +15,7 @@ export default abstract class DatabaseDriver {
   protected abstract _execute(
     sql: string,
     variables?: Record<string, any>,
-  ): Promise<string>;
+  ): Promise<DatabaseQueryResult>;
 
   public async connect(): Promise<void> {
     if (!this.connected) {
@@ -43,7 +37,7 @@ export default abstract class DatabaseDriver {
   public async execute(
     sql: string,
     variables?: Record<string, any>,
-  ): Promise<string> {
+  ): Promise<DatabaseQueryResult> {
     if (!this.connected) {
       throw new Error('Connection not open');
     }

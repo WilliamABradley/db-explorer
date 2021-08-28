@@ -1,4 +1,5 @@
-import { DatabaseConnectionInfo } from '../DatabaseDriver';
+import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
+import DatabaseQueryResult from '../models/DatabaseQueryResult';
 
 export type NativeDatabaseConnectionInfo = Partial<
   Record<keyof DatabaseConnectionInfo, string>
@@ -12,6 +13,6 @@ export default interface INativeDatabaseDriver {
     id: number,
     sql: string,
     variables?: Record<string, any>,
-  ): Promise<string>;
+  ): Promise<DatabaseQueryResult>;
   flush(): Promise<void>;
 }
