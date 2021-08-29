@@ -1,3 +1,3 @@
 #include <stdint.h>
 
-const char *say_hello(const char *to);
+const char *receive_message(const char *to);

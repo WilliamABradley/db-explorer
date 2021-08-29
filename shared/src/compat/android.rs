@@ -9,7 +9,7 @@ pub mod android {
   use std::ffi::CString;
 
   #[no_mangle]
-  pub unsafe extern "C" fn Java_com_db_1explorer_DriverManager_receive_message(
+  pub unsafe extern "C" fn Java_com_db_1explorer_DriverManager_receiveMessage(
     env: JNIEnv,
     _: JClass,
     data: JString,
