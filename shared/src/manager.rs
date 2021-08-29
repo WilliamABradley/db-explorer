@@ -76,20 +76,32 @@ async fn marshal_create(
   let mut connection_info: HashMap<String, String> = HashMap::new();
 
   // Decode message.
-  let data = message.as_object().unwrap();
+  let _data = message.as_object();
+  if _data.is_none() {
+    return as_error("Message Data is not an object!");
+  }
+
+  let data = _data.unwrap();
   for key in data.keys() {
-    let value: String;
+    let value: Option<String>;
 
     // We expect strings or booleans, convert the bools to string.
     // Otherwise panic.
     let _strdata = data[key].as_str();
     if _strdata.is_some() {
-      value = _strdata.unwrap().to_string();
+      value = Some(_strdata.unwrap().to_string());
     } else {
-      value = data[key].as_bool().unwrap().to_string();
+      let _booldata = data[key].as_bool();
+      if _booldata.is_some() {
+        value = Some(_booldata.unwrap().to_string());
+      } else {
+        return as_error(format!("Unknown Value Type on {}", key));
+      }
     }
 
-    connection_info.insert(key.clone(), value);
+    if value.is_some() {
+      connection_info.insert(key.clone(), value.unwrap());
+    }
   }
 
   // Create the Driver.
