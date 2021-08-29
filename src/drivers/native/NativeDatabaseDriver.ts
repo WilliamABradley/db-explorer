@@ -1,7 +1,7 @@
-import DatabaseConnectionInfo from './models/DatabaseConnectionInfo';
-import DatabaseDriver from './DatabaseDriver';
-import INativeDatabaseDriver from './interfaces/INativeDatabaseDriver';
-import DatabaseQueryResult from './models/DatabaseQueryResult';
+import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
+import DatabaseDriver from '../DatabaseDriver';
+import INativeDatabaseDriver from './INativeDatabaseDriver';
+import DatabaseQueryResult from '../models/DatabaseQueryResult';
 
 // Logic to ensure hot reload doesn't leave connections open.
 const flushDictionary: string[] = [];

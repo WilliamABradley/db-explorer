@@ -1,42 +1,13 @@
+pub mod types;
+
 use async_trait::async_trait;
 use std::collections::HashMap;
-use std::error::Error;
-use std::fmt;
-
-#[allow(non_snake_case)]
-pub struct DatabaseColumnInfo {
-  pub name: String,
-  pub dataType: String,
-}
-
-#[allow(non_snake_case)]
-pub struct DatabaseValueInfo {
-  pub value: Option<String>,
-  pub isNull: bool,
-}
-
-#[allow(non_snake_case)]
-pub struct DatabaseQueryResult {
-  pub columns: Vec<DatabaseColumnInfo>,
-  pub rows: Vec<Vec<DatabaseValueInfo>>,
-}
-
-#[derive(Debug)]
-pub struct NoConnectionError {
-  pub id: u32,
-}
-impl fmt::Display for NoConnectionError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "Connection {} not found", self.id)
-  }
-}
-impl Error for NoConnectionError {}
-
-pub type DatabaseError = Box<dyn Error>;
+use std::str::FromStr;
+use types::*;
 
 #[async_trait]
 pub trait DatabaseDriver {
-  fn create(&self, connection_info: &HashMap<String, String>) -> Result<u32, DatabaseError>;
+  async fn create(&self, connection_info: &HashMap<String, String>) -> Result<u32, DatabaseError>;
   async fn connect(&self, id: &u32) -> Result<(), DatabaseError>;
   async fn close(&self, id: &u32) -> Result<(), DatabaseError>;
   async fn execute(
@@ -56,9 +27,11 @@ pub trait DatabaseDriver {
 
 pub mod postgres;
 
-pub fn get_driver(driver_name: &str) -> Box<dyn DatabaseDriver> {
-  match driver_name {
-    "postgres" => Box::new(postgres::PostgresDriver {}),
-    _ => std::panic!("Unknown Driver Name: {}", driver_name),
+pub fn get_driver(driver_type: &str) -> &impl DatabaseDriver {
+  let type_enum = DriverType::from_str(driver_type).ok();
+
+  match type_enum {
+    Some(DriverType::Postgres) => &postgres::PostgresDriver {},
+    _ => std::panic!("Unknown Driver Name: {}", driver_type),
   }
 }

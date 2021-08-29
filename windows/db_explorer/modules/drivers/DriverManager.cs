@@ -1,4 +1,6 @@
 ﻿using Microsoft.ReactNative.Managed;
+using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -7,13 +9,23 @@ namespace db_explorer.modules.drivers
     [ReactModule(nameof(DriverManager))]
     public class DriverManager
     {
-        [ReactMethod("sendMessage")]
-        public Task<string> SendMessage(string data)
+        private static ReactContext _reactContext;
+
+        [ReactInitializer]
+        public void Initialize(ReactContext reactContext)
         {
-           return Task.Run(() => send_message(data));
+            _reactContext = reactContext;
+            Debug.WriteLine("Registered DriverManager Handler");
         }
 
-        [DllImport("shared.dll", EntryPoint = "send_message")]
-        private static extern string send_message(string data);
+        [ReactMethod("postMessage")]
+        public Task<string> PostMessage(string data)
+        {
+            return Task.Run(() => post_message(data));
+        }
+
+        // Post Message to library.
+        [DllImport("shared.dll", EntryPoint = "receive_message")]
+        private static extern string post_message(string data);
     }
 }

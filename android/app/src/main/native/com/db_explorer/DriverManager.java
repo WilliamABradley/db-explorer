@@ -23,9 +23,9 @@ public class DriverManager extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void sendMessage(final String data) {
-    promise.resolve(DriverManager.send_message(data));
+  public void postMessage(final String data) {
+    promise.resolve(DriverManager.receive_message(data));
   }
 
-  private static native String send_message(final String data);
+  private static native String receive_message(final String data);
 }

@@ -1,5 +1,6 @@
 use super::*;
 use async_trait::async_trait;
+use futures_util::lock::Mutex;
 use lazy_static::lazy_static;
 use sqlx::postgres::PgPoolOptions;
 use sqlx::postgres::Postgres;
@@ -7,28 +8,28 @@ use sqlx::Row;
 use std::collections::HashMap;
 
 lazy_static! {
-  static ref configs: HashMap<u32, HashMap<String, String>> = HashMap::new();
-  static ref instances: HashMap<u32, sqlx::Pool<Postgres>> = HashMap::new();
+  static ref _CONFIGS: Mutex<HashMap<u32, HashMap<String, String>>> = Mutex::new(HashMap::new());
+  static ref _INSTANCES: Mutex<HashMap<u32, sqlx::Pool<Postgres>>> = Mutex::new(HashMap::new());
 }
-
-//static Instances: Lazy<Mutex<HashMap<String, dyn DatabaseDriver>>> =
-//  Lazy::new(|| Mutex::new(HashMap::new()));
 
 pub struct PostgresDriver;
 
 #[async_trait]
 impl DatabaseDriver for PostgresDriver {
-  fn create(&self, connection_info: &HashMap<String, String>) -> Result<u32, DatabaseError> {
+  async fn create(&self, connection_info: &HashMap<String, String>) -> Result<u32, DatabaseError> {
+    let mut configs = _CONFIGS.lock().await;
     let id = configs.keys().len() as u32;
-    configs[&id] = connection_info.clone();
+    configs.insert(id, connection_info.clone());
     return Result::Ok(id);
   }
 
   async fn connect(&self, id: &u32) -> Result<(), DatabaseError> {
+    let configs = _CONFIGS.lock().await;
     if !configs.contains_key(id) {
       return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
     }
-    let connection_info = configs[id];
+    let connection_info = &configs[id];
+    drop(&configs);
 
     let pool = PgPoolOptions::new().max_connections(5);
 
@@ -43,7 +44,8 @@ impl DatabaseDriver for PostgresDriver {
     }
     let result = pool.connect(&connection_string).await;
     if result.is_ok() {
-      instances[id] = result.unwrap();
+      let mut instances = _INSTANCES.lock().await;
+      instances.insert(*id, result.unwrap());
       return Result::Ok(());
     } else {
       return Result::Err(Box::new(result.err().unwrap()));
@@ -51,11 +53,14 @@ impl DatabaseDriver for PostgresDriver {
   }
 
   async fn close(&self, id: &u32) -> Result<(), DatabaseError> {
+    let instances = _INSTANCES.lock().await;
     if !instances.contains_key(id) {
       return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
     }
-    let connection = instances[id];
-    let result = connection.close().await;
+    let connection = &instances[id];
+    drop(&instances);
+
+    connection.close().await;
     return Result::Ok(());
   }
 
@@ -65,13 +70,15 @@ impl DatabaseDriver for PostgresDriver {
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<u64, DatabaseError> {
+    let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
       return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
     }
-    let connection = instances[id];
+    let connection = &instances[id];
+    drop(&instances);
 
-    let mut query = sqlx::query(sql);
-    let result = query.execute(&connection).await;
+    let query = sqlx::query(sql);
+    let result = query.execute(connection).await;
     if result.is_ok() {
       let data = result.unwrap();
       return Result::Ok(data.rows_affected());
@@ -86,13 +93,15 @@ impl DatabaseDriver for PostgresDriver {
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<DatabaseQueryResult, DatabaseError> {
+    let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
       return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
     }
-    let connection = instances[id];
+    let connection = &instances[id];
+    drop(&instances);
 
-    let mut query = sqlx::query(sql);
-    let result = query.fetch_all(&connection).await;
+    let query = sqlx::query(sql);
+    let result = query.fetch_all(connection).await;
     if result.is_ok() {
       let columns: Vec<DatabaseColumnInfo> = Vec::new();
       let rows: Vec<Vec<DatabaseValueInfo>> = Vec::new();
@@ -101,10 +110,10 @@ impl DatabaseDriver for PostgresDriver {
       if result_data.len() > 0 {
         let column_info = result_data[0].columns();
 
-        for row in result_data {
-          let data: Vec<DatabaseValueInfo> = Vec::new();
+        for row in &result_data {
+          let mut data: Vec<DatabaseValueInfo> = Vec::new();
           for ordinal in 0..column_info.len() {
-            let column = column_info[ordinal];
+            let _column = &column_info[ordinal];
             let _value: Result<&str, sqlx::Error> = row.try_get(ordinal);
             let value = match _value {
               Ok(string_val) => DatabaseValueInfo {
@@ -129,10 +138,13 @@ impl DatabaseDriver for PostgresDriver {
   }
 
   async fn flush(&self) -> Result<(), DatabaseError> {
+    let mut configs = _CONFIGS.lock().await;
+    let mut instances = _INSTANCES.lock().await;
+
     let key_count = instances.keys().len() as u32;
     for index in 0..key_count {
       let id = index + 1;
-      self.close(&id).await;
+      let _ = self.close(&id).await;
       instances.remove(&id);
       configs.remove(&id);
     }

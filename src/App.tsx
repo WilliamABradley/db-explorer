@@ -31,7 +31,7 @@ export default function App() {
           }
 
           driverConnect!
-            .then(() => driver.execute(sql))
+            .then(() => driver.query(sql))
             .then(results => setResults(JSON.stringify(results, null, 4)))
             .catch(e => {
               console.error(e);

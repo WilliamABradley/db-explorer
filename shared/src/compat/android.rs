@@ -9,12 +9,12 @@ pub mod android {
   use std::ffi::CString;
 
   #[no_mangle]
-  pub unsafe extern "C" fn Java_com_db_1explorer_DriverManager_send_message(
+  pub unsafe extern "C" fn Java_com_db_1explorer_DriverManager_receive_message(
     env: JNIEnv,
     _: JClass,
     data: JString,
   ) -> jstring {
-    let result = send_message(env.get_string(data).expect("Invalid message data").as_ptr());
+    let result = receive_message(env.get_string(data).expect("Invalid message data").as_ptr());
     // Retake pointer so that we can use it below and allow memory to be freed when it goes out of scope.
     let result_ptr = CString::from_raw(result);
     let output = env

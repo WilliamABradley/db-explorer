@@ -1,41 +1,54 @@
 use crate::drivers;
-use crate::*;
-use json::JsonValue;
-use std::collections::HashMap;
+use crate::messages::*;
+use crate::utils::*;
+use std::str::FromStr;
 
-pub fn to_message(msg_type: String, data: HashMap<String, String>) -> String {
-  return json::stringify(object! {
-      "type": msg_type,
-      data: data,
-  });
-}
-
-pub fn handle_message(message_data: &str) -> String {
-  // Expect
-  let message_result = json::parse(message_data);
+pub async fn handle_message(message_data: &str) -> String {
+  let message_result: Result<InboundMessage, serde_json::Error> =
+    serde_json::from_str(message_data);
   if message_result.is_err() {
-    let mut error_info = HashMap::new();
     let error = message_result.unwrap_err();
-    error_info.insert(String::from("message"), format!("{}", error));
-    return to_message(String::from("ParseError"), error_info);
+    return as_driver_error(DriverErrorType::ParseError, &format!("{}", error));
   }
   let message = message_result.unwrap();
+  let message_type = InboundMessageType::from_str(message.r#type.as_str()).ok();
 
-  let driver_name = message["driver"].to_string();
-  let driver = drivers::get_driver(&driver_name);
-
-  // Determine which message we received.
-  let message_type = message["type"];
-  let response = match message_type.as_str() {
-    Some("create") => {}
-    _ => std::panic!("Unknown Message Type: {}", message_type.to_string()),
+  let result: String = match message_type {
+    Some(InboundMessageType::DatabaseDriver) => {
+      if message.data.is_none() {
+        return as_driver_error(
+          DriverErrorType::ParseError,
+          &"DatabaseDriver messages must contain the encapsulated \"data\" field".into(),
+        );
+      }
+      let database_message = message.data.unwrap();
+      handle_database_message(&database_message)
+    }
+    _ => as_driver_error(
+      DriverErrorType::UnknownMessage,
+      &format!("Unknown Message Type: {}", message.r#type.as_str()),
+    ),
   };
-
-  return String::from("WIP"); //to_message(String::from("result"), result_info);
+  return result;
 }
 
-fn marshal_create(driver: &impl drivers::DatabaseDriver, message: &JsonValue) -> JsonValue {
-  let connection_info = HashMap::new();
-  let id = driver.create(connection_info);
-  return json::from(id);
+fn handle_database_message(message: &DatabaseDriverMessage) -> String {
+  let driver = drivers::get_driver(&message.driver);
+  let message_type = DatabaseDriverMessageType::from_str(message.r#type.as_str()).ok();
+
+  return match message_type {
+    Some(DatabaseDriverMessageType::Create) => marshal_create(driver, &message.data),
+    _ => as_driver_error(
+      DriverErrorType::UnknownMessage,
+      &format!("Unknown Database Message Type: {}", message.r#type.as_str()),
+    ),
+  };
+}
+
+fn marshal_create(driver: &impl drivers::DatabaseDriver, message: &serde_json::Value) -> String {
+  //let id = driver.create(connection_info);
+  return to_message(
+    OutboundMessageType::Result,
+    serde_json::to_value(-1).unwrap(),
+  );
 }
