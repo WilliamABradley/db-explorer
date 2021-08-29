@@ -27,11 +27,11 @@ pub trait DatabaseDriver {
 
 pub mod postgres;
 
-pub fn get_driver(driver_type: &str) -> &impl DatabaseDriver {
+pub fn get_driver(driver_type: &str) -> Option<&impl DatabaseDriver> {
   let type_enum = DriverType::from_str(driver_type).ok();
 
-  match type_enum {
-    Some(DriverType::Postgres) => &postgres::PostgresDriver {},
-    _ => std::panic!("Unknown Driver Name: {}", driver_type),
-  }
+  return match type_enum {
+    Some(DriverType::Postgres) => Some(&postgres::PostgresDriver {}),
+    _ => None,
+  };
 }

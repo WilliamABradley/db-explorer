@@ -12,6 +12,7 @@ lazy_static! {
   static ref _INSTANCES: Mutex<HashMap<u32, sqlx::Pool<Postgres>>> = Mutex::new(HashMap::new());
 }
 
+#[derive(Debug)]
 pub struct PostgresDriver;
 
 #[async_trait]

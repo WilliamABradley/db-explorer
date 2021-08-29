@@ -22,7 +22,7 @@ pub async fn handle_message(message_data: &str) -> String {
         );
       }
       let database_message = message.data.unwrap();
-      handle_database_message(&database_message)
+      return handle_database_message(&database_message);
     }
     _ => as_driver_error(
       DriverErrorType::UnknownMessage,
@@ -33,7 +33,16 @@ pub async fn handle_message(message_data: &str) -> String {
 }
 
 fn handle_database_message(message: &DatabaseDriverMessage) -> String {
-  let driver = drivers::get_driver(&message.driver);
+  let driver_result = drivers::get_driver(&message.driver);
+  if driver_result.is_none() {
+    return as_driver_error(
+      DriverErrorType::UnknownDriver,
+      &format!("Unknown Driver Name: {}", message.driver),
+    );
+  }
+
+  // We known the driver you speak of.
+  let driver = driver_result.unwrap();
   let message_type = DatabaseDriverMessageType::from_str(message.r#type.as_str()).ok();
 
   return match message_type {

@@ -34,8 +34,9 @@ pub enum DatabaseDriverMessageType {
 pub enum DriverErrorType {
   FatalError,
   ParseError,
-  UnknownMessage,
   NoConnectionError,
+  UnknownMessage,
+  UnknownDriver,
   UnknownError,
 }
 
