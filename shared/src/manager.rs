@@ -53,15 +53,31 @@ async fn handle_database_message(message: &DatabaseDriverMessage) -> String {
     );
   }
 
+  let get_driver_id = || {
+    if message.id.is_none() {
+      panic!("Driver id not provided!");
+    }
+
+    return message.id.unwrap();
+  };
+
+  let get_driver_data = || {
+    if message.data.is_none() {
+      panic!("Driver data not provided!");
+    }
+
+    return message.data.as_ref().unwrap();
+  };
+
   let response = match message_type {
-    Some(DatabaseDriverMessageType::Create) => marshal_create(driver, &message.data).await,
-    Some(DatabaseDriverMessageType::Connect) => marshal_connect(driver, &message.id.unwrap()).await,
-    Some(DatabaseDriverMessageType::Close) => marshal_close(driver, &message.id.unwrap()).await,
+    Some(DatabaseDriverMessageType::Create) => marshal_create(driver, &get_driver_data()).await,
+    Some(DatabaseDriverMessageType::Connect) => marshal_connect(driver, &get_driver_id()).await,
+    Some(DatabaseDriverMessageType::Close) => marshal_close(driver, &get_driver_id()).await,
     Some(DatabaseDriverMessageType::Execute) => {
-      return marshal_execute(driver, &message.id.unwrap(), &message.data).await;
+      return marshal_execute(driver, &get_driver_id(), &get_driver_data()).await;
     }
     Some(DatabaseDriverMessageType::Query) => {
-      return marshal_query(driver, &message.id.unwrap(), &message.data).await;
+      return marshal_query(driver, &get_driver_id(), &get_driver_data()).await;
     }
     Some(DatabaseDriverMessageType::Flush) => marshal_flush(driver).await,
     _ => panic!("Fell through DriverMessageType!"),
@@ -140,7 +156,7 @@ async fn marshal_execute(
   }
 
   let _variables = message["variables"].as_object();
-  let mut variables: Option<HashMap<String, String>> = None;
+  let variables: Option<HashMap<String, String>> = None;
   if _variables.is_some() {
     panic!("Variable support not implemented!");
   }

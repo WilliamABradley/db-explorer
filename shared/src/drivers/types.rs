@@ -41,4 +41,15 @@ impl fmt::Display for NoConnectionError {
 }
 impl Error for NoConnectionError {}
 
+#[derive(Debug)]
+pub struct InvalidError {
+  pub message: String,
+}
+impl fmt::Display for InvalidError {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    write!(f, "{}", self.message)
+  }
+}
+impl Error for InvalidError {}
+
 pub type DatabaseError = Box<dyn Error>;

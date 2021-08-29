@@ -52,5 +52,5 @@ pub struct DatabaseDriverMessage {
   pub driver: String,
   pub id: Option<u32>,
   pub r#type: String,
-  pub data: serde_json::Value,
+  pub data: Option<serde_json::Value>,
 }

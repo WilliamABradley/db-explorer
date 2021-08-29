@@ -12,19 +12,14 @@ interface INativeMessageDatabaseDriver {
 }
 
 const manager: INativeMessageDatabaseDriver = NativeModules.DriverManager;
-const emitter = new NativeEventEmitter(NativeModules.DriverManager);
 
-emitter.addListener('receiveMessage', ev => {
-  console.log('[DriverManager]');
-  console.log(ev);
-});
-
-async function sendManagerMessage<T>(driver: string, type: string, data?: any): Promise<T> {
+async function sendManagerMessage<T>(driver: string, type: string, data?: any, id?: number): Promise<T> {
   const message = {
     type: 'DatabaseDriver',
     data: {
-      type,
       driver,
+      id,
+      type,
       data,
     },
   };
@@ -57,10 +52,6 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     }
 
     console.debug(`Aquiring Native ${this.#driverName} Instance`);
-    const createInfo = {
-      driver,
-      connectionInfo,
-    };
 
     // Handle hot flush.
     if (FLUSH && __DEV__ && !flushDictionary.includes(this.#driverName)) {
@@ -68,11 +59,11 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
       const flush = sendManagerMessage(this.#driverName, 'Flush');
       this.#instance = flush.then(() => {
         console.debug(`Initialising ${this.#driverName}`);
-        return sendManagerMessage(this.#driverName, 'Create', createInfo);
+        return sendManagerMessage(this.#driverName, 'Create', connectionInfo);
       });
       flushDictionary.push(this.#driverName);
     } else {
-      this.#instance = sendManagerMessage(this.#driverName, 'Create', createInfo);
+      this.#instance = sendManagerMessage(this.#driverName, 'Create', connectionInfo);
     }
 
     this.#instance.then(id => {
@@ -86,10 +77,7 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
   #instanceId: number = -1;
 
   private sendDriverMessage<T>(type: string, data?: any): Promise<T> {
-    return sendManagerMessage(this.#driverName, type, {
-      id: this.#instanceId,
-      data,
-    });
+    return sendManagerMessage(this.#driverName, type, data, this.#instanceId);
   }
 
   protected override async _connect(): Promise<void> {
@@ -119,9 +107,9 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     sql: string,
     variables?: Record<string, any>,
   ): Promise<DatabaseQueryResult> {
-    console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
+    console.debug(`Querying on ${this.#driverName}: ${this.#instanceId}`);
     const result = await this.sendDriverMessage<DatabaseQueryResult>('Query', { sql, variables });
-    console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
+    console.debug(`Querying on ${this.#driverName}: ${this.#instanceId}`);
     return result;
   }
 }

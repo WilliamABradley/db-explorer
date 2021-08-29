@@ -42,7 +42,23 @@ impl DatabaseDriver for PostgresDriver {
         connection_string.push_str(":");
         connection_string.push_str(&connection_info["password"])
       }
+      connection_string.push_str("@");
     }
+    if !connection_info.contains_key("host") {
+      return Result::Err(Box::new(InvalidError {
+        message: "Host must be provided".to_string(),
+      }));
+    }
+    connection_string.push_str(&connection_info["host"]);
+    if connection_info.contains_key("port") {
+      connection_string.push_str(":");
+      connection_string.push_str(&connection_info["port"]);
+    }
+    if connection_info.contains_key("database") {
+      connection_string.push_str("/");
+      connection_string.push_str(&connection_info["database"]);
+    }
+
     let result = pool.connect(&connection_string).await;
     if result.is_err() {
       return Result::Err(Box::new(result.err().unwrap()));
