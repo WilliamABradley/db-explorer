@@ -1,3 +1,4 @@
+use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::fmt;
 use std::fmt::Debug;
@@ -9,18 +10,21 @@ pub enum DriverType {
 }
 
 #[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseColumnInfo {
   pub name: String,
   pub dataType: String,
 }
 
 #[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseValueInfo {
   pub value: Option<String>,
   pub isNull: bool,
 }
 
 #[allow(non_snake_case)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseQueryResult {
   pub columns: Vec<DatabaseColumnInfo>,
   pub rows: Vec<Vec<DatabaseValueInfo>>,

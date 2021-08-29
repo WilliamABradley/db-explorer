@@ -34,7 +34,9 @@ pub enum DatabaseDriverMessageType {
 pub enum DriverErrorType {
   FatalError,
   ParseError,
+  SerializeError,
   NoConnectionError,
+  DriverError,
   UnknownMessage,
   UnknownDriver,
   UnknownError,
@@ -48,6 +50,7 @@ pub struct DriverError {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseDriverMessage {
   pub driver: String,
+  pub id: Option<u32>,
   pub r#type: String,
   pub data: serde_json::Value,
 }

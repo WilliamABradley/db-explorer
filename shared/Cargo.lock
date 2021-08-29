@@ -1468,6 +1468,7 @@ name = "shared"
 version = "0.1.0"
 dependencies = [
  "async-trait",
+ "backtrace",
  "cargo-lipo",
  "futures",
  "futures-util",

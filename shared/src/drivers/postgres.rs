@@ -44,13 +44,13 @@ impl DatabaseDriver for PostgresDriver {
       }
     }
     let result = pool.connect(&connection_string).await;
-    if result.is_ok() {
-      let mut instances = _INSTANCES.lock().await;
-      instances.insert(*id, result.unwrap());
-      return Result::Ok(());
-    } else {
+    if result.is_err() {
       return Result::Err(Box::new(result.err().unwrap()));
     }
+
+    let mut instances = _INSTANCES.lock().await;
+    instances.insert(*id, result.unwrap());
+    return Result::Ok(());
   }
 
   async fn close(&self, id: &u32) -> Result<(), DatabaseError> {
@@ -80,12 +80,12 @@ impl DatabaseDriver for PostgresDriver {
 
     let query = sqlx::query(sql);
     let result = query.execute(connection).await;
-    if result.is_ok() {
-      let data = result.unwrap();
-      return Result::Ok(data.rows_affected());
-    } else {
+    if result.is_err() {
       return Result::Err(Box::new(result.err().unwrap()));
     }
+
+    let data = result.unwrap();
+    return Result::Ok(data.rows_affected());
   }
 
   async fn query(
@@ -103,39 +103,39 @@ impl DatabaseDriver for PostgresDriver {
 
     let query = sqlx::query(sql);
     let result = query.fetch_all(connection).await;
-    if result.is_ok() {
-      let columns: Vec<DatabaseColumnInfo> = Vec::new();
-      let rows: Vec<Vec<DatabaseValueInfo>> = Vec::new();
-
-      let result_data = result.unwrap();
-      if result_data.len() > 0 {
-        let column_info = result_data[0].columns();
-
-        for row in &result_data {
-          let mut data: Vec<DatabaseValueInfo> = Vec::new();
-          for ordinal in 0..column_info.len() {
-            let _column = &column_info[ordinal];
-            let _value: Result<&str, sqlx::Error> = row.try_get(ordinal);
-            let value = match _value {
-              Ok(string_val) => DatabaseValueInfo {
-                value: Some(string_val.to_string()),
-                isNull: false,
-              },
-              _ => DatabaseValueInfo {
-                value: None,
-                isNull: true,
-              },
-            };
-            data.push(value);
-          }
-        }
-      }
-
-      let payload = DatabaseQueryResult { columns, rows };
-      return Result::Ok(payload);
-    } else {
+    if result.is_err() {
       return Result::Err(Box::new(result.err().unwrap()));
     }
+
+    let columns: Vec<DatabaseColumnInfo> = Vec::new();
+    let rows: Vec<Vec<DatabaseValueInfo>> = Vec::new();
+
+    let result_data = result.unwrap();
+    if result_data.len() > 0 {
+      let column_info = result_data[0].columns();
+
+      for row in &result_data {
+        let mut data: Vec<DatabaseValueInfo> = Vec::new();
+        for ordinal in 0..column_info.len() {
+          let _column = &column_info[ordinal];
+          let _value: Result<&str, sqlx::Error> = row.try_get(ordinal);
+          let value = match _value {
+            Ok(string_val) => DatabaseValueInfo {
+              value: Some(string_val.to_string()),
+              isNull: false,
+            },
+            _ => DatabaseValueInfo {
+              value: None,
+              isNull: true,
+            },
+          };
+          data.push(value);
+        }
+      }
+    }
+
+    let payload = DatabaseQueryResult { columns, rows };
+    return Result::Ok(payload);
   }
 
   async fn flush(&self) -> Result<(), DatabaseError> {

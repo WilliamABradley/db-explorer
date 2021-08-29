@@ -4,6 +4,7 @@ pub mod manager;
 pub mod messages;
 pub mod utils;
 
+use backtrace::Backtrace;
 use futures::executor::block_on;
 use futures_util::lock::Mutex;
 use lazy_static::lazy_static;
@@ -42,25 +43,27 @@ pub extern "system" fn receive_message(message_raw: *const c_char) -> *mut c_cha
         return std::ptr::null_mut();
     }
 
+    let trace = Backtrace::new();
+
     let result = panic::catch_unwind(|| {
         let future = manager::handle_message(message_str.unwrap());
         return to_cchar(block_on(future));
     });
 
     // Validate that we didn't panic
-    if result.is_ok() {
-        return result.unwrap();
-    } else {
+    if result.is_err() {
         let err = result.unwrap_err();
 
         // Try and capture the error message.
         let err_message: String = match err.downcast_ref::<&'static str>() {
-            Some(e) => e.to_string(),
-            _ => format!("Unknown Error: {:?}", err),
+            Some(e) => format!("{}\n{:?}", e, trace),
+            _ => format!("Unknown Error: {:?}\n{:?}", err, trace),
         };
 
-        return to_cchar(as_driver_error(DriverErrorType::FatalError, &err_message));
+        return to_cchar(to_driver_error(DriverErrorType::FatalError, &err_message));
     }
+
+    return result.unwrap();
 }
 
 pub async fn post_message(message: String) -> () {
