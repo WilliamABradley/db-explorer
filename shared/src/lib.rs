@@ -1,5 +1,6 @@
-mod compat;
-mod manager;
+pub mod compat;
+pub mod drivers;
+pub mod manager;
 
 use json::object;
 use std::ffi::{CStr, CString};

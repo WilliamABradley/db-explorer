@@ -8,6 +8,7 @@ const path = require('path');
 const exclusionList = require('metro-config/src/defaults/exclusionList');
 
 module.exports = {
+  watchFolders: [path.resolve(__dirname, 'src')],
   resolver: {
     blockList: exclusionList([
       // This stops "react-native run-windows" from causing the metro server to crash if its already running

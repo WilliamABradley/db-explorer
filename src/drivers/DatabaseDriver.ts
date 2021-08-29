@@ -15,6 +15,10 @@ export default abstract class DatabaseDriver {
   protected abstract _execute(
     sql: string,
     variables?: Record<string, any>,
+  ): Promise<number>;
+  protected abstract _query(
+    sql: string,
+    variables?: Record<string, any>,
   ): Promise<DatabaseQueryResult>;
 
   public async connect(): Promise<void> {
@@ -37,10 +41,20 @@ export default abstract class DatabaseDriver {
   public async execute(
     sql: string,
     variables?: Record<string, any>,
-  ): Promise<DatabaseQueryResult> {
+  ): Promise<number> {
     if (!this.connected) {
       throw new Error('Connection not open');
     }
     return this._execute(sql, variables);
+  }
+
+  public async query(
+    sql: string,
+    variables?: Record<string, any>,
+  ): Promise<DatabaseQueryResult> {
+    if (!this.connected) {
+      throw new Error('Connection not open');
+    }
+    return this._query(sql, variables);
   }
 }

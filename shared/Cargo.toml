@@ -10,7 +10,9 @@ crate-type = ["dylib", "staticlib"]
 
 [dependencies]
 json = "0.12.4"
-sqlx = { version = "0.5", features = [ "runtime-async-std-native-tls" ] }
+sqlx = { version = "0.5", features = [ "runtime-async-std-native-tls", "postgres" ] }
+lazy_static = "1.4.0"
+async-trait = "0.1.51"
 
 [build-dependencies]
 cargo-lipo = "3.1.1"

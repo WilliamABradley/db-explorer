@@ -13,8 +13,15 @@ interface INativeMessageDatabaseDriver {
 
 const manager: INativeMessageDatabaseDriver = NativeModules.DriverManager;
 
-async function sendManagerMessage<T>(type: string, data?: any): Promise<T> {
-  const response = await manager.sendMessage(JSON.stringify({ type, data }));
+async function sendManagerMessage<T>(driver: string, type: string, data?: any): Promise<T> {
+  const message = {
+    type,
+    data: {
+      driver,
+      ...data,
+    },
+  };
+  const response = await manager.sendMessage(JSON.stringify(message));
   console.log(response);
   const result = JSON.parse(response);
   switch (result.type) {
@@ -49,14 +56,14 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     // Handle hot flush.
     if (FLUSH && __DEV__ && !flushDictionary.includes(this.#driverName)) {
       console.debug(`Flushing ${this.#driverName}`);
-      const flush = sendManagerMessage('flush');
+      const flush = sendManagerMessage(this.#driverName, 'flush');
       this.#instance = flush.then(() => {
         console.debug(`Initialising ${this.#driverName}`);
-        return sendManagerMessage('create', createInfo);
+        return sendManagerMessage(this.#driverName, 'create', createInfo);
       });
       flushDictionary.push(this.#driverName);
     } else {
-      this.#instance = sendManagerMessage('create', createInfo);
+      this.#instance = sendManagerMessage(this.#driverName, 'create', createInfo);
     }
 
     this.#instance.then(id => {
@@ -70,8 +77,7 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
   #instanceId: number = -1;
 
   private sendDriverMessage<T>(type: string, data?: any): Promise<T> {
-    return sendManagerMessage(type, {
-      driver: this.#driverName,
+    return sendManagerMessage(this.#driverName, type, {
       id: this.#instanceId,
       data,
     });
@@ -93,9 +99,19 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
   protected override async _execute(
     sql: string,
     variables?: Record<string, any>,
+  ): Promise<number> {
+    console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
+    const result = await this.sendDriverMessage<number>('execute', { sql, variables });
+    console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
+    return result;
+  }
+
+  protected override async _query(
+    sql: string,
+    variables?: Record<string, any>,
   ): Promise<DatabaseQueryResult> {
     console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
-    const result = await this.sendDriverMessage<DatabaseQueryResult>('execute', { sql, variables });
+    const result = await this.sendDriverMessage<DatabaseQueryResult>('query', { sql, variables });
     console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
     return result;
   }

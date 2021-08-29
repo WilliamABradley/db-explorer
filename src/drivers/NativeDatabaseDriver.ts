@@ -71,9 +71,19 @@ export default abstract class NativeDriver extends DatabaseDriver {
   protected override async _execute(
     sql: string,
     variables?: Record<string, any>,
-  ): Promise<DatabaseQueryResult> {
+  ): Promise<number> {
     console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
     const result = await this.#driver.execute(this.#instanceId, sql, variables);
+    console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
+    return result;
+  }
+
+  protected override async _query(
+    sql: string,
+    variables?: Record<string, any>,
+  ): Promise<DatabaseQueryResult> {
+    console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
+    const result = await this.#driver.query(this.#instanceId, sql, variables);
     console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
     return result;
   }
