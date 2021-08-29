@@ -11,7 +11,8 @@ crate-type = ["dylib", "staticlib"]
 [dependencies]
 serde = "1.0"
 serde_json = "1.0"
-sqlx = { version = "0.5", features = [ "runtime-async-std-native-tls", "postgres" ] }
+# Offline gives us the ability to serialize pg type info, so we can extract the oid.
+sqlx = { version = "0.5", features = [ "runtime-async-std-native-tls", "postgres", "offline" ] }
 lazy_static = "1.4.0"
 async-trait = "0.1.51"
 futures-util = "0.3"

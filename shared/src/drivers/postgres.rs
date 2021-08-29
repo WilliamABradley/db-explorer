@@ -3,9 +3,12 @@ use async_trait::async_trait;
 use futures_util::lock::Mutex;
 use lazy_static::lazy_static;
 use sqlx::postgres::PgPoolOptions;
+use sqlx::postgres::PgTypeInfo;
 use sqlx::postgres::Postgres;
+use sqlx::Column;
 use sqlx::Row;
 use std::collections::HashMap;
+use utils::pg_unwrap;
 
 lazy_static! {
   static ref _CONFIGS: Mutex<HashMap<u32, HashMap<String, String>>> = Mutex::new(HashMap::new());
@@ -123,30 +126,36 @@ impl DatabaseDriver for PostgresDriver {
       return Result::Err(Box::new(result.err().unwrap()));
     }
 
-    let columns: Vec<DatabaseColumnInfo> = Vec::new();
-    let rows: Vec<Vec<DatabaseValueInfo>> = Vec::new();
+    let mut columns: Vec<DatabaseColumnInfo> = Vec::new();
+    let mut rows: Vec<Vec<Option<String>>> = Vec::new();
 
     let result_data = result.unwrap();
     if result_data.len() > 0 {
       let column_info = result_data[0].columns();
 
+      for column in column_info {
+        let _type_info = column.type_info();
+        let serialized = serde_json::to_vec(&_type_info).unwrap();
+        let type_info: pg_unwrap::PgTypeInfo = serde_json::from_slice(&serialized).unwrap();
+
+        columns.push(DatabaseColumnInfo {
+          name: column.name().to_string(),
+          dataType: type_info.oid().to_string(),
+        });
+      }
+
       for row in &result_data {
-        let mut data: Vec<DatabaseValueInfo> = Vec::new();
+        let mut data: Vec<Option<String>> = Vec::new();
         for ordinal in 0..column_info.len() {
           let _column = &column_info[ordinal];
           let _value: Result<&str, sqlx::Error> = row.try_get(ordinal);
-          let value = match _value {
-            Ok(string_val) => DatabaseValueInfo {
-              value: Some(string_val.to_string()),
-              isNull: false,
-            },
-            _ => DatabaseValueInfo {
-              value: None,
-              isNull: true,
-            },
+          let value: Option<String> = match _value {
+            Ok(string_val) => Some(string_val.to_string()),
+            _ => None,
           };
           data.push(value);
         }
+        rows.push(data);
       }
     }
 

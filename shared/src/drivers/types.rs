@@ -18,16 +18,9 @@ pub struct DatabaseColumnInfo {
 
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
-pub struct DatabaseValueInfo {
-  pub value: Option<String>,
-  pub isNull: bool,
-}
-
-#[allow(non_snake_case)]
-#[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseQueryResult {
   pub columns: Vec<DatabaseColumnInfo>,
-  pub rows: Vec<Vec<DatabaseValueInfo>>,
+  pub rows: Vec<Vec<Option<String>>>,
 }
 
 #[derive(Debug)]
