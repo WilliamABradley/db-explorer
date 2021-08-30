@@ -8,6 +8,7 @@ const isWindows = os.platform() === 'win32';
 
 const sharedDir = path.resolve(rootDir, 'shared');
 const rustDir = sharedDir;
+const libsDir = path.resolve(sharedDir, '.libs');
 const windowsDir = path.resolve(rootDir, 'windows');
 const androidDir = path.resolve(rootDir, 'android');
 const iosDir = path.resolve(rootDir, 'ios');
@@ -36,16 +37,22 @@ const platforms = {
     },
     targets: {
       'armv7-linux-androideabi': {
+        platform: 'arm',
         ndkName: 'armv7a-linux-androideabi',
-        abi: 'armeabi-v7a',
+        abiName: 'armeabi-v7a',
+        libName: 'arm-linux-androideabi',
       },
       'aarch64-linux-android': {
+        platform: 'arm64',
         ndkName: 'aarch64-linux-android',
-        abi: 'arm64-v8a',
+        abiName: 'arm64-v8a',
+        libName: 'aarch64-linux-android',
       },
       'x86_64-linux-android': {
+        platform: 'x86_64',
         ndkName: 'x86_64-linux-android',
-        abi: 'x86_64',
+        abiName: 'x86_64',
+        libName: 'x86_64-linux-android'
       }
     }
   },
@@ -70,7 +77,7 @@ for (const platform of Object.values(platforms)) {
 const exec = (command, options) => {
   console.log(command);
   try {
-    execSync(command, {
+    return execSync(command, {
       stdio: 'inherit',
       ...options,
       env: {
@@ -113,6 +120,7 @@ module.exports = {
   rootDir,
   rust,
   sharedDir,
+  libsDir,
   platforms,
   allTargets,
   exec,

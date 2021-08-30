@@ -60,4 +60,3 @@ buck-out/
 
 # MS
 msbuild.binlog
-shared/.NDK/
