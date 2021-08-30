@@ -3,7 +3,6 @@ use async_trait::async_trait;
 use futures_util::lock::Mutex;
 use lazy_static::lazy_static;
 use sqlx::postgres::PgPoolOptions;
-use sqlx::postgres::PgTypeInfo;
 use sqlx::postgres::Postgres;
 use sqlx::Column;
 use sqlx::Row;
