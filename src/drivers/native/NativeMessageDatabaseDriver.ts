@@ -24,16 +24,20 @@ async function sendManagerMessage<T>(driver: string, type: string, data?: any, i
     },
   };
   const response = await manager.postMessage(JSON.stringify(message));
-  const result = JSON.parse(response);
-  switch (result.type) {
-    case 'Result':
-      return result.data;
+  try {
+    const result = JSON.parse(response);
+    switch (result.type) {
+      case 'Result':
+        return result.data;
 
-    case 'Error':
-      throw new Error(`DriverManager (${result.data.error_type}): ${result.data.error_message}`);
+      case 'Error':
+        throw new Error(`DriverManager (${result.data.error_type}): ${result.data.error_message}`);
 
-    default:
-      throw new Error(`Received ${result.type} from Driver Manager: ${JSON.stringify(result.data, null, 2)}`);
+      default:
+        throw new Error(`Received ${result.type} from Driver Manager: ${JSON.stringify(result.data, null, 2)}`);
+    }
+  } catch (e) {
+    console.error(`Failed to Parse DriverManager Message: ${response} (${e.message})`)
   }
 }
 
