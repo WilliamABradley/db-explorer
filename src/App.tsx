@@ -15,6 +15,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      <Editor value={sql} onChange={setSQL} />
       <Button
         title="Run"
         onPress={() => {
@@ -38,7 +39,6 @@ export default function App() {
             });
         }}
       />
-      <Editor value={sql} onChange={setSQL} />
       <Text>Results:</Text>
       <ScrollView>
         <Text>{results}</Text>
