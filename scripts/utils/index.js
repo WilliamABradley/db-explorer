@@ -35,6 +35,10 @@ const platforms = {
     gradle: {
       root: path.resolve(androidDir, 'build.gradle')
     },
+    ndk: {
+      version_long: '21.4.7075529',
+      version: 'r21e'
+    },
     targets: {
       'armv7-linux-androideabi': {
         platform: 'arm',

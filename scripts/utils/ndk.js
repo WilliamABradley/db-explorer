@@ -27,7 +27,8 @@ switch (os.platform()) {
     throw new Error('Unknown prebuilt see: https://developer.android.com/ndk/guides/other_build_systems');
 }
 
-const toolchainsDir = path.resolve(ndkHome, 'toolchains', 'llvm', 'prebuilt', platformBinaryFolder);
+const toolchainsPrebuiltDir = path.resolve(ndkHome, 'toolchains', 'llvm', 'prebuilt');
+const toolchainsDir = path.resolve(toolchainsPrebuiltDir, platformBinaryFolder);
 const toolchainBinaryDir = path.resolve(toolchainsDir, 'bin');
 
 const gradleData = fs.readFileSync(androidConfig.gradle.root, 'utf-8');
@@ -59,6 +60,7 @@ function prepareNDK() {
 module.exports = {
   prepareNDK,
   ndkHome,
+  toolchainsPrebuiltDir,
   toolchainsDir,
   toolchainBinaryDir,
   androidTargetSDKVersion,
