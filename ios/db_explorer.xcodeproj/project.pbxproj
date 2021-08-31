@@ -11,10 +11,10 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		21519AC526D673DD003B0409 /* NativeDatabaseDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */; };
 		21519ACB26DA0033003B0409 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 21519ACA26DA0018003B0409 /* libresolv.tbd */; };
-		21519ACC26DA0049003B0409 /* libshared.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21519AC926D9FFEE003B0409 /* libshared.a */; };
 		21519ACF26DA0155003B0409 /* DriverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519ACE26DA0155003B0409 /* DriverManager.swift */; };
 		21519AD326DA0472003B0409 /* DriverManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 21519AD226DA0472003B0409 /* DriverManager.m */; };
 		21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B708B926D5123700A27C5B /* AppDelegate.swift */; };
+		21C45ECD26DE5470005BE6BB /* libdb_explorer_shared.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 21C45ECC26DE545F005BE6BB /* libdb_explorer_shared.a */; };
 		21F6AB3A26D147D00093BEC5 /* editor.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 21F6AB3926D147D00093BEC5 /* editor.bundle */; };
 		6C6679D22FB5287CC158E06C /* libPods-db_explorer-db_explorerTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DEFA357FBE069344366D11E1 /* libPods-db_explorer-db_explorerTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -42,11 +42,12 @@
 		21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeDatabaseDriver.swift; sourceTree = "<group>"; };
 		21519AC926D9FFEE003B0409 /* libshared.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libshared.a; path = ../shared/target/universal/release/libshared.a; sourceTree = "<group>"; };
 		21519ACA26DA0018003B0409 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
-		21519ACD26DA007F003B0409 /* shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shared.h; path = ../shared/src/shared.h; sourceTree = "<group>"; };
 		21519ACE26DA0155003B0409 /* DriverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverManager.swift; sourceTree = "<group>"; };
 		21519AD226DA0472003B0409 /* DriverManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DriverManager.m; sourceTree = "<group>"; };
 		21B708B926D5123700A27C5B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = db_explorer/AppDelegate.swift; sourceTree = "<group>"; };
 		21B708BB26D5126000A27C5B /* db_explorer-Bridging-Header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "db_explorer-Bridging-Header.h"; path = "db_explorer/db_explorer-Bridging-Header.h"; sourceTree = "<group>"; };
+		21C45ECC26DE545F005BE6BB /* libdb_explorer_shared.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libdb_explorer_shared.a; path = ../shared/target/universal/release/libdb_explorer_shared.a; sourceTree = "<group>"; };
+		21C45ECE26DE5502005BE6BB /* db_explorer_shared.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = db_explorer_shared.h; path = ../shared/src/db_explorer_shared.h; sourceTree = "<group>"; };
 		21F6AB3926D147D00093BEC5 /* editor.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = editor.bundle; path = ../assets/editor.bundle; sourceTree = "<group>"; };
 		3AF46295759B14A5039288DF /* Pods-db_explorer-db_explorerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-db_explorer-db_explorerTests.release.xcconfig"; path = "Target Support Files/Pods-db_explorer-db_explorerTests/Pods-db_explorer-db_explorerTests.release.xcconfig"; sourceTree = "<group>"; };
 		3F12471BA39DBBF934C43001 /* Pods-db_explorer.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-db_explorer.debug.xcconfig"; path = "Target Support Files/Pods-db_explorer/Pods-db_explorer.debug.xcconfig"; sourceTree = "<group>"; };
@@ -71,8 +72,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				86A518C732D10507BE4318F0 /* libPods-db_explorer.a in Frameworks */,
-				21519ACC26DA0049003B0409 /* libshared.a in Frameworks */,
 				21519ACB26DA0033003B0409 /* libresolv.tbd in Frameworks */,
+				21C45ECD26DE5470005BE6BB /* libdb_explorer_shared.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -101,6 +102,7 @@
 			children = (
 				21519AB926D66555003B0409 /* drivers */,
 				21B708BB26D5126000A27C5B /* db_explorer-Bridging-Header.h */,
+				21C45ECE26DE5502005BE6BB /* db_explorer_shared.h */,
 				21F6AB3926D147D00093BEC5 /* editor.bundle */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -124,6 +126,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				21C45ECC26DE545F005BE6BB /* libdb_explorer_shared.a */,
 				21519ACA26DA0018003B0409 /* libresolv.tbd */,
 				21519AC926D9FFEE003B0409 /* libshared.a */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
@@ -143,7 +146,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				21519ACD26DA007F003B0409 /* shared.h */,
 				13B07FAE1A68108700A75B9A /* db_explorer */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* db_explorerTests */,
