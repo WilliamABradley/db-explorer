@@ -227,7 +227,7 @@ dependencies {
     // Utils
     implementation "androidx.work:work-runtime-ktx:2.5.0"
     implementation 'com.google.code.gson:gson:2.8.5'
-    implementation 'com.github.jnr:jnr-ffi:2.2.3'
+    implementation 'net.java.dev.jna:jna:5.9.0@aar'
 
     // Drivers
     implementation 'com.github.jasync-sql:jasync-postgresql:1.1.6'

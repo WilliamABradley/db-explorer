@@ -9,6 +9,7 @@ const outDir = path.resolve(destDir, 'output');
 
 // On windows, we use wsl to compile openssl
 const NDK_PATH = isWindows ? process.env.NDK_LINUX : ndkHome;
+let openSSLVersion = '';
 
 function fetchOpenSSLScripts() {
   if (!fs.existsSync(libsDir)) {
@@ -26,9 +27,14 @@ function fetchOpenSSLScripts() {
     });
   }
   console.log();
+
+  const matchOpenSSLVersion = /version="(.*)"/g;
+  //const openSSLBuilder = 
 }
 
 function ensureOpenSSLToolsReady() {
+  fetchOpenSSLScripts();
+
   // Ensure pkg-config is installed.
   const pkgConfigPath = exec('bash -c \"which pkg-config\"', { stdio: 'pipe' })?.toString();
   if (!pkgConfigPath) {
@@ -60,7 +66,10 @@ function getOrBuildOpenSSLDir(target) {
         api: androidTargetSDKVersion,
         ANDROID_NDK_ROOT: NDK_PATH,
         PKG_CONFIG_PATH: '/usr/lib/pkgconfig',
-        WSLENV: 'api:ANDROID_NDK_ROOT/p:PKG_CONFIG_PATH',
+        // Remove the version postfix, it causes load errors.
+        SHLIB_VERSION_NUMBER: '',
+        SHLIB_EXT: '_11.so',
+        WSLENV: 'api:ANDROID_NDK_ROOT/p:PKG_CONFIG_PATH:SHLIB_VERSION_NUMBER:SHLIB_EXT',
         PATH: isWindows ? `${process.env.PATH};${toolchainBinaryDir}` : process.env.PATH,
       }
     });

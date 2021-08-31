@@ -50,3 +50,13 @@ where
 pub fn to_cchar(source: String) -> *mut c_char {
   return CString::new(source).unwrap().into_raw();
 }
+
+#[no_mangle]
+pub extern "C" fn free_message(s: *mut c_char) -> () {
+  unsafe {
+    if s.is_null() {
+      return;
+    }
+    CString::from_raw(s)
+  };
+}

@@ -6,14 +6,12 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
+import com.sun.jna.Library;
+import com.sun.jna.Native;
 
 public class DriverManager extends ReactContextBaseJavaModule {
   DriverManager(ReactApplicationContext context) {
     super(context);
-  }
-
-  static {
-    System.loadLibrary("shared");
   }
 
   @NonNull
@@ -24,8 +22,12 @@ public class DriverManager extends ReactContextBaseJavaModule {
 
   @ReactMethod
   public void postMessage(final String data, Promise promise) {
-    promise.resolve(DriverManager.receiveMessage(data));
+    promise.resolve(DriverInterface.INSTANCE.receive_message(data));
   }
 
-  private static native String receiveMessage(final String data);
+  public interface DriverInterface extends Library {
+    DriverInterface INSTANCE = (DriverInterface) Native.load("db_explorer_shared", DriverInterface.class);
+
+    String receive_message(String message_raw);
+  }
 }

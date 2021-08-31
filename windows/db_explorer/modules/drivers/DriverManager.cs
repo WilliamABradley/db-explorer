@@ -21,11 +21,14 @@ namespace db_explorer.modules.drivers
         [ReactMethod("postMessage")]
         public Task<string> PostMessage(string data)
         {
-            return Task.Run(() => post_message(data));
+            return Task.Run(() => {
+                var message = post_message(data);
+                return message;
+            });
         }
 
         // Post Message to library.
-        [DllImport("shared.dll", EntryPoint = "receive_message")]
+        [DllImport("db_explorer_shared.dll", EntryPoint = "receive_message")]
         private static extern string post_message(string data);
     }
 }

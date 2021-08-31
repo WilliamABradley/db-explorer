@@ -15,7 +15,7 @@ const iosDir = path.resolve(rootDir, 'ios');
 
 const rust = {
   dir: rustDir,
-  libName: 'libshared',
+  libName: 'libdb_explorer_shared',
 };
 
 const platforms = {
@@ -97,12 +97,26 @@ const exec = (command, options) => {
 
 const copy = (source, dest) => {
   console.log(`Copying ${source} > ${dest}`);
-  fs.copyFileSync(source, dest);
+  if (fs.statSync(source).isDirectory()) {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const item of fs.readdirSync(source)) {
+      copy(path.resolve(source, item), path.resolve(dest, item));
+    }
+  } else {
+    fs.copyFileSync(source, dest);
+  }
 };
 
 const link = (source, dest) => {
   console.log(`Linking ${source} > ${dest}`);
-  fs.linkSync(source, dest);
+  if (fs.statSync(source).isDirectory()) {
+    fs.mkdirSync(dest, { recursive: true });
+    for (const item of fs.readdirSync(source)) {
+      link(path.resolve(source, item), path.resolve(dest, item));
+    }
+  } else {
+    fs.linkSync(source, dest);
+  }
 };
 
 const rmIfExists = (source) => {

@@ -12,7 +12,7 @@ use std::panic;
 use utils::*;
 
 #[no_mangle]
-pub extern "system" fn receive_message(message_raw: *const c_char) -> *mut c_char {
+pub extern "C" fn receive_message(message_raw: *const c_char) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(message_raw) };
     let message_str = c_str.to_str();
     // Return null if no message was passed.
