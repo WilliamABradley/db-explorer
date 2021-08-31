@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { exec, link, rmIfExists, rust, platforms: { android: androidConfig }, copy } = require('./utils');
-const { getOrBuildOpenSSLDir } = require('./utils/openssl');
+const { getOrFetchOpenSSLDir } = require('./utils/openssl');
 
 const jniFolder = path.resolve(androidConfig.dir, 'app', 'src', 'main', 'jniLibs');
 const rustBinary = `${rust.libName}.so`;
@@ -17,8 +17,7 @@ for (const [target, info] of Object.entries(androidConfig.targets)) {
   const destBinary = path.resolve(abiJniFolder, rustBinary);
   rmIfExists(destBinary);
 
-  const openSSLDir = getOrBuildOpenSSLDir(target);
-  const openSSLLibDir = path.resolve(openSSLDir, 'lib');
+  const openSSLDir = getOrFetchOpenSSLDir(target);
 
   exec(`cargo build --target ${target} --release`, {
     cwd: rust.dir,
@@ -30,10 +29,10 @@ for (const [target, info] of Object.entries(androidConfig.targets)) {
   console.log();
   console.log('Copying OpenSSL Libs');
   link(buildBinary, destBinary);
-  for (const item of fs.readdirSync(openSSLLibDir)) {
+  for (const item of fs.readdirSync(openSSLDir)) {
     const dest = path.resolve(abiJniFolder, item);
     rmIfExists(dest);
-    link(path.resolve(openSSLLibDir, item), dest);
+    link(path.resolve(openSSLDir, item), dest);
   }
 
   console.log();

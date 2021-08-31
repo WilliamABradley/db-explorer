@@ -1,78 +1,49 @@
 const fs = require('fs');
 const path = require('path');
-const { exec, libsDir, isWindows, platforms } = require('.');
-const { androidTargetSDKVersion, ndkHome, toolchainBinaryDir } = require('./ndk');
+const { exec, libsDir, platforms, rmIfExists, copy } = require('.');
 
-const destDir = path.resolve(libsDir, 'openssl_for_ios_and_android');
-const scriptsDir = path.resolve(destDir, 'tools');
-const outDir = path.resolve(destDir, 'output');
+const destDir = path.resolve(libsDir, 'android_openssl_bin');
+const target_openssl = 'latest';
+const actual_openssl = '1.1.1k';
+const postfix = '_1_1.so';
+const srcDir = path.resolve(destDir, `openssl-${actual_openssl}`);
 
-// On windows, we use wsl to compile openssl
-const NDK_PATH = isWindows ? process.env.NDK_LINUX : ndkHome;
-let openSSLVersion = '';
-
-function fetchOpenSSLScripts() {
-  if (!fs.existsSync(libsDir)) {
-    fs.mkdirSync(libsDir, { recursive: true });
-  }
-
-  console.log('Cloning Android+iOS Open SSL Repo');
-  if (!fs.existsSync(destDir)) {
-    exec(`git clone https://github.com/leenjewel/openssl_for_ios_and_android`, {
-      cwd: libsDir,
-    });
-  } else {
-    exec('git pull origin master', {
+function getOpenSSLIncludes() {
+  if (!fs.existsSync(srcDir)) {
+    const openssl_gz = 'openssl.tar.gz';
+    exec(`curl -o ${openssl_gz} https://www.openssl.org/source/openssl-${actual_openssl}.tar.gz`, {
       cwd: destDir,
     });
-  }
-  console.log();
 
-  const matchOpenSSLVersion = /version="(.*)"/g;
-  //const openSSLBuilder = 
-}
-
-function ensureOpenSSLToolsReady() {
-  fetchOpenSSLScripts();
-
-  // Ensure pkg-config is installed.
-  const pkgConfigPath = exec('bash -c \"which pkg-config\"', { stdio: 'pipe' })?.toString();
-  if (!pkgConfigPath) {
-    if (isWindows) {
-      console.error('open wsl and run \"sudo apt-get install -y pkg-config\"');
-      process.exit(-1);
-    } else {
-      exec('brew install pkg-config');
-    }
-  }
-
-  if (!NDK_PATH) {
-    console.error('can\'t find NDK, for windows this must be environment variable named NDK_LINUX, as this is compiled with WSL, otherwise it must be in the NDK Environment variable.');
-    process.exit(-1);
-  }
-}
-
-function getOrBuildOpenSSLDir(target) {
-  ensureOpenSSLToolsReady();
-  const info = platforms.android.targets[target];
-  const targetOutDir = path.resolve(outDir, 'android', `openssl-${info.abiName}`);
-
-  // Only build if not exists.
-  if (!fs.existsSync(path.resolve(targetOutDir, 'bin'))) {
-    console.log(`Building OpenSSL for ${target}`);
-    exec(`bash ./build-android-openssl.sh ${info.platform}`, {
-      cwd: scriptsDir,
-      env: {
-        api: androidTargetSDKVersion,
-        ANDROID_NDK_ROOT: NDK_PATH,
-        PKG_CONFIG_PATH: '/usr/lib/pkgconfig',
-        // Remove the version postfix, it causes load errors.
-        SHLIB_VERSION_NUMBER: '',
-        SHLIB_EXT: '_11.so',
-        WSLENV: 'api:ANDROID_NDK_ROOT/p:PKG_CONFIG_PATH:SHLIB_VERSION_NUMBER:SHLIB_EXT',
-        PATH: isWindows ? `${process.env.PATH};${toolchainBinaryDir}` : process.env.PATH,
-      }
+    exec(`tar -xf ${openssl_gz}`, {
+      cwd: destDir,
     });
+    fs.rmSync(openssl_gz, { force: true });
+  }
+}
+
+function getOrFetchOpenSSLDir(target) {
+  getOpenSSLIncludes();
+
+  const info = platforms.android.targets[target];
+  const targetOutDir = path.resolve(destDir, info.platform);
+  const targetOutLibDir = path.resolve(targetOutDir, 'lib');
+  const targetOutIncludeDir = path.resolve(targetOutDir, 'include');
+
+  // Only do if not exists.
+  if (!fs.existsSync(targetOutDir)) {
+    fs.mkdirSync(targetOutLibDir, { recursive: true });
+    rmIfExists(targetOutIncludeDir);
+    copy(path.resolve(srcDir, 'include'), targetOutIncludeDir);
+
+    console.log(`Fetching OpenSSL lib for ${target}`);
+    const files = ['libssl', 'libcrypto'];
+    for (const file of files) {
+      const fullSOName = `${file}${postfix}`;
+      exec(`curl -o ${fullSOName} https://raw.githubusercontent.com/KDAB/android_openssl/master/${target_openssl}/${target.platform}/${fullSOName}`, {
+        cwd: targetOutLibDir,
+      });
+    }
   }
 
   console.log();
@@ -80,7 +51,5 @@ function getOrBuildOpenSSLDir(target) {
 }
 
 module.exports = {
-  fetchOpenSSLScripts,
-  ensureOpenSSLToolsReady,
-  getOrBuildOpenSSLDir,
+  getOrFetchOpenSSLDir,
 };
