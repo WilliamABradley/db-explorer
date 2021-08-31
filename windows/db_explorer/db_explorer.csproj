@@ -110,26 +110,26 @@
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <EmbeddedResource Include="..\..\shared\target\x86_64-pc-windows-msvc\debug\shared.dll">
-      <Link>shared.dll</Link>
+    <EmbeddedResource Include="..\..\shared\target\x86_64-pc-windows-msvc\debug\db_explorer_shared.dll">
+      <Link>db_explorer_shared.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <EmbeddedResource Include="..\..\shared\target\x86_64-pc-windows-msvc\release\shared.dll">
-      <Link>shared.dll</Link>
+    <EmbeddedResource Include="..\..\shared\target\x86_64-pc-windows-msvc\release\db_explorer_shared.dll">
+      <Link>db_explorer_shared.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM64'">
-    <EmbeddedResource Include="..\..\shared\target\aarch64-pc-windows-msvc\debug\shared.dll">
-      <Link>shared.dll</Link>
+    <EmbeddedResource Include="..\..\shared\target\aarch64-pc-windows-msvc\debug\db_explorer_shared.dll">
+      <Link>db_explorer_shared.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|ARM64'">
-    <EmbeddedResource Include="..\..\shared\target\aarch64-pc-windows-msvc\release\shared.dll">
-      <Link>shared.dll</Link>
+    <EmbeddedResource Include="..\..\shared\target\aarch64-pc-windows-msvc\release\db_explorer_shared.dll">
+      <Link>db_explorer_shared.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
