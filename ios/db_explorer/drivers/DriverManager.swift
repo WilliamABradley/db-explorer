@@ -6,11 +6,15 @@ class DriverManager : NSObject {
       return false
   }
   
-  @objc func postMessage(_ data: NSString, resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
-    let input = String(data)
-    let response = receive_message(input)
-    let result = String(cString: response!)
-    free(UnsafeMutablePointer(mutating: response))
-    resolve(result)
+  @objc func postMessage(_ data: NSString, resolve: @escaping RCTPromiseResolveBlock, reject: @escaping RCTPromiseRejectBlock) -> Void {
+    DispatchQueue.global(qos: .background).async {
+      let input = data.cString(using: String.Encoding.utf8.rawValue)
+      let response = receive_message(input)
+      let result = String(cString: response!)
+      free_message(UnsafeMutablePointer(mutating: response))
+      DispatchQueue.main.async {
+        resolve(result)
+      }
+    }
   }
 }
