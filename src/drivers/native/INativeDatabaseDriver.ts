@@ -13,6 +13,11 @@ export default interface INativeDatabaseDriver {
     id: number,
     sql: string,
     variables?: Record<string, any>,
+  ): Promise<number>;
+  query(
+    id: number,
+    sql: string,
+    variables?: Record<string, any>,
   ): Promise<DatabaseQueryResult>;
   flush(): Promise<void>;
 }

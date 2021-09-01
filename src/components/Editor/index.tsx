@@ -59,6 +59,7 @@ export default function Editor({value, onChange}: EditorProps): JSX.Element {
 
       // Scripts Loaded, initialise the editor.
       case 'loaded':
+        console.log('Initialising Monaco Context');
         init({
           contextmenu: false,
           minimap: {
@@ -87,6 +88,7 @@ export default function Editor({value, onChange}: EditorProps): JSX.Element {
         throw new Error(`Editor Failed to Load View`);
 
       case 'setValue':
+        _lastSetValue = message;
         onChange?.(message);
         break;
 

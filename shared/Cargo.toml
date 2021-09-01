@@ -1,0 +1,35 @@
+[package]
+name = "db_explorer_shared"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["dylib", "staticlib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+cargo-lipo = "3.1.1"
+
+[dependencies]
+serde = "1.0"
+serde_json = "1.0"
+lazy_static = "1.4.0"
+async-trait = "0.1.51"
+futures-util = "0.3"
+strum = "0.21.0"
+strum_macros = "0.21.1"
+futures = "0.3"
+backtrace = "0.3"
+sqlx = { version = "0.5", default_features = false, features = [ "postgres", "offline" ], optional = true }
+
+###########
+# ANDROID #
+###########
+
+[features]
+default = ["sqlx/runtime-async-std-native-tls"]
+windows = ["sqlx/runtime-async-std-native-tls"]
+ios = ["sqlx/runtime-async-std-native-tls"]
+# Native TLS on Android requires openssl.
+android = ["sqlx/runtime-async-std-rustls"]

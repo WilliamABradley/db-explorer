@@ -1,10 +1,11 @@
-import DatabaseConnectionInfo from './models/DatabaseConnectionInfo';
-import DatabaseDriver from './DatabaseDriver';
-import INativeDatabaseDriver from './interfaces/INativeDatabaseDriver';
-import DatabaseQueryResult from './models/DatabaseQueryResult';
+import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
+import DatabaseDriver from '../DatabaseDriver';
+import INativeDatabaseDriver from './INativeDatabaseDriver';
+import DatabaseQueryResult from '../models/DatabaseQueryResult';
 
 // Logic to ensure hot reload doesn't leave connections open.
 const flushDictionary: string[] = [];
+const FLUSH = false;
 
 export default abstract class NativeDriver extends DatabaseDriver {
   constructor(
@@ -31,7 +32,7 @@ export default abstract class NativeDriver extends DatabaseDriver {
     console.debug(`Aquiring Native ${this.#driverName} Instance`);
 
     // Handle hot flush.
-    if (__DEV__ && !flushDictionary.includes(this.#driverName)) {
+    if (FLUSH && __DEV__ && !flushDictionary.includes(this.#driverName)) {
       console.debug(`Flushing ${this.#driverName}`);
       const flush = this.#driver.flush();
       this.#instance = flush.then(() => {
@@ -70,9 +71,19 @@ export default abstract class NativeDriver extends DatabaseDriver {
   protected override async _execute(
     sql: string,
     variables?: Record<string, any>,
-  ): Promise<DatabaseQueryResult> {
+  ): Promise<number> {
     console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
     const result = await this.#driver.execute(this.#instanceId, sql, variables);
+    console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
+    return result;
+  }
+
+  protected override async _query(
+    sql: string,
+    variables?: Record<string, any>,
+  ): Promise<DatabaseQueryResult> {
+    console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
+    const result = await this.#driver.query(this.#instanceId, sql, variables);
     console.debug(`Executed on ${this.#driverName}: ${this.#instanceId}`);
     return result;
   }

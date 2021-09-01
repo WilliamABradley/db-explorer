@@ -12,3 +12,5 @@
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
 #endif
+
+#import "db_explorer_shared.h"

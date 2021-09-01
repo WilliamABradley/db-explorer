@@ -1,10 +1,51 @@
 /* eslint-disable no-unused-vars */
+var platform;
+var handle;
+
 function getHandle() {
-  return window.ReactNativeWebView || window.__REACT_WEB_VIEW_BRIDGE;
+  if (handle) {
+    return handle;
+  }
+
+  if (window.__REACT_WEB_VIEW_BRIDGE) {
+    platform = 'windows';
+  } else if (window.ReactNativeWebView) {
+    platform = window.webkit ? 'ios'
+      : 'android';
+  }
+  handle = window.ReactNativeWebView || window.__REACT_WEB_VIEW_BRIDGE;
+
+  if (handle) {
+    // Android posts to the document, everything else posts to the window.
+    let listenTo = platform === 'android' ? document : window;
+    listenTo.addEventListener('message', function (payload) {
+      var dataPayload;
+      try {
+        // Ignore vscode messages.
+        if (typeof payload.data === 'object' && payload.data.vscodeSetImmediateId) {
+          return;
+        }
+        dataPayload = JSON.parse(payload.data);
+      } catch (e) {
+        throw new Error(`Invalid Parent Message: ${JSON.stringify(payload.data)}`);
+      }
+
+      if (dataPayload) {
+        console.log(`[Parent] ${dataPayload.type}`);
+        if (typeof window.receiveMessage === 'function') {
+          window.receiveMessage(dataPayload.type, dataPayload.message);
+        } else {
+          console.log('Receive Message not attached to window!', dataPayload);
+        }
+      }
+    });
+  }
+
+  return handle;
 }
 
 function sendMessage(type, message) {
-  const payload = {type, message};
+  const payload = { type, message };
   let encoded;
   try {
     encoded = JSON.stringify(payload);
@@ -36,26 +77,6 @@ console = {
   warn: msg => log('warn', msg),
   error: msg => log('error', msg),
 };
-
-window.addEventListener('message', function (payload) {
-  var dataPayload;
-  try {
-    // Ignore vscode messages.
-    if (typeof payload.data === 'object' && payload.data.vscodeSetImmediateId) {
-      return;
-    }
-    dataPayload = JSON.parse(payload.data);
-  } catch (e) {
-    throw new Error(`Invalid Parent Message: ${JSON.stringify(payload.data)}`);
-  }
-
-  if (dataPayload) {
-    console.log(`[Parent] ${dataPayload.type}`);
-    if (typeof window.receiveMessage === 'function') {
-      window.receiveMessage(dataPayload.type, dataPayload.message);
-    }
-  }
-});
 
 window.onerror = function (message, source, lineno, colno, error) {
   sendMessage('fatal', {

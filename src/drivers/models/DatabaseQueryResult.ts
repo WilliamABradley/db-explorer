@@ -2,6 +2,5 @@ import DatabaseColumnInfo from './DatabaseColumnInfo';
 
 export default interface DatabaseQueryResult {
   columns: DatabaseColumnInfo[];
-  rows: string[][];
-  affectedRows: number;
+  rows: (string | null)[][];
 };
