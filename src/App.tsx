@@ -9,7 +9,7 @@ let driver: DatabaseDriver;
 let driverConnect: Promise<void> | undefined;
 
 export default function App() {
-  const [sql, setSQL] = useState('SELECT * FROM INFORMATION_SCHEMA.TABLES;');
+  const [sql, setSQL] = useState('SELECT * FROM public.user;');
   const [results, setResults] = useState('');
 
   return (
@@ -52,5 +52,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
+    backgroundColor: 'white',
+    color: 'black',
   },
 });

@@ -16,7 +16,7 @@ for (const [target, info] of Object.entries(androidConfig.targets)) {
   const destBinary = path.resolve(abiJniFolder, rustBinary);
   rmIfExists(destBinary);
 
-  exec(`cargo build --features "android" --target ${target} --release`, {
+  exec(`cargo build --features "android" --no-default-features --target ${target} --release`, {
     cwd: rust.dir,
   });
 

@@ -27,10 +27,8 @@ sqlx = { version = "0.5", default_features = false, features = [ "postgres", "of
 # ANDROID #
 ###########
 
-[target.'cfg(any(target_os = "android"))'.dependencies]
-jni = { version = "0.19", default-features = false }
-
 [features]
+default = ["sqlx/runtime-async-std-native-tls"]
 windows = ["sqlx/runtime-async-std-native-tls"]
 ios = ["sqlx/runtime-async-std-native-tls"]
 # Native TLS on Android requires openssl.

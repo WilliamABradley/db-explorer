@@ -35,6 +35,6 @@ namespace db_explorer.modules.drivers
 
         // Free Message from library.
         [DllImport("db_explorer_shared.dll", EntryPoint = "free_message")]
-        private static extern void free_message(string message);
+        private static extern void free_message(IntPtr messagePtr);
     }
 }
