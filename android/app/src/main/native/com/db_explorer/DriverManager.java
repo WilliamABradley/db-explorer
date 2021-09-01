@@ -28,6 +28,6 @@ public class DriverManager extends ReactContextBaseJavaModule {
   public interface DriverInterface extends Library {
     DriverInterface INSTANCE = (DriverInterface) Native.load("db_explorer_shared", DriverInterface.class);
 
-    String receive_message(String message_raw);
+    String receive_message(String message);
   }
 }

@@ -12,18 +12,20 @@ use std::panic;
 use utils::*;
 
 #[no_mangle]
-pub extern "C" fn receive_message(message_raw: *const c_char) -> *mut c_char {
-    let c_str = unsafe { CStr::from_ptr(message_raw) };
+pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
+    let c_str = unsafe { CStr::from_ptr(message) };
     let message_str = c_str.to_str();
     // Return null if no message was passed.
     if message_str.is_err() {
         return std::ptr::null_mut();
     }
+    // Copy the message incase the pointer is taken away.
+    let message_clone = message_str.unwrap().clone();
 
     let trace = Backtrace::new();
 
     let result = panic::catch_unwind(|| {
-        let future = manager::handle_message(message_str.unwrap());
+        let future = manager::handle_message(message_clone);
         return to_cchar(block_on(future));
     });
 

@@ -19,16 +19,22 @@ namespace db_explorer.modules.drivers
         }
 
         [ReactMethod("postMessage")]
-        public Task<string> PostMessage(string data)
+        public Task<string> PostMessage(string message)
         {
             return Task.Run(() => {
-                var message = post_message(data);
-                return message;
+                var resultPtr = post_message(message);
+                string result = Marshal.PtrToStringAnsi(resultPtr);
+                free_message(resultPtr);
+                return result;
             });
         }
 
         // Post Message to library.
         [DllImport("db_explorer_shared.dll", EntryPoint = "receive_message")]
-        private static extern string post_message(string data);
+        private static extern IntPtr post_message(string message);
+
+        // Free Message from library.
+        [DllImport("db_explorer_shared.dll", EntryPoint = "free_message")]
+        private static extern void free_message(string message);
     }
 }
