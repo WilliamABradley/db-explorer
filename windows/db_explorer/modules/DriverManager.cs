@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
-namespace db_explorer.modules.drivers
+namespace db_explorer.modules
 {
     [ReactModule(nameof(DriverManager))]
     public class DriverManager

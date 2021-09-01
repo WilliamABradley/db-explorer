@@ -84,11 +84,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="modules\ContextMenuHandle.cs" />
-    <Compile Include="modules\drivers\DriverManager.cs" />
-    <Compile Include="modules\drivers\INativeDatabaseDriver.cs" />
-    <Compile Include="modules\drivers\models\DatabaseColumnInfo.cs" />
-    <Compile Include="modules\drivers\models\DatabaseQueryResult.cs" />
-    <Compile Include="modules\drivers\PostgresDriver.cs" />
+    <Compile Include="modules\DriverManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutolinkedNativeModules.g.cs" />
     <Compile Include="ReactPackageProvider.cs" />
@@ -178,9 +174,6 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
-    </PackageReference>
-    <PackageReference Include="Npgsql">
-      <Version>5.0.7</Version>
     </PackageReference>
     <PackageReference Include="ReactNative.Hermes.Windows">
       <Version>0.8.0-ms.0</Version>
