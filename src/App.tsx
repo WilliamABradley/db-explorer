@@ -1,6 +1,13 @@
 import * as React from 'react';
-import { useState } from 'react';
-import { StyleSheet, View, Text, Button, ScrollView, SafeAreaView } from 'react-native';
+import {useState} from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  Button,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
 import Editor from './components/Editor';
 import DatabaseDriver from './drivers/DatabaseDriver';
 import PostgresDriver from './drivers/postgres';
@@ -27,8 +34,7 @@ export default function App() {
                 database: 'api',
                 ssl: false,
               });
-              driverConnect = driver
-                .connect();
+              driverConnect = driver.connect();
             }
 
             driverConnect!
@@ -52,7 +58,5 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    backgroundColor: 'white',
-    color: 'black',
   },
 });
