@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "config:toolchains": "node scripts/configureNativeToolchains",
-    "postinstall": "node scripts/buildMonaco",
+    "build:monaco": "node scripts/buildMonaco",
+    "postinstall": "rn-nodeify --yarn --hack --install \"process,stream,events,buffer\"",
     "prewindows": "node scripts/buildSharedWindows --debug",
     "windows": "react-native run-windows --arch x64",
     "preandroid": "node scripts/buildSharedAndroid",
@@ -16,12 +17,19 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "buffer": "^4.9.1",
+    "events": "1.0.0",
     "metro-config": "^0.66.2",
+    "pg-types": "^3.0.1",
+    "process": "^0.11.0",
     "react": "^17.0.2",
     "react-native": "^0.65.1",
     "react-native-table-component": "^1.2.1",
     "react-native-webview": "^11.13.0",
-    "react-native-windows": "^0.65.0-0"
+    "react-native-windows": "^0.65.0-0",
+    "readable-stream": "1.0.33",
+    "stream-browserify": "1.0.0",
+    "text-encoding": "^0.7.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
@@ -53,5 +61,21 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "react-native": {
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
+  },
+  "browser": {
+    "_stream_transform": "readable-stream/transform",
+    "_stream_readable": "readable-stream/readable",
+    "_stream_writable": "readable-stream/writable",
+    "_stream_duplex": "readable-stream/duplex",
+    "_stream_passthrough": "readable-stream/passthrough",
+    "stream": "stream-browserify"
   }
 }

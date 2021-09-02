@@ -9,6 +9,8 @@ import {
   SafeAreaView,
 } from 'react-native';
 import Editor from './components/Editor';
+import Convert from './dialects/postgres/types/Convert';
+import PgTypeInfo from './dialects/postgres/types/PgTypeInfo';
 import DatabaseDriver from './drivers/DatabaseDriver';
 import PostgresDriver from './drivers/postgres';
 
@@ -39,7 +41,22 @@ export default function App() {
 
             driverConnect!
               .then(() => driver.query(sql))
-              .then(results => setResults(JSON.stringify(results, null, 4)))
+              .then(results => {
+                const formattedResults = results.rows.map(r => {
+                  return r.reduce((row, c, i) => {
+                    const col = results.columns[i];
+                    const pgType = new PgTypeInfo(col.dataType);
+                    const rawVal = Array.isArray(c) ? Buffer.from(c) : c;
+                    let val = rawVal;
+                    if (rawVal !== null) {
+                      val = Convert(rawVal, pgType);
+                    }
+                    row[col.name] = val;
+                    return row;
+                  }, {} as Record<string, any>);
+                });
+                setResults(JSON.stringify(formattedResults, null, 4));
+              })
               .catch(e => {
                 console.error(e);
               });

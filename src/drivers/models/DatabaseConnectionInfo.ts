@@ -5,4 +5,4 @@ export default interface DatabaseConnectionInfo {
   username?: string;
   password?: string;
   database?: string;
-};
+}
