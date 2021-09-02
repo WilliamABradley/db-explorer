@@ -5,7 +5,7 @@
   "scripts": {
     "config:toolchains": "node scripts/configureNativeToolchains",
     "postinstall": "node scripts/buildMonaco",
-    "prewindows": "node scripts/buildSharedWindows",
+    "prewindows": "node scripts/buildSharedWindows --debug",
     "windows": "react-native run-windows --arch x64",
     "preandroid": "node scripts/buildSharedAndroid",
     "android": "react-native run-android",

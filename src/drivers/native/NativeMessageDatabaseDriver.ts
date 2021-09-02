@@ -13,7 +13,7 @@ interface INativeMessageDatabaseDriver {
 
 const manager: INativeMessageDatabaseDriver = NativeModules.DriverManager;
 
-async function sendManagerMessage<T>(driver: string, type: string, data?: any, id?: number): Promise<T> {
+async function sendManagerMessage<T = undefined>(driver: string, type: string, data?: any, id?: number): Promise<T> {
   const message = {
     type: 'DatabaseDriver',
     data: {
@@ -24,20 +24,22 @@ async function sendManagerMessage<T>(driver: string, type: string, data?: any, i
     },
   };
   const response = await manager.postMessage(JSON.stringify(message));
+  let result: any;
   try {
-    const result = JSON.parse(response);
-    switch (result.type) {
-      case 'Result':
-        return result.data;
-
-      case 'Error':
-        throw new Error(`DriverManager (${result.data.error_type}): ${result.data.error_message}`);
-
-      default:
-        throw new Error(`Received ${result.type} from Driver Manager: ${JSON.stringify(result.data, null, 2)}`);
-    }
+    result = JSON.parse(response);
   } catch (e) {
-    console.error(`Failed to Parse DriverManager Message: ${response} (${e.message})`)
+    throw new Error(`Failed to Parse DriverManager Message: ${response} (${e.message})`)
+  }
+
+  switch (result.type) {
+    case 'Result':
+      return result.data;
+
+    case 'Error':
+      throw new Error(`DriverManager (${result.data.error_type}): ${result.data.error_message}`);
+
+    default:
+      throw new Error(`Received ${result.type} from Driver Manager: ${JSON.stringify(result.data, null, 2)}`);
   }
 }
 

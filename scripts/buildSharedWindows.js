@@ -4,8 +4,13 @@ const RELEASE_FLAG = "--release";
 const isRelease = npmInfo.cooked.includes(RELEASE_FLAG)
   || npmInfo.original.includes(RELEASE_FLAG)
   || npmInfo.remain.includes(RELEASE_FLAG);
+const DEBUG_FLAG = "--debug";
+const isDebug = !isRelease && process.argv.includes(DEBUG_FLAG);
 
-for (const [target] of Object.entries(windowsConfig.targets)) {
+for (const [target, info] of Object.entries(windowsConfig.targets)) {
+  if (isDebug && info.platform !== 'x64') {
+    continue;
+  }
   console.log(`Building Windows ${target}`);
 
   exec(`cargo build --features "windows" --no-default-features --target ${target}${isRelease ? ' --release' : ''}`, {

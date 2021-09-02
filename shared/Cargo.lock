@@ -292,6 +292,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "bstr"
+version = "0.2.16"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "90682c8d613ad3373e66de8c6411e0ae2ab2571e879d2efbf73558cc66f21279"
+dependencies = [
+ "lazy_static",
+ "memchr",
+ "regex-automata",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -459,6 +470,7 @@ version = "0.1.0"
 dependencies = [
  "async-trait",
  "backtrace",
+ "bstr",
  "cargo-lipo",
  "futures",
  "futures-util",
@@ -1238,6 +1250,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "regex-automata"
+version = "0.1.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6c230d73fb8d8c1b9c0b3135c5142a8acee3a0558fb8db5cf1cb65f8d7862132"
+
+[[package]]
 name = "regex-syntax"
 version = "0.6.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1478,8 +1496,7 @@ dependencies = [
 [[package]]
 name = "sqlx"
 version = "0.5.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e4b94ab0f8c21ee4899b93b06451ef5d965f1a355982ee73684338228498440"
+source = "git+https://github.com/williamabradley/sqlx?branch=exposed-driver#b2bd4adeb351b1ce34987d2ac34dc329fafa19e9"
 dependencies = [
  "sqlx-core",
  "sqlx-macros",
@@ -1488,8 +1505,7 @@ dependencies = [
 [[package]]
 name = "sqlx-core"
 version = "0.5.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec28b91a01e1fe286d6ba66f68289a2286df023fc97444e1fd86c2fd6d5dc026"
+source = "git+https://github.com/williamabradley/sqlx?branch=exposed-driver#b2bd4adeb351b1ce34987d2ac34dc329fafa19e9"
 dependencies = [
  "ahash",
  "atoi",
@@ -1537,8 +1553,7 @@ dependencies = [
 [[package]]
 name = "sqlx-macros"
 version = "0.5.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4dc33c35d54774eed73d54568d47a6ac099aed8af5e1556a017c131be88217d5"
+source = "git+https://github.com/williamabradley/sqlx?branch=exposed-driver#b2bd4adeb351b1ce34987d2ac34dc329fafa19e9"
 dependencies = [
  "dotenv",
  "either",
@@ -1560,8 +1575,7 @@ dependencies = [
 [[package]]
 name = "sqlx-rt"
 version = "0.5.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14302b678d9c76b28f2e60115211e25e0aabc938269991745a169753dc00e35c"
+source = "git+https://github.com/williamabradley/sqlx?branch=exposed-driver#b2bd4adeb351b1ce34987d2ac34dc329fafa19e9"
 dependencies = [
  "async-native-tls",
  "async-rustls",
@@ -1722,9 +1736,9 @@ checksum = "cda74da7e1a664f795bb1f8a87ec406fb89a02522cf6e50620d016add6dbbf5c"
 
 [[package]]
 name = "typenum"
-version = "1.13.0"
+version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "879f6906492a7cd215bfa4cf595b600146ccfac0c79bcbd1f3000162af5e8b06"
+checksum = "b63708a265f51345575b27fe43f9500ad611579e764c79edbc2037b1121959ec"
 
 [[package]]
 name = "unicode-bidi"

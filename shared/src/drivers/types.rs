@@ -9,18 +9,18 @@ pub enum DriverType {
   Postgres,
 }
 
-#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseColumnInfo {
   pub name: String,
-  pub dataType: String,
+  #[serde(rename = "dataType")]
+  pub data_type: String,
 }
 
-#[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DatabaseQueryResult {
   pub columns: Vec<DatabaseColumnInfo>,
-  pub rows: Vec<Vec<Option<String>>>,
+  // A vector of rows, containg a vector or columns, containing a vector of bytes.
+  pub rows: Vec<Vec<Option<Vec<u8>>>>,
 }
 
 #[derive(Debug)]

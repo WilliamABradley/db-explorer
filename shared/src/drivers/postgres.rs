@@ -7,7 +7,7 @@ use sqlx::postgres::Postgres;
 use sqlx::Column;
 use sqlx::Row;
 use std::collections::HashMap;
-use utils::pg_unwrap;
+use std::str;
 
 lazy_static! {
   static ref _CONFIGS: Mutex<HashMap<u32, HashMap<String, String>>> = Mutex::new(HashMap::new());
@@ -126,32 +126,31 @@ impl DatabaseDriver for PostgresDriver {
     }
 
     let mut columns: Vec<DatabaseColumnInfo> = Vec::new();
-    let mut rows: Vec<Vec<Option<String>>> = Vec::new();
+    let mut rows: Vec<Vec<Option<Vec<u8>>>> = Vec::new();
 
     let result_data = result.unwrap();
     if result_data.len() > 0 {
       let column_info = result_data[0].columns();
 
       for column in column_info {
-        let _type_info = column.type_info();
-        let serialized = serde_json::to_vec(&_type_info).unwrap();
-        let type_info: pg_unwrap::PgTypeInfo = serde_json::from_slice(&serialized).unwrap();
+        let type_info = column.type_info();
 
         columns.push(DatabaseColumnInfo {
           name: column.name().to_string(),
-          dataType: type_info.oid().to_string(),
+          data_type: type_info.oid().to_string(),
         });
       }
 
       for row in &result_data {
-        let mut data: Vec<Option<String>> = Vec::new();
+        let mut data: Vec<Option<Vec<u8>>> = Vec::new();
         for ordinal in 0..column_info.len() {
-          let _column = &column_info[ordinal];
-          let _value: Result<&str, sqlx::Error> = row.try_get(ordinal);
-          let value: Option<String> = match _value {
-            Ok(string_val) => Some(string_val.to_string()),
-            _ => None,
-          };
+          let value_ref = row.try_get_raw(ordinal).unwrap();
+
+          let mut value: Option<Vec<u8>> = None;
+          if value_ref.value.is_some() {
+            let value_bytes = value_ref.value.unwrap();
+            value = Some(value_bytes.to_vec());
+          }
           data.push(value);
         }
         rows.push(data);
