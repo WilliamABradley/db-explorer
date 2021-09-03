@@ -24,11 +24,19 @@ export default function Convert(val: Buffer, typeInfo: PgTypeInfo) {
   const isBinary = binaryParserKeys.includes(oidKey);
 
   let str: string | undefined;
+  const getStr = () => {
+    if (str) return;
+    str = textDecoder.decode(val);
+    if (str?.startsWith('\u0001')) {
+      str = str.substring(1);
+    }
+  };
+
   try {
     if (isBinary) {
       return binaryParsers[typeInfo.oid](val);
     } else {
-      str = textDecoder.decode(val);
+      getStr();
       if (isText) {
         return textParsers[typeInfo.oid](str!);
       } else {
@@ -36,7 +44,8 @@ export default function Convert(val: Buffer, typeInfo: PgTypeInfo) {
       }
     }
   } catch (e) {
+    getStr();
     console.error(e);
-    return str || textDecoder.decode(val);
+    return str;
   }
 }
