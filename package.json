@@ -17,6 +17,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@types/react-native-table-component": "^1.2.1",
     "buffer": "^4.9.1",
     "events": "1.0.0",
     "metro-config": "^0.66.2",

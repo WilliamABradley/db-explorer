@@ -1,19 +1,10 @@
 import * as React from 'react';
 import {useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Button,
-  ScrollView,
-  SafeAreaView,
-  Platform,
-} from 'react-native';
-import {TextDecoder, TextEncoder} from 'text-encoding';
+import {StyleSheet, View, Button, SafeAreaView, Platform} from 'react-native';
+import TableView from './components/DataViews/TableView';
 import Editor from './components/Editor';
-import Convert from './dialects/postgres/types/Convert';
-import PgTypeInfo from './dialects/postgres/types/PgTypeInfo';
 import DatabaseDriver from './drivers/DatabaseDriver';
+import DatabaseQueryResult from './drivers/models/DatabaseQueryResult';
 import PostgresDriver from './drivers/postgres';
 
 let driver: DatabaseDriver;
@@ -21,7 +12,7 @@ let driverConnect: Promise<void> | undefined;
 
 export default function App() {
   const [sql, setSQL] = useState('SELECT * FROM public.user;');
-  const [results, setResults] = useState('');
+  const [response, setResponse] = useState<DatabaseQueryResult | null>(null);
 
   return (
     <SafeAreaView>
@@ -43,33 +34,13 @@ export default function App() {
 
             driverConnect!
               .then(() => driver.query(sql))
-              .then(results => {
-                const formattedResults = results.rows.map(r => {
-                  return r.reduce((row, c, i) => {
-                    const col = results.columns[i];
-                    const pgType = new PgTypeInfo(col.dataType);
-                    const encoder = new TextEncoder();
-                    const rawVal =
-                      c !== null ? Buffer.from(encoder.encode(c)) : c;
-                    let val = rawVal;
-                    if (val !== null) {
-                      val = Convert(val, pgType);
-                    }
-                    row[col.name] = val;
-                    return row;
-                  }, {} as Record<string, any>);
-                });
-                setResults(JSON.stringify(formattedResults, null, 4));
-              })
+              .then(setResponse)
               .catch(e => {
                 console.error(e);
               });
           }}
         />
-        <Text>Results:</Text>
-        <ScrollView>
-          <Text>{results}</Text>
-        </ScrollView>
+        <TableView data={response} />
       </View>
     </SafeAreaView>
   );
