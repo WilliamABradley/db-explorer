@@ -1,3 +1,4 @@
+import {platform} from 'node:os';
 import * as React from 'react';
 import {useState} from 'react';
 import {
@@ -75,5 +76,6 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
+    backgroundColor: platform() === 'android' ? 'white' : undefined,
   },
 });
