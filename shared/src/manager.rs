@@ -12,7 +12,7 @@ pub async fn handle_message(message_data: &str) -> String {
     return to_driver_error(DriverErrorType::ParseError, &format!("{}", error));
   }
   let message = message_result.unwrap();
-  let message_type = InboundMessageType::from_str(message.r#type.as_str()).ok();
+  let message_type = InboundMessageType::from_str(message.message_type.as_str()).ok();
 
   let result: String = match message_type {
     Some(InboundMessageType::DatabaseDriver) => {
@@ -27,7 +27,7 @@ pub async fn handle_message(message_data: &str) -> String {
     }
     _ => to_driver_error(
       DriverErrorType::UnknownMessage,
-      &format!("Unknown Message Type: {}", message.r#type.as_str()),
+      &format!("Unknown Message Type: {}", message.message_type.as_str()),
     ),
   };
   return result;
@@ -45,11 +45,14 @@ async fn handle_database_message(message: &DatabaseDriverMessage) -> String {
   let driver = driver_result.unwrap();
 
   // Do
-  let message_type = DatabaseDriverMessageType::from_str(message.r#type.as_str()).ok();
+  let message_type = DatabaseDriverMessageType::from_str(message.message_type.as_str()).ok();
   if message_type.is_none() {
     return to_driver_error(
       DriverErrorType::UnknownMessage,
-      &format!("Unknown Database Message Type: {}", message.r#type.as_str()),
+      &format!(
+        "Unknown Database Message Type: {}",
+        message.message_type.as_str()
+      ),
     );
   }
 

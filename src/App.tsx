@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Platform,
 } from 'react-native';
+import {TextDecoder, TextEncoder} from 'text-encoding';
 import Editor from './components/Editor';
 import Convert from './dialects/postgres/types/Convert';
 import PgTypeInfo from './dialects/postgres/types/PgTypeInfo';
@@ -47,7 +48,9 @@ export default function App() {
                   return r.reduce((row, c, i) => {
                     const col = results.columns[i];
                     const pgType = new PgTypeInfo(col.dataType);
-                    const rawVal = Array.isArray(c) ? Buffer.from(c) : c;
+                    const encoder = new TextEncoder();
+                    const rawVal =
+                      c !== null ? Buffer.from(encoder.encode(c)) : c;
                     let val = rawVal;
                     if (val !== null) {
                       val = Convert(val, pgType);

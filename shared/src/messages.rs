@@ -5,7 +5,8 @@ use strum_macros::EnumString;
 #[allow(non_snake_case)]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct InboundMessage {
-  pub r#type: String,
+  #[serde(rename = "type")]
+  pub message_type: String,
   pub data: Option<DatabaseDriverMessage>,
 }
 
@@ -43,7 +44,7 @@ pub enum DriverErrorType {
 }
 
 pub struct DriverError {
-  pub r#type: DriverErrorType,
+  pub error_type: DriverErrorType,
   pub message: String,
 }
 
@@ -51,6 +52,7 @@ pub struct DriverError {
 pub struct DatabaseDriverMessage {
   pub driver: String,
   pub id: Option<u32>,
-  pub r#type: String,
+  #[serde(rename = "type")]
+  pub message_type: String,
   pub data: Option<serde_json::Value>,
 }
