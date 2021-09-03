@@ -23,17 +23,20 @@ export default function Convert(val: Buffer, typeInfo: PgTypeInfo) {
   const isText = textParserKeys.includes(oidKey);
   const isBinary = binaryParserKeys.includes(oidKey);
 
-  if (isText) {
-    try {
-      const str = textDecoder.decode(val);
-      return textParsers[typeInfo.oid](str);
-    } catch {
-      return '???';
+  let str: string | undefined;
+  try {
+    if (isBinary) {
+      return binaryParsers[typeInfo.oid](val);
+    } else {
+      str = textDecoder.decode(val);
+      if (isText) {
+        return textParsers[typeInfo.oid](str!);
+      } else {
+        return str;
+      }
     }
-  } else if (isBinary) {
-    return binaryParsers[typeInfo.oid](val);
-  } else {
-    const str = textDecoder.decode(val);
-    return String(str);
+  } catch (e) {
+    console.error(e);
+    return str || textDecoder.decode(val);
   }
 }

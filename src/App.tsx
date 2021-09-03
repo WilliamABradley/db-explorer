@@ -48,8 +48,8 @@ export default function App() {
                     const pgType = new PgTypeInfo(col.dataType);
                     const rawVal = Array.isArray(c) ? Buffer.from(c) : c;
                     let val = rawVal;
-                    if (rawVal !== null) {
-                      val = Convert(rawVal, pgType);
+                    if (val !== null) {
+                      val = Convert(val, pgType);
                     }
                     row[col.name] = val;
                     return row;

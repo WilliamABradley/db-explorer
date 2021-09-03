@@ -1,4 +1,4 @@
-import {NativeEventEmitter, NativeModules} from 'react-native';
+import {NativeModules} from 'react-native';
 import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
 import DatabaseDriver from '../DatabaseDriver';
 import DatabaseQueryResult from '../models/DatabaseQueryResult';
@@ -38,6 +38,7 @@ async function sendManagerMessage<T = undefined>(
     );
   }
 
+  console.debug(result);
   switch (result.type) {
     case 'Result':
       return result.data;
