@@ -1,4 +1,3 @@
-import {platform} from 'node:os';
 import * as React from 'react';
 import {useState} from 'react';
 import {
@@ -8,6 +7,7 @@ import {
   Button,
   ScrollView,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import Editor from './components/Editor';
 import Convert from './dialects/postgres/types/Convert';
@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',
     height: '100%',
-    backgroundColor: platform() === 'android' ? 'white' : undefined,
+    backgroundColor: Platform.OS === 'android' ? 'white' : undefined,
   },
 });
