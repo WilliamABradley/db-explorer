@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {View, StyleSheet, ScrollView} from 'react-native';
 import {Table, Row, Cell, TableWrapper} from 'react-native-table-component';
-import {TextEncoder} from 'util';
+import {TextEncoder} from 'text-encoding';
 import Convert from '../../../dialects/postgres/types/Convert';
 import PgTypeInfo from '../../../dialects/postgres/types/PgTypeInfo';
 import DatabaseQueryResult from '../../../drivers/models/DatabaseQueryResult';
@@ -26,9 +26,16 @@ export default function TableView(props: {
       if (val !== null) {
         val = Convert(val, pgType);
       }
-      row[col.name] = val;
+      row.push(val);
       return row;
-    }, {} as Record<string, any>);
+    }, [] as any[]);
+  });
+
+  const widthArr = data.columns.map(c => {
+    switch (c.dataType) {
+      default:
+        return 300;
+    }
   });
 
   return (
@@ -36,24 +43,16 @@ export default function TableView(props: {
       <ScrollView horizontal={true}>
         <View>
           <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-            <Row
-              data={headData}
-              style={styles.header}
-              textStyle={styles.text}
-            />
+            <Row widthArr={widthArr} data={headData} style={styles.header} />
           </Table>
           <ScrollView style={styles.dataWrapper}>
             <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
               {tableData.map((rowData, index) => (
-                <TableWrapper key={index} style={styles.row}>
-                  {rowData.map((cellData: any, cellIndex: number) => (
-                    <Cell
-                      key={cellIndex}
-                      data={cellData}
-                      textStyle={styles.text}
-                    />
-                  ))}
-                </TableWrapper>
+                <Row
+                  key={index}
+                  widthArr={widthArr}
+                  data={rowData.map(d => JSON.stringify(d))}
+                />
               ))}
             </Table>
           </ScrollView>
@@ -66,7 +65,6 @@ export default function TableView(props: {
 const styles = StyleSheet.create({
   container: {flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff'},
   header: {height: 50, backgroundColor: '#537791'},
-  text: {textAlign: 'center', fontWeight: '100'},
   dataWrapper: {marginTop: -1},
-  row: {height: 40, backgroundColor: '#E7E6E1'},
+  row: {backgroundColor: '#E7E6E1'},
 });
