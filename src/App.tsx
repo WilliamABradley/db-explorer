@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {useState} from 'react';
 import {StyleSheet, View, Button, SafeAreaView, Platform} from 'react-native';
+import StorybookUI from '../Storybook';
 import TableView from './components/DataViews/TableView';
 import Editor from './components/Editor';
 import DatabaseDriver from './drivers/DatabaseDriver';
@@ -11,12 +12,28 @@ let driver: DatabaseDriver;
 let driverConnect: Promise<void> | undefined;
 
 export default function App() {
+  const [showStorybook, setShowStorybook] = useState(false);
   const [sql, setSQL] = useState('SELECT * FROM public.user;');
   const [response, setResponse] = useState<DatabaseQueryResult | null>(null);
+
+  if (showStorybook) {
+    return (
+      <SafeAreaView>
+        <View style={styles.container}>
+          <Button
+            title="Hide Storybook"
+            onPress={() => setShowStorybook(false)}
+          />
+          <StorybookUI />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView>
       <View style={styles.container}>
+        <Button title="View Storybook" onPress={() => setShowStorybook(true)} />
         <Editor value={sql} onChange={setSQL} />
         <Button
           title="Run"

@@ -2,8 +2,14 @@
 
 using System.Collections.Generic;
 
+// Namespaces from @react-native-community/slider
+using SliderWindows;
+
 // Namespaces from react-native-webview
 using ReactNativeWebView;
+
+// Namespaces from @react-native-async-storage/async-storage
+using ReactNativeAsyncStorage;
 
 namespace Microsoft.ReactNative.Managed
 {
@@ -11,8 +17,12 @@ namespace Microsoft.ReactNative.Managed
     {
         internal static void RegisterAutolinkedNativeModulePackages(IList<IReactPackageProvider> packageProviders)
         { 
+            // IReactPackageProviders from @react-native-community/slider
+            packageProviders.Add(new SliderWindows.ReactPackageProvider());
             // IReactPackageProviders from react-native-webview
             packageProviders.Add(new ReactNativeWebView.ReactPackageProvider());
+            // IReactPackageProviders from @react-native-async-storage/async-storage
+            packageProviders.Add(new ReactNativeAsyncStorage.ReactPackageProvider());
         }
     }
 }

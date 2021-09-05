@@ -12,11 +12,16 @@
     "android": "react-native run-android",
     "preios": "node scripts/buildSharedIOS",
     "ios": "react-native run-ios",
+    "prestart": "yarn get-stories",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "get-stories": "sbn-get-stories",
+    "storybook-watcher": "sbn-watcher"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "^3.5.2",
+    "@react-native-community/slider": "^4.1.6",
     "@types/react-native-table-component": "^1.2.1",
     "buffer": "^4.9.1",
     "events": "1.0.0",
@@ -33,6 +38,14 @@
     "text-encoding": "^0.7.0"
   },
   "devDependencies": {
+    "@react-native-async-storage/async-storage": "^1.15.7",
+    "@storybook/addon-actions": "^6.3.8",
+    "@storybook/addon-controls": "^6.3.8",
+    "@storybook/addon-ondevice-actions": "^6.0.1-alpha.0",
+    "@storybook/addon-ondevice-backgrounds": "^6.0.1-alpha.0",
+    "@storybook/addon-ondevice-controls": "^6.0.1-alpha.0",
+    "@storybook/addon-ondevice-notes": "^6.0.1-alpha.0",
+    "@storybook/react-native": "^6.0.1-alpha.1",
     "@babel/core": "^7.15.0",
     "@babel/plugin-transform-classes": "^7.14.9",
     "@babel/plugin-transform-runtime": "^7.15.0",
