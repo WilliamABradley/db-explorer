@@ -161,7 +161,7 @@ export default function Editor({value, onChange}: EditorProps): JSX.Element {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 300,
+    height: 200,
     overflow: 'hidden',
   },
 });
