@@ -1,12 +1,14 @@
 pub mod drivers;
-pub mod manager;
-pub mod messages;
+pub mod handle_db;
+pub mod handle_tunnel;
+pub mod io;
 pub mod utils;
 
 use backtrace::Backtrace;
 use futures::executor::block_on;
-use messages::*;
+use io::*;
 use std::ffi::CStr;
+use std::ffi::CString;
 use std::os::raw::c_char;
 use std::panic;
 use utils::*;
@@ -23,14 +25,17 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
     let message_clone = message_str.unwrap().clone();
 
     let trace = Backtrace::new();
+    let outbound_message: OutboundMessage;
 
     let result = panic::catch_unwind(|| {
-        let future = manager::handle_message(message_clone);
-        return to_cchar(block_on(future));
+        let future = handle_message(message_clone);
+        return block_on(future);
     });
 
     // Validate that we didn't panic
-    if result.is_err() {
+    if result.is_ok() {
+        outbound_message = result.unwrap();
+    } else {
         let err = result.unwrap_err();
 
         // Try and capture the error message.
@@ -39,8 +44,59 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
             _ => format!("Unknown Error: {:?}\n{:?}", err, trace),
         };
 
-        return to_cchar(to_driver_error(DriverErrorType::FatalError, &err_message));
+        outbound_message = OutboundMessage::Error {
+            error_type: DriverErrorType::FatalError,
+            error_message: err_message,
+        };
     }
 
-    return result.unwrap();
+    let serialize_result = serde_json::to_string(&outbound_message);
+    let response = serialize_result.unwrap_or_else(|err| {
+        serde_json::to_string(&OutboundMessage::Error {
+            error_type: DriverErrorType::SerializeError,
+            error_message: format!("{}", err),
+        })
+        .unwrap()
+    });
+    return to_cchar(response);
+}
+
+#[no_mangle]
+pub extern "C" fn free_message(s: *mut c_char) -> () {
+    unsafe {
+        if s.is_null() {
+            return;
+        }
+        // Retake ownership of the c string for de-allocation.
+        CString::from_raw(s)
+    };
+}
+
+async fn handle_message(message_data: &str) -> OutboundMessage {
+    let message_result: Result<InboundMessage, serde_json::Error> =
+        serde_json::from_str(message_data);
+    if message_result.is_err() {
+        let error = message_result.unwrap_err();
+        return OutboundMessage::Error {
+            error_type: DriverErrorType::ParseError,
+            error_message: format!("{}", error),
+        };
+    }
+    let message = message_result.unwrap();
+
+    #[allow(unreachable_patterns)]
+    match message {
+        InboundMessage::DatabaseDriver(database_message) => {
+            return handle_db::handle_database_message(&database_message).await;
+        }
+        InboundMessage::SSHTunnel(tunnel_message) => {
+            return handle_tunnel::handle_tunnel_message(&tunnel_message).await;
+        }
+        _ => {
+            return OutboundMessage::Error {
+                error_type: DriverErrorType::UnknownMessage,
+                error_message: format!("Received unhandled message type: {}", message_data),
+            }
+        }
+    };
 }

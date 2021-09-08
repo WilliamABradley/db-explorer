@@ -89,6 +89,10 @@ impl DatabaseDriver for PostgresDriver {
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<u64, DatabaseError> {
+    if variables.is_some() {
+      panic!("Variable support not implemented!");
+    }
+
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
       return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
@@ -112,6 +116,10 @@ impl DatabaseDriver for PostgresDriver {
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<DatabaseQueryResult, DatabaseError> {
+    if variables.is_some() {
+      panic!("Variable support not implemented!");
+    }
+
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
       return Result::Err(Box::new(NoConnectionError { id: id.clone() }));

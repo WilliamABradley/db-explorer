@@ -1,4 +1,4 @@
-import {NativeModules} from 'react-native';
+import { NativeModules } from 'react-native';
 import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
 import DatabaseDriver from '../DatabaseDriver';
 import DatabaseQueryResult from '../models/DatabaseQueryResult';
@@ -20,8 +20,8 @@ async function sendManagerMessage<T = undefined>(
   id?: number,
 ): Promise<T> {
   const message = {
-    type: 'DatabaseDriver',
-    data: {
+    class: 'DatabaseDriver',
+    payload: {
       driver,
       id,
       type,
@@ -32,7 +32,7 @@ async function sendManagerMessage<T = undefined>(
   let result: any;
   try {
     result = JSON.parse(response);
-  } catch (e) {
+  } catch (e: any) {
     throw new Error(
       `Failed to Parse DriverManager Message: ${response} (${e.message})`,
     );
@@ -68,6 +68,13 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
       throw new Error('Native Module for DriverManager is not registered');
     }
 
+    const _connectionInfo: Partial<
+      Record<keyof DatabaseConnectionInfo, string>
+    > = {
+      ...connectionInfo,
+      ssl: connectionInfo.ssl.toString(),
+    };
+
     console.debug(`Aquiring Native ${this.#driverName} Instance`);
 
     // Handle hot flush.
@@ -76,14 +83,14 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
       const flush = sendManagerMessage(this.#driverName, 'Flush');
       this.#instance = flush.then(() => {
         console.debug(`Initialising ${this.#driverName}`);
-        return sendManagerMessage(this.#driverName, 'Create', connectionInfo);
+        return sendManagerMessage(this.#driverName, 'Create', _connectionInfo);
       });
       flushDictionary.push(this.#driverName);
     } else {
       this.#instance = sendManagerMessage(
         this.#driverName,
         'Create',
-        connectionInfo,
+        _connectionInfo,
       );
     }
 
