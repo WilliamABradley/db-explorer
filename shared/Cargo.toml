@@ -31,6 +31,6 @@ bstr = "0.2"
 [features]
 default = ["sqlx/runtime-async-std-native-tls"]
 windows = ["sqlx/runtime-async-std-native-tls"]
-ios = ["sqlx/runtime-async-std-native-tls"]
+ios = ["sqlx/runtime-async-std-rustls"]
 # Native TLS on Android requires openssl.
 android = ["sqlx/runtime-async-std-rustls"]
