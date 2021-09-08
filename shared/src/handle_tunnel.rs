@@ -3,5 +3,5 @@ use crate::io::*;
 use crate::utils::*;
 
 pub async fn handle_tunnel_message(message: &SSHTunnelMessagePayload) -> OutboundMessage {
-  return as_result("");
+  return as_result(message);
 }

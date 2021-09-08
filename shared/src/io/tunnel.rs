@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::fmt::Debug;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -11,5 +12,8 @@ pub struct SSHTunnelMessagePayload {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type", content = "data")]
 pub enum SSHTunnelMessage {
-  Test,
+  Create(HashMap<String, String>),
+  Connect,
+  Close,
+  Flush,
 }
