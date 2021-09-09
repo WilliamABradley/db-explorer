@@ -1,10 +1,10 @@
-/// <reference path="../../../node_modules/monaco-editor/monaco.d.ts" />
+/// <reference path="../../../../node_modules/monaco-editor/monaco.d.ts" />
 
 import * as React from 'react';
 import {Platform, StyleSheet, View} from 'react-native';
 import WebView from 'react-native-webview';
-import {platformAssetsUri} from '../../utils';
-import {openContextMenu} from '../../utils/contextMenu';
+import {platformAssetsUri} from '../../../utils';
+import {openContextMenu} from '../../../utils/contextMenu';
 
 export type EditorProps = {
   value: string;

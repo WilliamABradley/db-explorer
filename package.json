@@ -31,6 +31,7 @@
     "react": "^17.0.2",
     "react-native": "^0.65.1",
     "react-native-root-modal": "^5.0.1",
+    "react-native-sensitive-info": "^5.5.8",
     "react-native-table-component": "^1.2.1",
     "react-native-webview": "^11.13.0",
     "react-native-windows": "^0.65.0-0",
