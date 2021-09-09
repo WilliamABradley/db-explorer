@@ -2,8 +2,14 @@
 
 using System.Collections.Generic;
 
+// Namespaces from @react-native-community/checkbox
+using CheckboxWindows;
+
 // Namespaces from @react-native-community/slider
 using SliderWindows;
+
+// Namespaces from react-native-sensitive-info
+using RNSensitiveInfoCPP;
 
 // Namespaces from react-native-webview
 using ReactNativeWebView;
@@ -17,8 +23,12 @@ namespace Microsoft.ReactNative.Managed
     {
         internal static void RegisterAutolinkedNativeModulePackages(IList<IReactPackageProvider> packageProviders)
         { 
+            // IReactPackageProviders from @react-native-community/checkbox
+            packageProviders.Add(new CheckboxWindows.ReactPackageProvider());
             // IReactPackageProviders from @react-native-community/slider
             packageProviders.Add(new SliderWindows.ReactPackageProvider());
+            // IReactPackageProviders from react-native-sensitive-info
+            packageProviders.Add(new RNSensitiveInfoCPP.ReactPackageProvider());
             // IReactPackageProviders from react-native-webview
             packageProviders.Add(new ReactNativeWebView.ReactPackageProvider());
             // IReactPackageProviders from @react-native-async-storage/async-storage

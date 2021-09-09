@@ -2,7 +2,7 @@ import * as React from 'react';
 import Editor from '.';
 
 export default {
-  title: 'Editor',
+  title: 'atoms/Editor',
 };
 
 let value = 'SELECT * from INFORMATION_SCHEMA.TABLES;';

@@ -8,7 +8,7 @@ import "@storybook/addon-ondevice-backgrounds/register";
 import "@storybook/addon-ondevice-actions/register";
 
 import { argsEnhancers } from '@storybook/addon-actions/dist/modern/preset/addArgs';
-argsEnhancers.forEach(enhancer => addArgsEnhancer(enhancer))
+argsEnhancers.forEach(enhancer => addArgsEnhancer(enhancer));
 
 
 import { decorators, parameters } from './.storybook/preview';
@@ -19,12 +19,11 @@ if (parameters) {
   addParameters(parameters);
 }
 
-const getStories=() => {
+const getStories = () => {
   return [
-		require("./src/components/DataViews/TableView/story.tsx"), 
-		require("./src/components/Editor/story.tsx")
-	];
-}
-configure(getStories, module, false)
+    require("./src/components/molecules/TableView/story.tsx"),
+    require("./src/components/atoms/Editor/story.tsx")
+  ];
+};
+configure(getStories, module, false);
 
-  

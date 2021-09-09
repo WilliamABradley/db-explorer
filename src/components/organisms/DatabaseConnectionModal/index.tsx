@@ -1,49 +1,55 @@
 import * as React from 'react';
 import {View, Button, Text, TextInput, Alert, StyleSheet} from 'react-native';
 import Modal from 'react-native-root-modal';
-import {SSHTunnelAuthenticationMethod, SSHTunnelInfo} from '../../../tunnel';
+import CheckBox from '@react-native-community/checkbox';
+import DatabaseConnectionInfo from '../../../drivers/models/DatabaseConnectionInfo';
 
-export type SSHTunnelModalProps = {
+export type DatabaseConnectionModalProps = {
   visible: boolean;
   changeVisibleTo: (visible: boolean) => void;
-  existingSSHTunnelInfo?: SSHTunnelInfo;
-  onSetTunnel: (info: SSHTunnelInfo | null) => Promise<Error | undefined>;
+  existingConnection?: DatabaseConnectionInfo;
+  onSetDatabaseConnection: (
+    info: DatabaseConnectionInfo | null,
+  ) => Promise<Error | undefined>;
 };
 
-export default function SSHTunnelModal(
-  props: SSHTunnelModalProps,
+export default function DatabaseConnectionModal(
+  props: DatabaseConnectionModalProps,
 ): JSX.Element {
   const [host, setHost] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.host,
+    props.existingConnection?.host,
   );
   const [port, setPort] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.port ?? '22',
+    props.existingConnection?.port ?? '5432',
   );
   const [username, setUsername] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.username,
+    props.existingConnection?.username,
   );
-  const [privateKey, setPrivateKey] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.privateKey,
+  const [password, setPassword] = React.useState<string | undefined>(
+    props.existingConnection?.password,
   );
-  const [passphrase, setPassphrase] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.passphrase,
+  const [ssl, setSSL] = React.useState<boolean>(
+    props.existingConnection?.ssl ?? true,
+  );
+  const [database, setDatabase] = React.useState<string | undefined>(
+    props.existingConnection?.database ?? 'postgres',
   );
 
   return (
     <Modal visible={props.visible} style={styles.modalContainer}>
       <View style={styles.modal}>
-        <Text>SSH Host</Text>
+        <Text>Host</Text>
         <TextInput
-          placeholder="SSH Host"
+          placeholder="Host"
           defaultValue={host}
           onChangeText={setHost}
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
         />
-        <Text>SSH Port</Text>
+        <Text>Port</Text>
         <TextInput
-          placeholder="SSH Port"
+          placeholder="Port"
           defaultValue={port}
           onChangeText={setPort}
           style={styles.modalEntry}
@@ -59,23 +65,24 @@ export default function SSHTunnelModal(
           autoCorrect={false}
           spellCheck={false}
         />
-        <Text>Private Key Data</Text>
+        <Text>Password</Text>
         <TextInput
-          placeholder="Private Key Data"
-          defaultValue={privateKey}
-          onChangeText={setPrivateKey}
+          placeholder="Password"
+          defaultValue={password}
+          onChangeText={setPassword}
           style={styles.modalEntry}
           secureTextEntry={true}
           autoCorrect={false}
           spellCheck={false}
         />
-        <Text>Passphrase</Text>
+        <Text>Use SSL</Text>
+        <CheckBox value={ssl} onValueChange={setSSL} />
+        <Text>Database</Text>
         <TextInput
-          placeholder="Passphrase"
-          defaultValue={passphrase}
-          onChangeText={setPassphrase}
+          placeholder="Database"
+          defaultValue={database}
+          onChangeText={setDatabase}
           style={styles.modalEntry}
-          secureTextEntry={true}
           autoCorrect={false}
           spellCheck={false}
         />
@@ -88,31 +95,27 @@ export default function SSHTunnelModal(
             <Button
               title="Save"
               onPress={async () => {
-                const error = await props.onSetTunnel({
+                const error = await props.onSetDatabaseConnection({
                   host: host!,
-                  username: username!,
                   port: port!,
-                  authenticationMethod: SSHTunnelAuthenticationMethod.PublicKey,
-                  privateKey: privateKey!,
-                  passphrase: passphrase!,
+                  username: username!,
+                  password: password!,
+                  ssl,
+                  database: database!,
                 });
 
                 props.changeVisibleTo(false);
 
                 // Show Alert if failed.
                 if (error) {
-                  Alert.alert(
-                    'Failed to Connect to SSH Tunnel',
-                    error.message,
-                    [
-                      {
-                        text: 'OK',
-                        onPress: () => props.changeVisibleTo(true),
-                      },
-                    ],
-                  );
+                  Alert.alert('Failed to Connect to Database', error.message, [
+                    {
+                      text: 'OK',
+                      onPress: () => props.changeVisibleTo(true),
+                    },
+                  ]);
                 } else {
-                  Alert.alert('Success', 'SSH Tunnel Connected');
+                  Alert.alert('Success', 'Database Connected');
                 }
               }}
             />
@@ -137,15 +140,16 @@ export default function SSHTunnelModal(
             <Button
               title="Delete"
               onPress={() => {
-                props.onSetTunnel(null);
+                props.onSetDatabaseConnection(null);
                 props.changeVisibleTo(false);
 
                 // reset form
                 setHost(undefined);
                 setPort('22');
                 setUsername(undefined);
-                setPrivateKey(undefined);
-                setPassphrase(undefined);
+                setPassword(undefined);
+                setSSL(true);
+                setDatabase('postgres');
               }}
             />
           </View>

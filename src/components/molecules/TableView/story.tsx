@@ -2,7 +2,7 @@ import * as React from 'react';
 import TableView from '.';
 
 export default {
-  title: 'DataViews/TableView',
+  title: 'molecules/TableView',
 };
 
 const ofColumn = (name: string, dataType: string = 'text') => {

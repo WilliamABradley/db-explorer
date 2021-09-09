@@ -42,6 +42,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SliderWindows", "..\node_mo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReactNativeAsyncStorage", "..\node_modules\@react-native-async-storage\async-storage\windows\ReactNativeAsyncStorage\ReactNativeAsyncStorage.vcxproj", "{4855D892-E16C-404D-8286-0089E0F7F9C4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CheckboxWindows", "..\node_modules\@react-native-community\checkbox\windows\CheckboxWindows\CheckboxWindows.vcxproj", "{EAF81BEB-A159-4421-9B6D-E59C37828A57}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "RNSensitiveInfoCPP", "..\node_modules\react-native-sensitive-info\windows\RNSensitiveInfoCPP\RNSensitiveInfoCPP.vcxproj", "{471024F1-CD6D-4F1E-A6C7-0037152C850E}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		..\node_modules\react-native-windows\Shared\Shared.vcxitems*{2049dbe9-8d13-42c9-ae4b-413ae38fffd0}*SharedItemsImports = 9
@@ -162,6 +166,22 @@ Global
 		{4855D892-E16C-404D-8286-0089E0F7F9C4}.Release|ARM64.Build.0 = Release|ARM64
 		{4855D892-E16C-404D-8286-0089E0F7F9C4}.Release|x64.ActiveCfg = Release|x64
 		{4855D892-E16C-404D-8286-0089E0F7F9C4}.Release|x64.Build.0 = Release|x64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Debug|ARM64.Build.0 = Debug|ARM64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Debug|x64.ActiveCfg = Debug|x64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Debug|x64.Build.0 = Debug|x64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Release|ARM64.ActiveCfg = Release|ARM64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Release|ARM64.Build.0 = Release|ARM64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Release|x64.ActiveCfg = Release|x64
+		{EAF81BEB-A159-4421-9B6D-E59C37828A57}.Release|x64.Build.0 = Release|x64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Debug|ARM64.Build.0 = Debug|ARM64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Debug|x64.ActiveCfg = Debug|x64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Debug|x64.Build.0 = Debug|x64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Release|ARM64.ActiveCfg = Release|ARM64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Release|ARM64.Build.0 = Release|ARM64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Release|x64.ActiveCfg = Release|x64
+		{471024F1-CD6D-4F1E-A6C7-0037152C850E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
