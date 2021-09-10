@@ -7,7 +7,6 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import SecureInfo from 'react-native-sensitive-info';
 import StorybookUI from '../Storybook';
 import TableView from './components/molecules/TableView';
 import Editor from './components/atoms/Editor';
@@ -18,28 +17,29 @@ import DatabaseQueryResult from './drivers/models/DatabaseQueryResult';
 import PostgresDriver from './drivers/postgres';
 import SSHTunnel, {SSHTunnelInfo} from './tunnel';
 import DatabaseConnectionInfo from './drivers/models/DatabaseConnectionInfo';
+import {getSecureData, setSecureData} from './utils/secureStorage';
 
 const DRIVER_KEY = 'database_connection';
 const TUNNEL_KEY = 'tunnel_configuration';
 
 let _driver: DatabaseDriver | null = null;
-let _driver_info: DatabaseConnectionInfo | null = null;
-
 let _tunnel: SSHTunnel | null = null;
-let _tunnel_info: SSHTunnelInfo | null = null;
 
-const getDriver = (): DatabaseDriver | null => {
-  if (!_driver && _driver_info) {
-    _driver = new PostgresDriver(_driver_info);
+const getDriver = async (): Promise<DatabaseDriver | null> => {
+  if (!_driver) {
+    const driverInfo = await getSecureData<DatabaseConnectionInfo>(DRIVER_KEY);
+    if (driverInfo) {
+      _driver = new PostgresDriver(driverInfo);
+    }
   }
   return _driver;
 };
 
-const setDriver = (
+const setDriver = async (
   connectionInfo: DatabaseConnectionInfo | null,
-): DatabaseDriver | null => {
+): Promise<DatabaseDriver | null> => {
   if (connectionInfo !== null) {
-    SecureInfo.setItem(DRIVER_KEY, JSON.stringify(connectionInfo), {});
+    await setSecureData(DRIVER_KEY, connectionInfo);
     _driver = new PostgresDriver(connectionInfo);
   } else {
     _driver = null;
@@ -47,16 +47,21 @@ const setDriver = (
   return _driver;
 };
 
-const getTunnel = (): SSHTunnel | null => {
-  if (!_tunnel && _tunnel_info) {
-    _tunnel = new SSHTunnel(_tunnel_info);
+const getTunnel = async (): Promise<SSHTunnel | null> => {
+  if (!_tunnel) {
+    const tunnelInfo = await getSecureData<SSHTunnelInfo>(TUNNEL_KEY);
+    if (tunnelInfo) {
+      _tunnel = new SSHTunnel(tunnelInfo);
+    }
   }
   return _tunnel;
 };
 
-const setTunnel = (tunnelInfo: SSHTunnelInfo | null): SSHTunnel | null => {
+const setTunnel = async (
+  tunnelInfo: SSHTunnelInfo | null,
+): Promise<SSHTunnel | null> => {
   if (tunnelInfo !== null) {
-    SecureInfo.setItem(TUNNEL_KEY, JSON.stringify(tunnelInfo), {});
+    await setSecureData(TUNNEL_KEY, tunnelInfo);
     _tunnel = new SSHTunnel(tunnelInfo);
   } else {
     _tunnel = null;
@@ -73,16 +78,6 @@ export default function App() {
   const [response, setResponse] = React.useState<DatabaseQueryResult | null>(
     null,
   );
-
-  React.useEffect(() => {
-    SecureInfo.getItem(DRIVER_KEY, {}).then(info =>
-      setDriver(JSON.parse(info)),
-    );
-
-    SecureInfo.getItem(TUNNEL_KEY, {}).then(info =>
-      setTunnel(JSON.parse(info)),
-    );
-  });
 
   if (showStorybook) {
     return (
@@ -104,8 +99,11 @@ export default function App() {
         <SSHTunnelModal
           visible={openSSHTunnelModal}
           changeVisibleTo={setOpenSSHTunnelModal}
+          getExistingSSHTunnelInfo={() =>
+            getSecureData<SSHTunnelInfo>(TUNNEL_KEY)
+          }
           onSetTunnel={async info => {
-            const existingTunnel = getTunnel();
+            const existingTunnel = await getTunnel();
 
             // Close existing tunnel.
             if (existingTunnel) {
@@ -114,7 +112,7 @@ export default function App() {
 
             if (info) {
               console.log(info);
-              const newTunnel = setTunnel(info);
+              const newTunnel = await setTunnel(info);
               if (newTunnel) {
                 try {
                   await newTunnel.connect();
@@ -129,8 +127,11 @@ export default function App() {
         <DatabaseConnectionModal
           visible={openDatabaseConnectionModal}
           changeVisibleTo={setOpenDatabaseConnectionModal}
+          getExistingConnection={() =>
+            getSecureData<DatabaseConnectionInfo>(DRIVER_KEY)
+          }
           onSetDatabaseConnection={async info => {
-            const existingDriver = getDriver();
+            const existingDriver = await getDriver();
 
             // Close existing driver.
             if (existingDriver?.connected) {
@@ -138,7 +139,7 @@ export default function App() {
             }
 
             if (info) {
-              const newDriver = setDriver(info);
+              const newDriver = await setDriver(info);
               if (newDriver) {
                 try {
                   await newDriver.connect();
@@ -177,7 +178,12 @@ export default function App() {
             <Button
               title="Run"
               onPress={async () => {
-                const driver = getDriver();
+                const tunnel = await getTunnel();
+                if (tunnel && !tunnel.connected) {
+                  await tunnel.connect();
+                }
+
+                const driver = await getDriver();
                 if (!driver) {
                   Alert.alert(
                     'Error',

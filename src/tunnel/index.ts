@@ -40,6 +40,7 @@ export default class SSHTunnel {
 
   #instance: Promise<number>;
   #instanceId: number = -1;
+  public connected: boolean = false;
 
   private sendDriverMessage<T>(
     type: DriverManagerTunnelMessageType,
@@ -59,12 +60,14 @@ export default class SSHTunnel {
     await this.#instance;
     console.debug(`Connecting Tunnel: ${this.#instanceId}`);
     await this.sendDriverMessage(DriverManagerTunnelMessageType.Connect);
+    this.connected = true;
     console.debug(`Connected Tunnel: ${this.#instanceId}`);
   }
 
   public async close(): Promise<void> {
     console.debug(`Closing Tunnel: ${this.#instanceId}`);
     await this.sendDriverMessage(DriverManagerTunnelMessageType.Close);
+    this.connected = false;
     console.debug(`Closed Tunnel: ${this.#instanceId}`);
   }
 }

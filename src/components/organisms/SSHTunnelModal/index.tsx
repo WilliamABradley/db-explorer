@@ -6,28 +6,34 @@ import {SSHTunnelAuthenticationMethod, SSHTunnelInfo} from '../../../tunnel';
 export type SSHTunnelModalProps = {
   visible: boolean;
   changeVisibleTo: (visible: boolean) => void;
-  existingSSHTunnelInfo?: SSHTunnelInfo;
+  getExistingSSHTunnelInfo?: () => Promise<SSHTunnelInfo | null>;
   onSetTunnel: (info: SSHTunnelInfo | null) => Promise<Error | undefined>;
 };
 
 export default function SSHTunnelModal(
   props: SSHTunnelModalProps,
 ): JSX.Element {
-  const [host, setHost] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.host,
-  );
-  const [port, setPort] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.port ?? '22',
-  );
-  const [username, setUsername] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.username,
-  );
+  const [host, setHost] = React.useState<string | undefined>(undefined);
+  const [port, setPort] = React.useState<string | undefined>('22');
+  const [username, setUsername] = React.useState<string | undefined>(undefined);
   const [privateKey, setPrivateKey] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.privateKey,
+    undefined,
   );
   const [passphrase, setPassphrase] = React.useState<string | undefined>(
-    props.existingSSHTunnelInfo?.passphrase,
+    undefined,
   );
+
+  React.useEffect(() => {
+    props.getExistingSSHTunnelInfo?.().then(info => {
+      if (info) {
+        setHost(info.host);
+        setPort(info.port);
+        setUsername(info.username);
+        setPrivateKey(info.privateKey);
+        setPassphrase(info.passphrase);
+      }
+    });
+  }, [props.getExistingSSHTunnelInfo]);
 
   return (
     <Modal visible={props.visible} style={styles.modalContainer}>

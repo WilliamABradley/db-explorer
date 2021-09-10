@@ -7,7 +7,7 @@ import DatabaseConnectionInfo from '../../../drivers/models/DatabaseConnectionIn
 export type DatabaseConnectionModalProps = {
   visible: boolean;
   changeVisibleTo: (visible: boolean) => void;
-  existingConnection?: DatabaseConnectionInfo;
+  getExistingConnection?: () => Promise<DatabaseConnectionInfo | null>;
   onSetDatabaseConnection: (
     info: DatabaseConnectionInfo | null,
   ) => Promise<Error | undefined>;
@@ -16,24 +16,27 @@ export type DatabaseConnectionModalProps = {
 export default function DatabaseConnectionModal(
   props: DatabaseConnectionModalProps,
 ): JSX.Element {
-  const [host, setHost] = React.useState<string | undefined>(
-    props.existingConnection?.host,
-  );
-  const [port, setPort] = React.useState<string | undefined>(
-    props.existingConnection?.port ?? '5432',
-  );
-  const [username, setUsername] = React.useState<string | undefined>(
-    props.existingConnection?.username,
-  );
-  const [password, setPassword] = React.useState<string | undefined>(
-    props.existingConnection?.password,
-  );
-  const [ssl, setSSL] = React.useState<boolean>(
-    props.existingConnection?.ssl ?? true,
-  );
+  const [host, setHost] = React.useState<string | undefined>(undefined);
+  const [port, setPort] = React.useState<string | undefined>('5432');
+  const [username, setUsername] = React.useState<string | undefined>(undefined);
+  const [password, setPassword] = React.useState<string | undefined>(undefined);
+  const [ssl, setSSL] = React.useState<boolean>(true);
   const [database, setDatabase] = React.useState<string | undefined>(
-    props.existingConnection?.database ?? 'postgres',
+    'postgres',
   );
+
+  React.useEffect(() => {
+    props.getExistingConnection?.().then(connection => {
+      if (connection) {
+        setHost(connection.host);
+        setPort(connection.port);
+        setUsername(connection.username);
+        setPassword(connection.password);
+        setSSL(connection.ssl);
+        setDatabase(connection.database);
+      }
+    });
+  }, [props.getExistingConnection]);
 
   return (
     <Modal visible={props.visible} style={styles.modalContainer}>
