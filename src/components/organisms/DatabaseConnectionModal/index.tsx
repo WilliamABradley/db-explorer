@@ -142,8 +142,8 @@ export default function DatabaseConnectionModal(
             }}>
             <Button
               title="Delete"
-              onPress={() => {
-                props.onSetDatabaseConnection(null);
+              onPress={async () => {
+                await props.onSetDatabaseConnection(null);
                 props.changeVisibleTo(false);
 
                 // reset form

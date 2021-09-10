@@ -17,7 +17,11 @@ import DatabaseQueryResult from './drivers/models/DatabaseQueryResult';
 import PostgresDriver from './drivers/postgres';
 import SSHTunnel, {SSHTunnelInfo} from './tunnel';
 import DatabaseConnectionInfo from './drivers/models/DatabaseConnectionInfo';
-import {getSecureData, setSecureData} from './utils/secureStorage';
+import {
+  deleteSecureData,
+  getSecureData,
+  setSecureData,
+} from './utils/secureStorage';
 
 const DRIVER_KEY = 'database_connection';
 const TUNNEL_KEY = 'tunnel_configuration';
@@ -42,6 +46,7 @@ const setDriver = async (
     await setSecureData(DRIVER_KEY, connectionInfo);
     _driver = new PostgresDriver(connectionInfo);
   } else {
+    await deleteSecureData(DRIVER_KEY);
     _driver = null;
   }
   return _driver;
@@ -64,6 +69,7 @@ const setTunnel = async (
     await setSecureData(TUNNEL_KEY, tunnelInfo);
     _tunnel = new SSHTunnel(tunnelInfo);
   } else {
+    await deleteSecureData(TUNNEL_KEY);
     _tunnel = null;
   }
   return _tunnel;
@@ -119,6 +125,8 @@ export default function App() {
                   return e;
                 }
               }
+            } else {
+              await setTunnel(null);
             }
             return undefined;
           }}
@@ -146,6 +154,8 @@ export default function App() {
                   return e;
                 }
               }
+            } else {
+              await setDriver(null);
             }
             return undefined;
           }}

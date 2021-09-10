@@ -164,8 +164,8 @@ export default function SSHTunnelModal(
             }}>
             <Button
               title="Delete"
-              onPress={() => {
-                props.onSetTunnel(null);
+              onPress={async () => {
+                await props.onSetTunnel(null);
                 props.changeVisibleTo(false);
 
                 // reset form
