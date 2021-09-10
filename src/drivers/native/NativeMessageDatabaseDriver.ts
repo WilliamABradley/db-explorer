@@ -17,12 +17,21 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     super(connectionInfo);
     this.#driverName = driver;
 
-    const _connectionInfo: NativeDatabaseConnectionInfo = {
-      ...connectionInfo,
-      ssl: connectionInfo.ssl.toString(),
-    };
-
     console.debug(`Aquiring Native ${this.#driverName} Instance`);
+
+    const getInstance = async () => {
+      console.debug(`Initialising ${this.#driverName}`);
+
+      const _connectionInfo: NativeDatabaseConnectionInfo = {
+        ...connectionInfo,
+        ssl: connectionInfo.ssl.toString(),
+      };
+
+      return this.sendDriverMessage<number>(
+        DriverManagerDatabaseMessageType.Create,
+        _connectionInfo,
+      );
+    };
 
     // Handle hot flush.
     if (FLUSH && __DEV__ && !flushDictionary.includes(this.#driverName)) {
@@ -30,19 +39,10 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
       const flush = this.sendDriverMessage(
         DriverManagerDatabaseMessageType.Flush,
       );
-      this.#instance = flush.then(() => {
-        console.debug(`Initialising ${this.#driverName}`);
-        return this.sendDriverMessage(
-          DriverManagerDatabaseMessageType.Create,
-          _connectionInfo,
-        );
-      });
+      this.#instance = flush.then(getInstance);
       flushDictionary.push(this.#driverName);
     } else {
-      this.#instance = this.sendDriverMessage(
-        DriverManagerDatabaseMessageType.Create,
-        _connectionInfo,
-      );
+      this.#instance = getInstance();
     }
 
     this.#instance.then(id => {

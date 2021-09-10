@@ -8,5 +8,6 @@
   "files.associations": {
     "*.tsx": "typescriptreact",
     "map": "cpp"
-  }
+  },
+  "java.configuration.updateBuildConfiguration": "interactive"
 }

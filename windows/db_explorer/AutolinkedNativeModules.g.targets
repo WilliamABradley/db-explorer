@@ -10,6 +10,14 @@
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\@react-native-community\slider\windows\SliderWindows\SliderWindows.vcxproj">
       <Project>{685a83ae-36bc-4e9d-bdc6-417ebf168463}</Project>
     </ProjectReference>
+    <!-- Projects from react-native-document-picker -->
+    <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-document-picker\windows\ReactNativeDocumentPicker\ReactNativeDocumentPicker.csproj">
+      <Project>{A4C9C727-0AEB-4A3D-B547-BEDB812B172D}</Project>
+    </ProjectReference>
+    <!-- Projects from react-native-fs -->
+    <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-fs\windows\RNFS\RNFS.vcxproj">
+      <Project>{4f89a807-a843-4df0-8d74-a04a3f48fef9}</Project>
+    </ProjectReference>
     <!-- Projects from react-native-sensitive-info -->
     <ProjectReference Include="$(ProjectDir)..\..\node_modules\react-native-sensitive-info\windows\RNSensitiveInfoCPP\RNSensitiveInfoCPP.vcxproj">
       <Project>{471024f1-cd6d-4f1e-a6c7-0037152c850e}</Project>

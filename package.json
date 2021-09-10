@@ -5,7 +5,7 @@
   "scripts": {
     "config:toolchains": "node scripts/configureNativeToolchains",
     "build:monaco": "node scripts/buildMonaco",
-    "postinstall": "rn-nodeify --yarn --hack --install \"process,stream,events,buffer\"",
+    "postinstall": "rn-nodeify --yarn --hack --install \"process,path,stream,events,buffer\"",
     "prewindows": "node scripts/buildSharedWindows --debug",
     "windows": "react-native run-windows --arch x64",
     "preandroid": "node scripts/buildSharedAndroid",
@@ -27,10 +27,13 @@
     "buffer": "^4.9.1",
     "events": "1.0.0",
     "metro-config": "^0.66.2",
+    "path-browserify": "0.0.0",
     "pg-types": "^3.0.1",
     "process": "^0.11.0",
     "react": "^17.0.2",
     "react-native": "^0.65.1",
+    "react-native-document-picker": "^6.0.4",
+    "react-native-fs": "avmoroz/react-native-fs#dev",
     "react-native-root-modal": "^5.0.1",
     "react-native-sensitive-info": "^6.0.0-alpha.9",
     "react-native-table-component": "^1.2.1",
@@ -85,7 +88,8 @@
     "_stream_writable": "readable-stream/writable",
     "_stream_duplex": "readable-stream/duplex",
     "_stream_passthrough": "readable-stream/passthrough",
-    "stream": "stream-browserify"
+    "stream": "stream-browserify",
+    "path": "path-browserify"
   },
   "browser": {
     "_stream_transform": "readable-stream/transform",
@@ -93,6 +97,7 @@
     "_stream_writable": "readable-stream/writable",
     "_stream_duplex": "readable-stream/duplex",
     "_stream_passthrough": "readable-stream/passthrough",
-    "stream": "stream-browserify"
+    "stream": "stream-browserify",
+    "path": "path-browserify"
   }
 }

@@ -4,12 +4,22 @@ export enum SSHTunnelAuthenticationMethod {
   Agent = 'Agent',
 }
 
-export type SSHTunnelInfo = {
+type SSHTunnelInfoBase = {
   host: string;
   port: string;
   username: string;
   authenticationMethod: SSHTunnelAuthenticationMethod;
   password?: string;
-  privateKey?: string;
   passphrase?: string;
+};
+
+export type SSHTunnelInfo = SSHTunnelInfoBase & {
+  privateKey?: {
+    uri: string;
+    data: string;
+  };
+};
+
+export type SSHTunnelConfiguration = SSHTunnelInfoBase & {
+  privateKey?: String;
 };

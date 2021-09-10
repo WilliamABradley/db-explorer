@@ -1,7 +1,9 @@
+import path from 'path';
 import * as React from 'react';
 import {View, Button, Text, TextInput, Alert, StyleSheet} from 'react-native';
 import Modal from 'react-native-root-modal';
 import {SSHTunnelAuthenticationMethod, SSHTunnelInfo} from '../../../tunnel';
+import {FileData, PickFileData} from '../../../utils/fileManager';
 
 export type SSHTunnelModalProps = {
   visible: boolean;
@@ -16,7 +18,7 @@ export default function SSHTunnelModal(
   const [host, setHost] = React.useState<string | undefined>(undefined);
   const [port, setPort] = React.useState<string | undefined>('22');
   const [username, setUsername] = React.useState<string | undefined>(undefined);
-  const [privateKey, setPrivateKey] = React.useState<string | undefined>(
+  const [privateKey, setPrivateKey] = React.useState<FileData | undefined>(
     undefined,
   );
   const [passphrase, setPassphrase] = React.useState<string | undefined>(
@@ -65,16 +67,33 @@ export default function SSHTunnelModal(
           autoCorrect={false}
           spellCheck={false}
         />
-        <Text>Private Key Data</Text>
-        <TextInput
-          placeholder="Private Key Data"
-          defaultValue={privateKey}
-          onChangeText={setPrivateKey}
-          style={styles.modalEntry}
-          secureTextEntry={true}
-          autoCorrect={false}
-          spellCheck={false}
-        />
+        <Text>Private Key</Text>
+        <View
+          style={{
+            ...styles.modalEntry,
+            ...styles.filePickerContainer,
+          }}>
+          <View style={styles.filePickerButton}>
+            <Button
+              title="Open File"
+              onPress={async () => {
+                try {
+                  const data = await PickFileData('utf8');
+                  if (data) {
+                    setPrivateKey(data);
+                  }
+                } catch (e: any) {
+                  Alert.alert('Failed to Pick File', e.message);
+                }
+              }}
+            />
+          </View>
+          <Text style={styles.filePickerText}>
+            {privateKey
+              ? `Copied from: ${path.basename(privateKey?.uri)}`
+              : 'No Private Key'}
+          </Text>
+        </View>
         <Text>Passphrase</Text>
         <TextInput
           placeholder="Passphrase"
@@ -112,7 +131,10 @@ export default function SSHTunnelModal(
                     error.message,
                     [
                       {
-                        text: 'OK',
+                        text: 'Ignore',
+                      },
+                      {
+                        text: 'Cancel',
                         onPress: () => props.changeVisibleTo(true),
                       },
                     ],
@@ -192,4 +214,13 @@ const styles = StyleSheet.create({
   modalActionRight: {
     marginLeft: 2,
   },
+  filePickerContainer: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filePickerButton: {
+    marginRight: 5,
+  },
+  filePickerText: {},
 });

@@ -8,6 +8,12 @@ using CheckboxWindows;
 // Namespaces from @react-native-community/slider
 using SliderWindows;
 
+// Namespaces from react-native-document-picker
+using ReactNativeDocumentPicker;
+
+// Namespaces from react-native-fs
+using RNFS;
+
 // Namespaces from react-native-sensitive-info
 using RNSensitiveInfoCPP;
 
@@ -27,6 +33,10 @@ namespace Microsoft.ReactNative.Managed
             packageProviders.Add(new CheckboxWindows.ReactPackageProvider());
             // IReactPackageProviders from @react-native-community/slider
             packageProviders.Add(new SliderWindows.ReactPackageProvider());
+            // IReactPackageProviders from react-native-document-picker
+            packageProviders.Add(new ReactNativeDocumentPicker.ReactPackageProvider());
+            // IReactPackageProviders from react-native-fs
+            packageProviders.Add(new RNFS.ReactPackageProvider());
             // IReactPackageProviders from react-native-sensitive-info
             packageProviders.Add(new RNSensitiveInfoCPP.ReactPackageProvider());
             // IReactPackageProviders from react-native-webview

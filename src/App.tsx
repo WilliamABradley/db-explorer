@@ -111,7 +111,6 @@ export default function App() {
             }
 
             if (info) {
-              console.log(info);
               const newTunnel = await setTunnel(info);
               if (newTunnel) {
                 try {
@@ -180,7 +179,12 @@ export default function App() {
               onPress={async () => {
                 const tunnel = await getTunnel();
                 if (tunnel && !tunnel.connected) {
-                  await tunnel.connect();
+                  try {
+                    await tunnel.connect();
+                  } catch (e: any) {
+                    Alert.alert('SSH Tunnel Connection Failed', e.message);
+                    return;
+                  }
                 }
 
                 const driver = await getDriver();
@@ -193,7 +197,12 @@ export default function App() {
                 }
 
                 if (!driver.connected) {
-                  await driver.connect();
+                  try {
+                    await driver.connect();
+                  } catch (e: any) {
+                    Alert.alert('Driver Connection Failed', e.message);
+                    return;
+                  }
                 }
 
                 driver
@@ -201,6 +210,7 @@ export default function App() {
                   .then(setResponse)
                   .catch(e => {
                     console.error(e);
+                    Alert.alert('Query Failed', e.message);
                   });
               }}
             />
