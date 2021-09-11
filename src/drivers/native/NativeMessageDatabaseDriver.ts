@@ -1,7 +1,6 @@
 import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
 import DatabaseDriver from '../DatabaseDriver';
 import DatabaseQueryResult from '../models/DatabaseQueryResult';
-import {NativeDatabaseConnectionInfo} from './INativeDatabaseDriver';
 import {sendManagerMessage} from '../../utils/driverManager';
 import {
   DriverManagerDatabaseMessageType,
@@ -22,14 +21,9 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     const getInstance = async () => {
       console.debug(`Initialising ${this.#driverName}`);
 
-      const _connectionInfo: NativeDatabaseConnectionInfo = {
-        ...connectionInfo,
-        ssl: connectionInfo.ssl.toString(),
-      };
-
       return this.sendDriverMessage<number>(
         DriverManagerDatabaseMessageType.Create,
-        _connectionInfo,
+        connectionInfo,
       );
     };
 

@@ -23,3 +23,7 @@ export type SSHTunnelInfo = SSHTunnelInfoBase & {
 export type SSHTunnelConfiguration = SSHTunnelInfoBase & {
   privateKey?: String;
 };
+
+export type SSHTunnelConnection = {
+  localPort: String;
+};

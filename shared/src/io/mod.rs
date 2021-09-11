@@ -1,6 +1,7 @@
 pub mod database;
 pub mod tunnel;
 
+use crate::errors::DriverError;
 use database::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -18,20 +19,5 @@ pub enum InboundMessage {
 #[serde(tag = "type", content = "data")]
 pub enum OutboundMessage {
   Result(Value),
-  Error {
-    error_type: DriverErrorType,
-    error_message: String,
-  },
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum DriverErrorType {
-  FatalError,
-  ParseError,
-  SerializeError,
-  NoConnectionError,
-  DriverError,
-  UnknownMessage,
-  UnknownDriver,
-  UnknownError,
+  Error(DriverError),
 }

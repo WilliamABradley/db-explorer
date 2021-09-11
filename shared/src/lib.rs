@@ -1,10 +1,13 @@
 pub mod drivers;
+pub mod errors;
 pub mod handle_db;
 pub mod handle_tunnel;
 pub mod io;
+pub mod tunnel;
 pub mod utils;
 
 use backtrace::Backtrace;
+use errors::DriverError;
 use futures::executor::block_on;
 use io::*;
 use std::ffi::CStr;
@@ -44,18 +47,14 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
             _ => format!("Unknown Error: {:?}\n{:?}", err, trace),
         };
 
-        outbound_message = OutboundMessage::Error {
-            error_type: DriverErrorType::FatalError,
-            error_message: err_message,
-        };
+        outbound_message = OutboundMessage::Error(DriverError::FatalError(err_message));
     }
 
     let serialize_result = serde_json::to_string(&outbound_message);
     let response = serialize_result.unwrap_or_else(|err| {
-        serde_json::to_string(&OutboundMessage::Error {
-            error_type: DriverErrorType::SerializeError,
-            error_message: format!("{}", err),
-        })
+        serde_json::to_string(&OutboundMessage::Error(DriverError::SerializeError(
+            format!("{}", err),
+        )))
         .unwrap()
     });
     return to_cchar(response);
@@ -77,10 +76,7 @@ async fn handle_message(message_data: &str) -> OutboundMessage {
         serde_json::from_str(message_data);
     if message_result.is_err() {
         let error = message_result.unwrap_err();
-        return OutboundMessage::Error {
-            error_type: DriverErrorType::ParseError,
-            error_message: format!("{}", error),
-        };
+        return OutboundMessage::Error(DriverError::ParseError(format!("{}", error)));
     }
     let message = message_result.unwrap();
 
@@ -93,10 +89,7 @@ async fn handle_message(message_data: &str) -> OutboundMessage {
             return handle_tunnel::handle_tunnel_message(&tunnel_message).await;
         }
         _ => {
-            return OutboundMessage::Error {
-                error_type: DriverErrorType::UnknownMessage,
-                error_message: format!("Received unhandled message type: {}", message_data),
-            }
+            return OutboundMessage::Error(DriverError::UnknownMessage(message_data.into()));
         }
     };
 }

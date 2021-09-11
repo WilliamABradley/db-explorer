@@ -1,3 +1,4 @@
+use crate::drivers::types::DatabaseConnectionInfo;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt::Debug;
@@ -13,7 +14,7 @@ pub struct DatabaseDriverMessagePayload {
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "type", content = "data")]
 pub enum DatabaseDriverMessage {
-  Create(HashMap<String, String>),
+  Create(DatabaseConnectionInfo),
   Connect,
   Close,
   Execute(DatabaseQueryData),

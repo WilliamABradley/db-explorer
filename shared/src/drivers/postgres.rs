@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use std::str;
 
 lazy_static! {
-  static ref _CONFIGS: Mutex<HashMap<u32, HashMap<String, String>>> = Mutex::new(HashMap::new());
+  static ref _CONFIGS: Mutex<HashMap<u32, DatabaseConnectionInfo>> = Mutex::new(HashMap::new());
   static ref _INSTANCES: Mutex<HashMap<u32, sqlx::Pool<Postgres>>> = Mutex::new(HashMap::new());
 }
 
@@ -19,17 +19,17 @@ pub struct PostgresDriver;
 
 #[async_trait]
 impl DatabaseDriver for PostgresDriver {
-  async fn create(&self, connection_info: &HashMap<String, String>) -> Result<u32, DatabaseError> {
+  async fn create(&self, connection_info: &DatabaseConnectionInfo) -> Result<u32, DriverError> {
     let mut configs = _CONFIGS.lock().await;
     let id = configs.keys().len() as u32;
     configs.insert(id, connection_info.clone());
     return Result::Ok(id);
   }
 
-  async fn connect(&self, id: &u32) -> Result<(), DatabaseError> {
+  async fn connect(&self, id: &u32) -> Result<(), DriverError> {
     let configs = _CONFIGS.lock().await;
     if !configs.contains_key(id) {
-      return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
+      return Result::Err(DriverError::NoConnectionError(*id));
     }
     let connection_info = &configs[id];
     drop(&configs);
@@ -37,33 +37,26 @@ impl DatabaseDriver for PostgresDriver {
     let pool = PgPoolOptions::new().max_connections(5);
 
     let mut connection_string: String = "postgres://".to_owned();
-    if connection_info.contains_key("username") {
-      connection_string.push_str(&connection_info["username"]);
+    if connection_info.username.is_some() {
+      connection_string.push_str(&connection_info.username.as_ref().unwrap());
 
-      if connection_info.contains_key("password") {
+      if connection_info.password.is_some() {
         connection_string.push_str(":");
-        connection_string.push_str(&connection_info["password"])
+        connection_string.push_str(&connection_info.password.as_ref().unwrap());
       }
       connection_string.push_str("@");
     }
-    if !connection_info.contains_key("host") {
-      return Result::Err(Box::new(InvalidError {
-        message: "Host must be provided".to_string(),
-      }));
-    }
-    connection_string.push_str(&connection_info["host"]);
-    if connection_info.contains_key("port") {
-      connection_string.push_str(":");
-      connection_string.push_str(&connection_info["port"]);
-    }
-    if connection_info.contains_key("database") {
+    connection_string.push_str(&connection_info.host);
+    connection_string.push_str(":");
+    connection_string.push_str(&connection_info.port);
+    if connection_info.database.is_some() {
       connection_string.push_str("/");
-      connection_string.push_str(&connection_info["database"]);
+      connection_string.push_str(&connection_info.database.as_ref().unwrap());
     }
 
     let result = pool.connect(&connection_string).await;
     if result.is_err() {
-      return Result::Err(Box::new(result.err().unwrap()));
+      return Result::Err(DriverError::Error(format!("{}", result.err().unwrap())));
     }
 
     let mut instances = _INSTANCES.lock().await;
@@ -71,10 +64,10 @@ impl DatabaseDriver for PostgresDriver {
     return Result::Ok(());
   }
 
-  async fn close(&self, id: &u32) -> Result<(), DatabaseError> {
+  async fn close(&self, id: &u32) -> Result<(), DriverError> {
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(id) {
-      return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
+      return Result::Err(DriverError::NoConnectionError(*id));
     }
     let connection = &instances[id];
     drop(&instances);
@@ -88,14 +81,14 @@ impl DatabaseDriver for PostgresDriver {
     id: &u32,
     sql: &str,
     variables: &Option<HashMap<String, String>>,
-  ) -> Result<u64, DatabaseError> {
+  ) -> Result<u64, DriverError> {
     if variables.is_some() {
       panic!("Variable support not implemented!");
     }
 
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
-      return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
+      return Result::Err(DriverError::NoConnectionError(*id));
     }
     let connection = &instances[id];
     drop(&instances);
@@ -103,7 +96,7 @@ impl DatabaseDriver for PostgresDriver {
     let query = sqlx::query(sql);
     let result = query.execute(connection).await;
     if result.is_err() {
-      return Result::Err(Box::new(result.err().unwrap()));
+      return Result::Err(DriverError::Error(format!("{}", result.err().unwrap())));
     }
 
     let data = result.unwrap();
@@ -115,14 +108,14 @@ impl DatabaseDriver for PostgresDriver {
     id: &u32,
     sql: &str,
     variables: &Option<HashMap<String, String>>,
-  ) -> Result<DatabaseQueryResult, DatabaseError> {
+  ) -> Result<DatabaseQueryResult, DriverError> {
     if variables.is_some() {
       panic!("Variable support not implemented!");
     }
 
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
-      return Result::Err(Box::new(NoConnectionError { id: id.clone() }));
+      return Result::Err(DriverError::NoConnectionError(*id));
     }
     let connection = &instances[id];
     drop(&instances);
@@ -130,7 +123,7 @@ impl DatabaseDriver for PostgresDriver {
     let query = sqlx::query(sql);
     let result = query.fetch_all(connection).await;
     if result.is_err() {
-      return Result::Err(Box::new(result.err().unwrap()));
+      return Result::Err(DriverError::Error(format!("{}", result.err().unwrap())));
     }
 
     let mut columns: Vec<DatabaseColumnInfo> = Vec::new();
@@ -169,7 +162,7 @@ impl DatabaseDriver for PostgresDriver {
     return Result::Ok(payload);
   }
 
-  async fn flush(&self) -> Result<(), DatabaseError> {
+  async fn flush(&self) -> Result<(), DriverError> {
     let mut configs = _CONFIGS.lock().await;
     let mut instances = _INSTANCES.lock().await;
 

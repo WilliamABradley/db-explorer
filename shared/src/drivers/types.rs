@@ -1,6 +1,4 @@
 use serde::{Deserialize, Serialize, Serializer};
-use std::error::Error;
-use std::fmt;
 use std::fmt::Debug;
 use std::str;
 use strum_macros::EnumString;
@@ -8,6 +6,16 @@ use strum_macros::EnumString;
 #[derive(strum_macros::Display, EnumString)]
 pub enum DriverType {
   Postgres,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct DatabaseConnectionInfo {
+  pub host: String,
+  pub port: String,
+  pub ssl: bool,
+  pub username: Option<String>,
+  pub password: Option<String>,
+  pub database: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -47,27 +55,3 @@ where
   }
   return s.collect_seq(rows);
 }
-
-#[derive(Debug)]
-pub struct NoConnectionError {
-  pub id: u32,
-}
-impl fmt::Display for NoConnectionError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "Connection {} not found", self.id)
-  }
-}
-impl Error for NoConnectionError {}
-
-#[derive(Debug)]
-pub struct InvalidError {
-  pub message: String,
-}
-impl fmt::Display for InvalidError {
-  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-    write!(f, "{}", self.message)
-  }
-}
-impl Error for InvalidError {}
-
-pub type DatabaseError = Box<dyn Error>;

@@ -3,7 +3,11 @@ import {
   DriverManagerTunnelMessageType,
   sendManagerMessage,
 } from '../utils/driverManager';
-import {SSHTunnelConfiguration, SSHTunnelInfo} from './types';
+import {
+  SSHTunnelConfiguration,
+  SSHTunnelConnection,
+  SSHTunnelInfo,
+} from './types';
 export * from './types';
 
 const FLUSH = false;
@@ -48,6 +52,7 @@ export default class SSHTunnel {
   #instance: Promise<number>;
   #instanceId: number = -1;
   public connected: boolean = false;
+  public connection: SSHTunnelConnection | null = null;
 
   private sendDriverMessage<T>(
     type: DriverManagerTunnelMessageType,
@@ -63,12 +68,15 @@ export default class SSHTunnel {
     });
   }
 
-  public async connect(): Promise<void> {
+  public async connect(): Promise<SSHTunnelConnection> {
     await this.#instance;
     console.debug(`Connecting Tunnel: ${this.#instanceId}`);
-    await this.sendDriverMessage(DriverManagerTunnelMessageType.Connect);
+    this.connection = await this.sendDriverMessage<SSHTunnelConnection>(
+      DriverManagerTunnelMessageType.Connect,
+    );
     this.connected = true;
     console.debug(`Connected Tunnel: ${this.#instanceId}`);
+    return this.connection;
   }
 
   public async close(): Promise<void> {

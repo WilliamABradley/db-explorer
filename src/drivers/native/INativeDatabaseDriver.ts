@@ -1,12 +1,8 @@
 import DatabaseConnectionInfo from '../models/DatabaseConnectionInfo';
 import DatabaseQueryResult from '../models/DatabaseQueryResult';
 
-export type NativeDatabaseConnectionInfo = Partial<
-  Record<keyof DatabaseConnectionInfo, string>
->;
-
 export default interface INativeDatabaseDriver {
-  create(connectionInfo: NativeDatabaseConnectionInfo): Promise<number>;
+  create(connectionInfo: DatabaseConnectionInfo): Promise<number>;
   connect(id: number): Promise<void>;
   close(id: number): Promise<void>;
   execute(

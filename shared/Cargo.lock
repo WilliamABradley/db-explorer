@@ -60,6 +60,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "anyhow"
+version = "1.0.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28ae2b3dec75a406790005a200b1bd89785afc02517a00ca99ecfe093ee9e6cf"
+
+[[package]]
 name = "async-channel"
 version = "1.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -558,6 +564,7 @@ checksum = "3ee2393c4a91429dffb4bedf19f4d6abf27d8a732c8ce4980305d782e5426d57"
 name = "db_explorer_shared"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "async-trait",
  "backtrace",
  "bstr",
@@ -570,7 +577,9 @@ dependencies = [
  "sqlx",
  "strum",
  "strum_macros",
+ "thiserror",
  "thrussh",
+ "thrussh-keys",
 ]
 
 [[package]]
