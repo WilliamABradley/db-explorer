@@ -1,5 +1,6 @@
-﻿using System.Linq;
-using System.Net.NetworkInformation;
+﻿using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.ReactNative.Managed;
 
@@ -13,21 +14,16 @@ namespace db_explorer.modules
         {
             return Task.Run(() =>
             {
-                var ipProperties = IPGlobalProperties.GetIPGlobalProperties();
-
-                var usedPorts = ipProperties.GetActiveTcpConnections()
-                        .Where(connection => connection.State != TcpState.Closed)
-                        .Select(connection => connection.LocalEndPoint)
-                        .Concat(ipProperties.GetActiveTcpListeners())
-                        .Concat(ipProperties.GetActiveUdpListeners())
-                        .Select(endpoint => endpoint.Port)
-                        .ToArray();
-
                 var isPortUsed = true;
                 var _port = port;
                 while (isPortUsed)
                 {
-                    isPortUsed = usedPorts.Contains(_port);
+                    if(_port > 65535)
+                    {
+                        throw new Exception("No ports are available");
+                    }
+
+                    isPortUsed = IsPortOpen(_port);
                     if (isPortUsed)
                     {
                         _port++;
@@ -35,6 +31,21 @@ namespace db_explorer.modules
                 }
                 return _port;
             });
+        }
+
+        private bool IsPortOpen(int port)
+        {
+            try
+            {
+                TcpListener tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+                tcpListener.Start();
+                tcpListener.Stop();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
+import FindFreePort from 'react-native-find-free-port';
 import StorybookUI from '../Storybook';
 import TableView from './components/molecules/TableView';
 import Editor from './components/atoms/Editor';
@@ -27,36 +28,16 @@ const DRIVER_KEY = 'database_connection';
 const TUNNEL_KEY = 'tunnel_configuration';
 
 let _driver: DatabaseDriver | null = null;
+let _driver_info: DatabaseConnectionInfo | null = null;
 let _tunnel: SSHTunnel | null = null;
-
-const getDriver = async (): Promise<DatabaseDriver | null> => {
-  if (!_driver) {
-    const driverInfo = await getSecureData<DatabaseConnectionInfo>(DRIVER_KEY);
-    if (driverInfo) {
-      _driver = new PostgresDriver(driverInfo);
-    }
-  }
-  return _driver;
-};
-
-const setDriver = async (
-  connectionInfo: DatabaseConnectionInfo | null,
-): Promise<DatabaseDriver | null> => {
-  if (connectionInfo !== null) {
-    await setSecureData(DRIVER_KEY, connectionInfo);
-    _driver = new PostgresDriver(connectionInfo);
-  } else {
-    await deleteSecureData(DRIVER_KEY);
-    _driver = null;
-  }
-  return _driver;
-};
+let _tunnel_port: string | null = null;
 
 const getTunnel = async (): Promise<SSHTunnel | null> => {
   if (!_tunnel) {
     const tunnelInfo = await getSecureData<SSHTunnelInfo>(TUNNEL_KEY);
     if (tunnelInfo) {
       _tunnel = new SSHTunnel(tunnelInfo);
+      _tunnel_port = (await FindFreePort.getFirstStartingFrom(1024)).toString();
     }
   }
   return _tunnel;
@@ -72,7 +53,44 @@ const setTunnel = async (
     await deleteSecureData(TUNNEL_KEY);
     _tunnel = null;
   }
+
+  // re-register driver.
+  if (_driver) {
+    await _driver.close();
+    await getDriver();
+  }
   return _tunnel;
+};
+
+const getDriver = async (): Promise<DatabaseDriver | null> => {
+  if (!_driver) {
+    _driver_info = await getSecureData<DatabaseConnectionInfo>(DRIVER_KEY);
+    if (_driver_info) {
+      if (_tunnel_port) {
+        _driver = new PostgresDriver({
+          ..._driver_info,
+          host: '127.0.0.1',
+          port: _tunnel_port,
+        });
+      } else {
+        _driver = new PostgresDriver(_driver_info);
+      }
+    }
+  }
+  return _driver;
+};
+
+const setDriver = async (
+  connectionInfo: DatabaseConnectionInfo | null,
+): Promise<DatabaseDriver | null> => {
+  if (connectionInfo !== null) {
+    await setSecureData(DRIVER_KEY, connectionInfo);
+    _driver = await getDriver();
+  } else {
+    await deleteSecureData(DRIVER_KEY);
+    _driver = null;
+  }
+  return _driver;
 };
 
 export default function App() {
@@ -120,7 +138,7 @@ export default function App() {
               const newTunnel = await setTunnel(info);
               if (newTunnel) {
                 try {
-                  await newTunnel.connect();
+                  await newTunnel.test();
                 } catch (e: any) {
                   return e;
                 }
@@ -187,10 +205,21 @@ export default function App() {
             <Button
               title="Run"
               onPress={async () => {
+                if (!_driver_info) {
+                  Alert.alert(
+                    'Error',
+                    'No database connection has been configured.',
+                  );
+                  return;
+                }
+
                 const tunnel = await getTunnel();
                 if (tunnel && !tunnel.connected) {
                   try {
-                    await tunnel.connect();
+                    await tunnel.connect({
+                      remoteHost: _driver_info.host,
+                      remotePort: _driver_info.port,
+                    });
                   } catch (e: any) {
                     Alert.alert('SSH Tunnel Connection Failed', e.message);
                     return;
@@ -199,11 +228,7 @@ export default function App() {
 
                 const driver = await getDriver();
                 if (!driver) {
-                  Alert.alert(
-                    'Error',
-                    'No database connection has been configured.',
-                  );
-                  return;
+                  throw new Error('Invalid state');
                 }
 
                 if (!driver.connected) {

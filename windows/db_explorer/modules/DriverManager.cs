@@ -89,6 +89,8 @@ namespace db_explorer.modules
             try
             {
                 var payloadType = payload.Value<string>("type");
+                var data = payload["data"];
+
                 int getId() => payload.Value<int>("id");
                 DriverManagerResult asResult(object result) => new DriverManagerResult
                 {
@@ -108,11 +110,20 @@ namespace db_explorer.modules
                         switch (payloadType)
                         {
                             case "Create":
-                                var configuration = payload.Value<SSHTunnelConfiguration>("data");
+                                var configuration = data.ToObject<SSHTunnelConfiguration>();
                                 var creationId = TUNNELS.Count;
                                 var createdTunnel = new SSHTunnel(configuration);
                                 TUNNELS.Add(creationId, createdTunnel);
                                 return asResult(creationId);
+
+                            case "Test":
+                                var testId = getId();
+                                if (!TUNNELS.TryGetValue(testId, out SSHTunnel testingTunnel))
+                                {
+                                    return noConnection(testId);
+                                }
+                                testingTunnel.Test();
+                                return asResult(null);
 
                             case "Connect":
                                 var connectId = getId();
@@ -120,7 +131,7 @@ namespace db_explorer.modules
                                 {
                                     return noConnection(connectId);
                                 }
-                                var forward = payload.Value<SSHTunnelPortForward>("data");
+                                var forward = data.ToObject<SSHTunnelPortForward>();
                                 connectingTunnel.Connect(forward);
                                 return asResult(null);
 

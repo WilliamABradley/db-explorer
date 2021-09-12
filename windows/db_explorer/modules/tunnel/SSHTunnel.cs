@@ -2,6 +2,8 @@
 using Newtonsoft.Json.Converters;
 using Renci.SshNet;
 using System;
+using System.IO;
+using System.Text;
 
 namespace db_explorer.modules.tunnel
 {
@@ -59,7 +61,11 @@ namespace db_explorer.modules.tunnel
             switch(configuration.AuthenticationMethod)
             {
                 case SSHTunnelAuthenticationMethod.PublicKey:
-                    authenticationMethod = new PrivateKeyAuthenticationMethod(configuration.Username, new PrivateKeyFile(configuration.PrivateKey, configuration.Passphrase));
+                    byte[] privateKeyBytes = Encoding.UTF8.GetBytes(configuration.PrivateKey);
+                    using (var privateKeyStream = new MemoryStream(privateKeyBytes))
+                    {
+                        authenticationMethod = new PrivateKeyAuthenticationMethod(configuration.Username, new PrivateKeyFile(privateKeyStream, configuration.Passphrase));
+                    }
                     break;
 
                 case SSHTunnelAuthenticationMethod.Password:
@@ -77,24 +83,40 @@ namespace db_explorer.modules.tunnel
 
         public SSHTunnelConfiguration Configuration { get; }
         private SshClient Client { get; }
+        private ForwardedPortLocal Port { get; set; }
+
+        public void Test()
+        {
+            Client.Connect();
+            Client.Disconnect();
+        }
 
         public void Connect(SSHTunnelPortForward target)
         {
+            Client.KeepAliveInterval = new TimeSpan(0, 0, 30);
+            Client.ConnectionInfo.Timeout = new TimeSpan(0, 0, 20);
             Client.Connect();
-            Client.AddForwardedPort(new ForwardedPortLocal(Convert.ToUInt32(target.LocalPort), target.RemoteHost, Convert.ToUInt32(target.RemotePort)));
+
+            Port = new ForwardedPortLocal(Convert.ToUInt32(target.LocalPort), target.RemoteHost, Convert.ToUInt32(target.RemotePort));
+            Client.AddForwardedPort(Port);
+
+            Port.Start();
         }
 
         public void Close()
         {
-            Client.Disconnect();
-            foreach(var port in Client.ForwardedPorts)
+            foreach (var port in Client.ForwardedPorts)
             {
+                port.Stop();
                 Client.RemoveForwardedPort(port);
             }
+
+            Client.Disconnect();
         }
 
         public void Dispose()
         {
+            Close();
             Client.Dispose();
         }
     }

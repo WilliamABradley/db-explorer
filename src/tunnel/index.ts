@@ -1,7 +1,6 @@
 import FindFreePort from 'react-native-find-free-port';
 import {
   DriverManagerMessageClass,
-  DriverManagerMessagePayload,
   DriverManagerTunnelMessage,
   DriverManagerTunnelMessageResult,
   DriverManagerTunnelMessageType,
@@ -15,7 +14,7 @@ import {
 } from './types';
 export * from './types';
 
-const FLUSH = false;
+const FLUSH = true;
 
 export default class SSHTunnel {
   constructor(connectionInfo: SSHTunnelInfo) {
@@ -73,13 +72,19 @@ export default class SSHTunnel {
     });
   }
 
+  public async test(): Promise<void> {
+    console.debug(`Testing Tunnel: ${this.#instanceId}`);
+    await this.sendDriverMessage(DriverManagerTunnelMessageType.Test);
+    console.debug(`Tested Tunnel: ${this.#instanceId}`);
+  }
+
   public async connect(
     forward: SSHTunnelPortForward,
   ): Promise<SSHTunnelConnection> {
     await this.#instance;
     const localPort =
       forward.localPort ||
-      (await FindFreePort.getFirstStartingFrom(1023)).toString();
+      (await FindFreePort.getFirstStartingFrom(1024)).toString();
 
     console.debug(
       `Connecting Tunnel: ${this.#instanceId} to Port ${localPort}`,

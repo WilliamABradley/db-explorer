@@ -1,0 +1,3 @@
+[submodule "windows/SSH.NET"]
+	path = windows/SSH.NET
+	url = https://github.com/williamabradley/SSH.NET.git

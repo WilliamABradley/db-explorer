@@ -66,6 +66,7 @@ export type DriverManagerDatabaseMessageResult = {
 
 export enum DriverManagerTunnelMessageType {
   Create = 'Create',
+  Test = 'Test',
   Connect = 'Connect',
   Close = 'Close',
   Flush = 'Flush',
@@ -83,6 +84,10 @@ export type DriverManagerTunnelMessage = {
       data: SSHTunnelPortForward;
     }
   | {
+      type: DriverManagerTunnelMessageType.Test;
+      data: never;
+    }
+  | {
       type: DriverManagerTunnelMessageType.Close;
       data: never;
     }
@@ -94,6 +99,7 @@ export type DriverManagerTunnelMessage = {
 
 export type DriverManagerTunnelMessageResult = {
   [DriverManagerTunnelMessageType.Create]: number;
+  [DriverManagerTunnelMessageType.Test]: void;
   [DriverManagerTunnelMessageType.Connect]: void;
   [DriverManagerTunnelMessageType.Close]: void;
   [DriverManagerTunnelMessageType.Flush]: void;
