@@ -17,6 +17,8 @@ export async function sendManagerMessage<T = undefined>(
   if (message.payload.id === -1) {
     delete message.payload.id;
   }
+
+  console.debug('Sending:', message);
   const response = await manager.postMessage(JSON.stringify(message));
   let result: any;
   try {
@@ -26,16 +28,19 @@ export async function sendManagerMessage<T = undefined>(
       `Failed to Parse DriverManager Message: ${response} (${e.message})`,
     );
   }
+  console.debug('Received: ', result);
 
-  console.debug(result);
   switch (result.type) {
     case 'Result':
       return result.data;
 
     case 'Error':
       throw new Error(
-        `DriverManager (${result.data.error_type}): ${result.data.error_message}`,
+        `${result.data.error_type}: ${result.data.error_message}`,
       );
+
+    case 'FatalError':
+      throw new Error(result.data);
 
     default:
       throw new Error(

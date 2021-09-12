@@ -7759,6 +7759,11 @@ react-native-document-picker@^6.0.4:
   dependencies:
     invariant "^2.2.4"
 
+react-native-find-free-port@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-find-free-port/-/react-native-find-free-port-1.0.0.tgz#b9106aeace34a94b2162f3a6266971cf3b5dd675"
+  integrity sha512-UpVUtHQBDNf7U8tYvEJP0Ldn4IYZXvPXZX9372cgYnIncOhIPDbv3odX5nlS680jx1vkpSSiV1YpBPCiTdAahg==
+
 react-native-fs@avmoroz/react-native-fs#dev:
   version "2.18.0"
   resolved "https://codeload.github.com/avmoroz/react-native-fs/tar.gz/e8e092c5d5c7bf8f10e7eccd7cda5eb1c26d58a5"

@@ -24,6 +24,12 @@ export type SSHTunnelConfiguration = SSHTunnelInfoBase & {
   privateKey?: String;
 };
 
+export type SSHTunnelPortForward = {
+  remoteHost: String;
+  remotePort: String;
+  localPort?: String;
+};
+
 export type SSHTunnelConnection = {
   localPort: String;
 };

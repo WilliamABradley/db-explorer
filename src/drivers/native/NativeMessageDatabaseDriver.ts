@@ -3,6 +3,8 @@ import DatabaseDriver from '../DatabaseDriver';
 import DatabaseQueryResult from '../models/DatabaseQueryResult';
 import {sendManagerMessage} from '../../utils/driverManager';
 import {
+  DriverManagerDatabaseMessage,
+  DriverManagerDatabaseMessageResult,
   DriverManagerDatabaseMessageType,
   DriverManagerMessageClass,
 } from '../../utils/driverManager/types';
@@ -21,7 +23,7 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     const getInstance = async () => {
       console.debug(`Initialising ${this.#driverName}`);
 
-      return this.sendDriverMessage<number>(
+      return this.sendDriverMessage(
         DriverManagerDatabaseMessageType.Create,
         connectionInfo,
       );
@@ -49,13 +51,13 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
   #instance: Promise<number>;
   #instanceId: number = -1;
 
-  private sendDriverMessage<T>(
-    type: DriverManagerDatabaseMessageType,
-    data?: any,
-  ): Promise<T> {
+  private sendDriverMessage<TType extends DriverManagerDatabaseMessageType>(
+    type: TType,
+    data?: ({type: TType} & DriverManagerDatabaseMessage)['data'],
+  ): Promise<DriverManagerDatabaseMessageResult[TType]> {
     return sendManagerMessage({
       class: DriverManagerMessageClass.DatabaseDriver,
-      payload: {
+      payload: <DriverManagerDatabaseMessage>{
         driver: this.#driverName,
         id: this.#instanceId,
         type,
@@ -82,7 +84,7 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     variables?: Record<string, any>,
   ): Promise<number> {
     console.debug(`Executing on ${this.#driverName}: ${this.#instanceId}`);
-    const result = await this.sendDriverMessage<number>(
+    const result = await this.sendDriverMessage(
       DriverManagerDatabaseMessageType.Execute,
       {
         sql,
@@ -98,7 +100,7 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     variables?: Record<string, any>,
   ): Promise<DatabaseQueryResult> {
     console.debug(`Querying on ${this.#driverName}: ${this.#instanceId}`);
-    const result = await this.sendDriverMessage<DatabaseQueryResult>(
+    const result = await this.sendDriverMessage(
       DriverManagerDatabaseMessageType.Query,
       {
         sql,

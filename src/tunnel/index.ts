@@ -1,5 +1,9 @@
+import FindFreePort from 'react-native-find-free-port';
 import {
   DriverManagerMessageClass,
+  DriverManagerMessagePayload,
+  DriverManagerTunnelMessage,
+  DriverManagerTunnelMessageResult,
   DriverManagerTunnelMessageType,
   sendManagerMessage,
 } from '../utils/driverManager';
@@ -7,6 +11,7 @@ import {
   SSHTunnelConfiguration,
   SSHTunnelConnection,
   SSHTunnelInfo,
+  SSHTunnelPortForward,
 } from './types';
 export * from './types';
 
@@ -26,7 +31,7 @@ export default class SSHTunnel {
           : undefined,
       };
 
-      return this.sendDriverMessage<number>(
+      return this.sendDriverMessage(
         DriverManagerTunnelMessageType.Create,
         configuration,
       );
@@ -54,13 +59,13 @@ export default class SSHTunnel {
   public connected: boolean = false;
   public connection: SSHTunnelConnection | null = null;
 
-  private sendDriverMessage<T>(
-    type: DriverManagerTunnelMessageType,
-    data?: any,
-  ): Promise<T> {
+  private sendDriverMessage<TType extends DriverManagerTunnelMessageType>(
+    type: TType,
+    data?: ({type: TType} & DriverManagerTunnelMessage)['data'],
+  ): Promise<DriverManagerTunnelMessageResult[TType]> {
     return sendManagerMessage({
       class: DriverManagerMessageClass.SSHTunnel,
-      payload: {
+      payload: <DriverManagerTunnelMessage>{
         id: this.#instanceId,
         type,
         data,
@@ -68,15 +73,25 @@ export default class SSHTunnel {
     });
   }
 
-  public async connect(): Promise<SSHTunnelConnection> {
+  public async connect(
+    forward: SSHTunnelPortForward,
+  ): Promise<SSHTunnelConnection> {
     await this.#instance;
-    console.debug(`Connecting Tunnel: ${this.#instanceId}`);
-    this.connection = await this.sendDriverMessage<SSHTunnelConnection>(
-      DriverManagerTunnelMessageType.Connect,
+    const localPort =
+      forward.localPort ||
+      (await FindFreePort.getFirstStartingFrom(1023)).toString();
+
+    console.debug(
+      `Connecting Tunnel: ${this.#instanceId} to Port ${localPort}`,
     );
+    await this.sendDriverMessage(DriverManagerTunnelMessageType.Connect, {
+      ...forward,
+      localPort,
+    });
     this.connected = true;
     console.debug(`Connected Tunnel: ${this.#instanceId}`);
-    return this.connection;
+
+    return {localPort};
   }
 
   public async close(): Promise<void> {
