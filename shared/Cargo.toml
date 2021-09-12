@@ -23,14 +23,8 @@ futures = "0.3"
 backtrace = "0.3"
 sqlx = { git = "https://github.com/williamabradley/sqlx", branch = "exposed-driver", default_features = false, features = [ "postgres", "offline" ], optional = true }
 bstr = "0.2"
-thrussh = "0.33.5"
-thrussh-keys = "0.21.0"
 anyhow = "1.0.43"
 thiserror = "1.0"
-
-###########
-# ANDROID #
-###########
 
 [features]
 default = ["sqlx/runtime-async-std-rustls"]

@@ -1,9 +1,7 @@
 pub mod drivers;
 pub mod errors;
 pub mod handle_db;
-pub mod handle_tunnel;
 pub mod io;
-pub mod tunnel;
 pub mod utils;
 
 use backtrace::Backtrace;
@@ -84,9 +82,6 @@ async fn handle_message(message_data: &str) -> OutboundMessage {
     match message {
         InboundMessage::DatabaseDriver(database_message) => {
             return handle_db::handle_database_message(&database_message).await;
-        }
-        InboundMessage::SSHTunnel(tunnel_message) => {
-            return handle_tunnel::handle_tunnel_message(&tunnel_message).await;
         }
         _ => {
             return OutboundMessage::Error(DriverError::UnknownMessage(message_data.into()));
