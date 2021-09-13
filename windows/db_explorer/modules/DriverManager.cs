@@ -15,6 +15,7 @@ namespace db_explorer.modules
     public enum DriverManagerResultType
     {
         Result,
+        Log,
         Error,
         FatalError,
         NoConnectionError,
@@ -34,15 +35,25 @@ namespace db_explorer.modules
     [ReactModule(nameof(DriverManager))]
     public class DriverManager
     {
-        private static ReactContext _reactContext;
+        public static DriverManager Current;
+        public delegate void PostbackDelegate(IntPtr message);
+
         private static readonly string[] FORWARDED_CLASSES = new string[] { "DatabaseDriver" };
         private static readonly Dictionary<int, SSHTunnel> TUNNELS = new Dictionary<int, SSHTunnel>();
+
+        private ReactContext _reactContext;
+        private PostbackDelegate _postbackHandle;
 
         [ReactInitializer]
         public void Initialize(ReactContext reactContext)
         {
+            Current = this;
             _reactContext = reactContext;
-            Debug.WriteLine("Registered DriverManager Handler");
+            Logger.Info("Registered DriverManager Handler");
+
+            _postbackHandle = new PostbackDelegate(ReceiveMessage);
+            var postbackHandlePtr = Marshal.GetFunctionPointerForDelegate(_postbackHandle);
+            register_postback_handler(postbackHandlePtr);
         }
 
         [ReactMethod("postMessage")]
@@ -55,10 +66,20 @@ namespace db_explorer.modules
                 // Forward message to lower level.
                 if(isForwarding)
                 {
-                    var resultPtr = post_message(message);
-                    string result = Marshal.PtrToStringAnsi(resultPtr);
-                    free_message(resultPtr);
-                    return result;
+                    try
+                    {
+                        var resultPtr = post_message(message);
+                        var result = PtrToString(ref resultPtr);
+                        return result;
+                    }
+                    catch(Exception e)
+                    {
+                        return JsonConvert.SerializeObject(new DriverManagerResult
+                        {
+                            Type = DriverManagerResultType.FatalError,
+                            Data = e.Message
+                        });
+                    }
                 } 
                 // Process message on this level.
                 else
@@ -76,13 +97,40 @@ namespace db_explorer.modules
             });
         }
 
-        // Post Message to library.
+        public void ReceiveMessage(IntPtr messagePtr)
+        {
+            var message = PtrToString(ref messagePtr);
+            Emit(message);
+        }
+
+        public void Emit(DriverManagerResult result)
+        {
+            Emit(JsonConvert.SerializeObject(result));
+        }
+
+        public void Emit(string message)
+        {
+            _reactContext.EmitJSEvent("RCTDeviceEventEmitter", "DriverManagerEvent", message);
+        }
+
+        private static string PtrToString(ref IntPtr strPtr)
+        {
+            string result = Marshal.PtrToStringAnsi(strPtr);
+            free_message(strPtr);
+            return result;
+        }
+
+        // Post Message to library with Message Results.
         [DllImport("db_explorer_shared.dll", EntryPoint = "receive_message")]
         private static extern IntPtr post_message(string message);
 
         // Free Message from library.
         [DllImport("db_explorer_shared.dll", EntryPoint = "free_message")]
         private static extern void free_message(IntPtr messagePtr);
+
+        // Receive Async Message from Library.
+        [DllImport("db_explorer_shared.dll", EntryPoint = "register_postback_handler")]
+        private static extern void register_postback_handler(IntPtr postbackHandlePtr);
 
         private static DriverManagerResult HandleMessage(string messageClass, JObject payload)
         {
@@ -116,13 +164,13 @@ namespace db_explorer.modules
                                 TUNNELS.Add(creationId, createdTunnel);
                                 return asResult(creationId);
 
-                            case "Test":
-                                var testId = getId();
-                                if (!TUNNELS.TryGetValue(testId, out SSHTunnel testingTunnel))
+                            case "TestAuth":
+                                var testAuthId = getId();
+                                if (!TUNNELS.TryGetValue(testAuthId, out SSHTunnel testingAuthTunnel))
                                 {
-                                    return noConnection(testId);
+                                    return noConnection(testAuthId);
                                 }
-                                testingTunnel.Test();
+                                testingAuthTunnel.TestAuth();
                                 return asResult(null);
 
                             case "Connect":
@@ -135,6 +183,15 @@ namespace db_explorer.modules
                                 connectingTunnel.Connect(forward);
                                 return asResult(null);
 
+                            case "TestPort":
+                                var testId = getId();
+                                if (!TUNNELS.TryGetValue(testId, out SSHTunnel testingTunnel))
+                                {
+                                    return noConnection(testId);
+                                }
+                                var isOpen = testingTunnel.TestPort();
+                                return asResult(isOpen);
+
                             case "Close":
                                 var closeId = getId();
                                 if (!TUNNELS.TryGetValue(closeId, out SSHTunnel closingTunnel))
@@ -145,7 +202,7 @@ namespace db_explorer.modules
                                 return asResult(null);
 
                             case "Flush":
-                                foreach (var tunnel in TUNNELS.Reverse())
+                                foreach (var tunnel in TUNNELS.ToList())
                                 {
                                     tunnel.Value.Close();
                                     TUNNELS.Remove(tunnel.Key);

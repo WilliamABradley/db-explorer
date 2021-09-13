@@ -83,6 +83,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="modules\Logger.cs" />
     <Compile Include="modules\FindFreePort.cs" />
     <Compile Include="modules\ContextMenuHandle.cs" />
     <Compile Include="modules\DriverManager.cs" />

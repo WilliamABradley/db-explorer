@@ -23,6 +23,10 @@ import {
   getSecureData,
   setSecureData,
 } from './utils/secureStorage';
+import {
+  registerEventEmitter,
+  unregisterEventEmitter,
+} from './utils/driverManager';
 
 const DRIVER_KEY = 'database_connection';
 const TUNNEL_KEY = 'tunnel_configuration';
@@ -37,7 +41,7 @@ const getTunnel = async (): Promise<SSHTunnel | null> => {
     const tunnelInfo = await getSecureData<SSHTunnelInfo>(TUNNEL_KEY);
     if (tunnelInfo) {
       _tunnel = new SSHTunnel(tunnelInfo);
-      _tunnel_port = (await FindFreePort.getFirstStartingFrom(1024)).toString();
+      _tunnel_port = '3000'; //(await FindFreePort.getFirstStartingFrom(1024)).toString();
     }
   }
   return _tunnel;
@@ -62,9 +66,12 @@ const setTunnel = async (
   return _tunnel;
 };
 
-const getDriver = async (): Promise<DatabaseDriver | null> => {
+const getDriver = async (
+  info?: DatabaseConnectionInfo,
+): Promise<DatabaseDriver | null> => {
   if (!_driver) {
-    _driver_info = await getSecureData<DatabaseConnectionInfo>(DRIVER_KEY);
+    _driver_info =
+      info || (await getSecureData<DatabaseConnectionInfo>(DRIVER_KEY));
     if (_driver_info) {
       if (_tunnel_port) {
         _driver = new PostgresDriver({
@@ -103,6 +110,11 @@ export default function App() {
     null,
   );
 
+  React.useEffect(() => {
+    registerEventEmitter();
+    return () => unregisterEventEmitter();
+  });
+
   if (showStorybook) {
     return (
       <SafeAreaView>
@@ -138,7 +150,7 @@ export default function App() {
               const newTunnel = await setTunnel(info);
               if (newTunnel) {
                 try {
-                  await newTunnel.test();
+                  await newTunnel.testAuth();
                 } catch (e: any) {
                   return e;
                 }
@@ -164,9 +176,19 @@ export default function App() {
             }
 
             if (info) {
+              const tunnel = await getTunnel();
               const newDriver = await setDriver(info);
+
               if (newDriver) {
                 try {
+                  if (tunnel) {
+                    await tunnel.connect({
+                      remoteHost: info.host,
+                      remotePort: info.port,
+                      localPort: _tunnel_port || undefined,
+                    });
+                  }
+
                   await newDriver.connect();
                 } catch (e: any) {
                   return e;
@@ -203,8 +225,66 @@ export default function App() {
           </View>
           <View style={styles.appBarButton}>
             <Button
+              title="Open Tunnel for Port"
+              onPress={async () => {
+                try {
+                  const tunnel = await getTunnel();
+                  await getDriver();
+
+                  if (!_driver_info) {
+                    Alert.alert(
+                      'Error',
+                      'No database connection has been configured.',
+                    );
+                    return;
+                  }
+
+                  if (tunnel && !tunnel.connected) {
+                    try {
+                      await tunnel.connect({
+                        remoteHost: _driver_info.host,
+                        remotePort: _driver_info.port,
+                        localPort: _tunnel_port || undefined,
+                      });
+                    } catch (e: any) {
+                      Alert.alert('SSH Tunnel Connection Failed', e.message);
+                      return;
+                    }
+                  }
+                } catch (e: any) {
+                  Alert.alert('SSH Tunnel Failed', e.message);
+                }
+              }}
+            />
+          </View>
+          <View style={styles.appBarButton}>
+            <Button
+              title="Test Port"
+              onPress={async () => {
+                try {
+                  const tunnel = await getTunnel();
+                  if (tunnel) {
+                    const isOpen = await tunnel.testPort();
+                    Alert.alert(
+                      'Tunnel Status',
+                      isOpen ? 'Tunnel is Open' : "Tunnel can't be reached",
+                    );
+                  } else {
+                    Alert.alert('Tunnel not configured');
+                  }
+                } catch (e: any) {
+                  Alert.alert('SSH Tunnel Port Test Failed', e.message);
+                }
+              }}
+            />
+          </View>
+          <View style={styles.appBarButton}>
+            <Button
               title="Run"
               onPress={async () => {
+                const tunnel = await getTunnel();
+                const driver = await getDriver();
+
                 if (!_driver_info) {
                   Alert.alert(
                     'Error',
@@ -213,12 +293,12 @@ export default function App() {
                   return;
                 }
 
-                const tunnel = await getTunnel();
                 if (tunnel && !tunnel.connected) {
                   try {
                     await tunnel.connect({
                       remoteHost: _driver_info.host,
                       remotePort: _driver_info.port,
+                      localPort: _tunnel_port || undefined,
                     });
                   } catch (e: any) {
                     Alert.alert('SSH Tunnel Connection Failed', e.message);
@@ -226,7 +306,6 @@ export default function App() {
                   }
                 }
 
-                const driver = await getDriver();
                 if (!driver) {
                   throw new Error('Invalid state');
                 }

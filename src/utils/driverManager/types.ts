@@ -66,8 +66,9 @@ export type DriverManagerDatabaseMessageResult = {
 
 export enum DriverManagerTunnelMessageType {
   Create = 'Create',
-  Test = 'Test',
+  TestAuth = 'TestAuth',
   Connect = 'Connect',
+  TestPort = 'TestPort',
   Close = 'Close',
   Flush = 'Flush',
 }
@@ -80,11 +81,15 @@ export type DriverManagerTunnelMessage = {
       data: SSHTunnelConfiguration;
     }
   | {
+      type: DriverManagerTunnelMessageType.TestAuth;
+      data: never;
+    }
+  | {
       type: DriverManagerTunnelMessageType.Connect;
       data: SSHTunnelPortForward;
     }
   | {
-      type: DriverManagerTunnelMessageType.Test;
+      type: DriverManagerTunnelMessageType.TestPort;
       data: never;
     }
   | {
@@ -99,8 +104,9 @@ export type DriverManagerTunnelMessage = {
 
 export type DriverManagerTunnelMessageResult = {
   [DriverManagerTunnelMessageType.Create]: number;
-  [DriverManagerTunnelMessageType.Test]: void;
+  [DriverManagerTunnelMessageType.TestAuth]: void;
   [DriverManagerTunnelMessageType.Connect]: void;
+  [DriverManagerTunnelMessageType.TestPort]: boolean;
   [DriverManagerTunnelMessageType.Close]: void;
   [DriverManagerTunnelMessageType.Flush]: void;
 };
@@ -113,4 +119,35 @@ export type DriverManagerMessagePayload =
   | {
       class: DriverManagerMessageClass.SSHTunnel;
       payload: DriverManagerTunnelMessage;
+    };
+
+export enum DriverManagerOutboundMessageType {
+  Result = 'Result',
+  Log = 'Log',
+  Error = 'Error',
+  FatalError = 'FatalError',
+}
+
+export type DriverManagerOutboundMessage =
+  | {
+      type: DriverManagerOutboundMessageType.Result;
+      data: any;
+    }
+  | {
+      type: DriverManagerOutboundMessageType.Log;
+      data: {
+        level: 'Debug' | 'Info' | 'Warn' | 'Error' | 'Fatal';
+        message: string;
+      };
+    }
+  | {
+      type: DriverManagerOutboundMessageType.Error;
+      data: {
+        error_type: string;
+        error_message: string;
+      };
+    }
+  | {
+      type: DriverManagerOutboundMessageType.FatalError;
+      data: any;
     };

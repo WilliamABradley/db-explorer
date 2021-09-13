@@ -1,4 +1,5 @@
 use super::*;
+use crate::logger::*;
 use async_trait::async_trait;
 use futures_util::lock::Mutex;
 use lazy_static::lazy_static;
@@ -53,6 +54,11 @@ impl DatabaseDriver for PostgresDriver {
       connection_string.push_str("/");
       connection_string.push_str(&connection_info.database.as_ref().unwrap());
     }
+
+    log(LogData::Info(format!(
+      "Connecting to {}:{}",
+      connection_info.host, connection_info.port,
+    )));
 
     let result = pool.connect(&connection_string).await;
     if result.is_err() {

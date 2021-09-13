@@ -2,17 +2,33 @@ pub mod drivers;
 pub mod errors;
 pub mod handle_db;
 pub mod io;
+pub mod logger;
 pub mod utils;
 
 use backtrace::Backtrace;
 use errors::DriverError;
 use futures::executor::block_on;
 use io::*;
+use lazy_static::*;
+use logger::{log, LogData};
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;
 use std::panic;
+use std::sync::{Arc, Mutex};
 use utils::*;
+
+type PostbackHandler = unsafe extern "C" fn(*mut c_char);
+
+lazy_static! {
+    static ref POSTBACK_HANDLER: Arc<Mutex<Option<PostbackHandler>>> = Arc::new(Mutex::new(None));
+}
+
+#[no_mangle]
+pub extern "C" fn register_postback_handler(callback: PostbackHandler) -> () {
+    let mut postback_handler = POSTBACK_HANDLER.lock().unwrap();
+    *postback_handler = Some(callback);
+}
 
 #[no_mangle]
 pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
@@ -38,6 +54,7 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
         outbound_message = result.unwrap();
     } else {
         let err = result.unwrap_err();
+        log(LogData::Fatal("Panic!".into()));
 
         // Try and capture the error message.
         let err_message: String = match err.downcast_ref::<&'static str>() {
@@ -87,4 +104,22 @@ async fn handle_message(message_data: &str) -> OutboundMessage {
             return OutboundMessage::Error(DriverError::UnknownMessage(message_data.into()));
         }
     };
+}
+
+pub fn postback_message(outbound_message: OutboundMessage) -> () {
+    let serialize_result = serde_json::to_string(&outbound_message);
+    let response = serialize_result.unwrap_or_else(|err| {
+        serde_json::to_string(&OutboundMessage::Error(DriverError::SerializeError(
+            format!("{}", err),
+        )))
+        .unwrap()
+    });
+
+    let postback_handler = POSTBACK_HANDLER.lock().unwrap();
+    match *postback_handler {
+        Some(postback) => unsafe {
+            postback(to_cchar(response));
+        },
+        None => (),
+    }
 }

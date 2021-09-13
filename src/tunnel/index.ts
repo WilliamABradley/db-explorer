@@ -72,10 +72,10 @@ export default class SSHTunnel {
     });
   }
 
-  public async test(): Promise<void> {
-    console.debug(`Testing Tunnel: ${this.#instanceId}`);
-    await this.sendDriverMessage(DriverManagerTunnelMessageType.Test);
-    console.debug(`Tested Tunnel: ${this.#instanceId}`);
+  public async testAuth(): Promise<void> {
+    console.debug(`Testing Tunnel Auth: ${this.#instanceId}`);
+    await this.sendDriverMessage(DriverManagerTunnelMessageType.TestAuth);
+    console.debug(`Tested Tunnel Auth: ${this.#instanceId}`);
   }
 
   public async connect(
@@ -97,6 +97,15 @@ export default class SSHTunnel {
     console.debug(`Connected Tunnel: ${this.#instanceId}`);
 
     return {localPort};
+  }
+
+  public async testPort(): Promise<boolean> {
+    console.debug(`Testing Tunnel: ${this.#instanceId}`);
+    const result = await this.sendDriverMessage(
+      DriverManagerTunnelMessageType.TestPort,
+    );
+    console.debug(`Tested Tunnel: ${this.#instanceId}`);
+    return result;
   }
 
   public async close(): Promise<void> {

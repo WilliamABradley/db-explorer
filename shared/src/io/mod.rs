@@ -1,6 +1,7 @@
 pub mod database;
 
 use crate::errors::DriverError;
+use crate::logger::LogData;
 use database::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -16,5 +17,6 @@ pub enum InboundMessage {
 #[serde(tag = "type", content = "data")]
 pub enum OutboundMessage {
   Result(Value),
+  Log(LogData),
   Error(DriverError),
 }
