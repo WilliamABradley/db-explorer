@@ -4,11 +4,13 @@ import {
   NativeModules,
 } from 'react-native';
 import {
+  DriverErrors,
   DriverManagerMessagePayload,
   DriverManagerOutboundMessage,
   DriverManagerOutboundMessageType,
   INativeMessageDatabaseDriver,
 } from './types';
+
 export * from './types';
 
 const manager: INativeMessageDatabaseDriver = NativeModules.DriverManager;
@@ -34,18 +36,13 @@ export function registerEventEmitter() {
           // Fatal doesn't exist in console.
           if (level === 'fatal') {
             level = 'error';
-            message += ` (Fatal)`;
+            message = `Fatal: ${message}`;
           }
           (<any>console)[level](message);
           break;
 
         case DriverManagerOutboundMessageType.Error:
-          throw new Error(
-            `${result.data.error_type}: ${result.data.error_message}`,
-          );
-
-        case DriverManagerOutboundMessageType.FatalError:
-          throw new Error(result.data);
+          throw new Error(getErrorMessage(result.data));
 
         default:
           throw new Error(
@@ -69,8 +66,9 @@ export function unregisterEventEmitter() {
 export async function sendManagerMessage<T = undefined>(
   message: DriverManagerMessagePayload,
 ): Promise<T> {
-  if (message.payload.id === -1) {
-    delete message.payload.id;
+  const payload = <any>message.payload;
+  if (payload.id === -1) {
+    delete payload.id;
   }
 
   console.debug('Sending:', message);
@@ -90,12 +88,7 @@ export async function sendManagerMessage<T = undefined>(
       return result.data;
 
     case DriverManagerOutboundMessageType.Error:
-      throw new Error(
-        `${result.data.error_type}: ${result.data.error_message}`,
-      );
-
-    case DriverManagerOutboundMessageType.FatalError:
-      throw new Error(result.data);
+      throw new Error(getErrorMessage(result.data));
 
     default:
       throw new Error(
@@ -105,5 +98,36 @@ export async function sendManagerMessage<T = undefined>(
           2,
         )}`,
       );
+  }
+}
+
+function getErrorMessage(error: DriverErrors): string {
+  switch (error.error_type) {
+    case 'Error':
+      return error.error_data;
+
+    case 'FatalError':
+      return `Fatal: ${error.error_data}`;
+
+    case 'ParseError':
+      return `Failed to parse message: ${error.error_data}`;
+
+    case 'SerializeError':
+      return `Failed to serialize message: ${error.error_data}`;
+
+    case 'NoConnectionError':
+      return `${error.error_data.connection_type} Connection ${error.error_data.connection_id} not found`;
+
+    case 'UnknownMessage':
+      return `Received unhandled message type for ${error.error_data.unknown_from}: ${error.error_data.unknown_type}`;
+
+    case 'UnknownDriver':
+      return `Unknown ${error.error_data.unknown_from}: ${error.error_data.unknown_type}`;
+
+    case 'UnknownError':
+      return 'An unexpected error occurred';
+
+    default:
+      return JSON.stringify(error);
   }
 }

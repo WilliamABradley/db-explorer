@@ -19,13 +19,6 @@ where
   return OutboundMessage::Result(serialize_result.unwrap());
 }
 
-pub fn as_error<T>(error: T) -> OutboundMessage
-where
-  T: std::fmt::Display,
-{
-  return OutboundMessage::Error(DriverError::Error(format!("{}", error)));
-}
-
 pub fn to_cchar(source: String) -> *mut c_char {
   return CString::new(source).unwrap().into_raw();
 }

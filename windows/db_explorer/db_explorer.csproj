@@ -83,11 +83,13 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="modules\DriverManager.Types.cs" />
     <Compile Include="modules\Logger.cs" />
     <Compile Include="modules\FindFreePort.cs" />
     <Compile Include="modules\ContextMenuHandle.cs" />
     <Compile Include="modules\DriverManager.cs" />
     <Compile Include="modules\tunnel\SSHTunnel.cs" />
+    <Compile Include="modules\tunnel\Types.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AutolinkedNativeModules.g.cs" />
     <Compile Include="ReactPackageProvider.cs" />

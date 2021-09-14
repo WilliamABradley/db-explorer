@@ -6,7 +6,7 @@ pub mod logger;
 pub mod utils;
 
 use backtrace::Backtrace;
-use errors::DriverError;
+use errors::{DriverError, DriverManagerUnknownType};
 use futures::executor::block_on;
 use io::*;
 use lazy_static::*;
@@ -101,7 +101,10 @@ async fn handle_message(message_data: &str) -> OutboundMessage {
             return handle_db::handle_database_message(&database_message).await;
         }
         _ => {
-            return OutboundMessage::Error(DriverError::UnknownMessage(message_data.into()));
+            return OutboundMessage::Error(DriverError::UnknownMessage(DriverManagerUnknownType {
+                unknown_from: "Message Class".into(),
+                unknown_type: message_data.into(),
+            }));
         }
     };
 }

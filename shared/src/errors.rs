@@ -1,24 +1,27 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
-use thiserror::Error;
 
-#[derive(Serialize, Deserialize, Error, Debug)]
-#[serde(tag = "error_type")]
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(tag = "error_type", content = "error_data")]
 pub enum DriverError {
-  #[error("{0}")]
   Error(String),
-  #[error("{0}")]
   FatalError(String),
-  #[error("Failed to parse message: {0}")]
   ParseError(String),
-  #[error("Failed to serialize message: {0}")]
   SerializeError(String),
-  #[error("Connection {0} not found")]
-  NoConnectionError(u32),
-  #[error("Received unhandled message type: {0}")]
-  UnknownMessage(String),
-  #[error("Unknown Driver: {0}")]
-  UnknownDriver(String),
-  #[error("Unknown Error")]
+  NoConnectionError(DriverManagerUnknownConnection),
+  UnknownMessage(DriverManagerUnknownType),
+  UnknownDriver(DriverManagerUnknownType),
   UnknownError,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DriverManagerUnknownConnection {
+  pub connection_type: String,
+  pub connection_id: u32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DriverManagerUnknownType {
+  pub unknown_from: String,
+  pub unknown_type: String,
 }

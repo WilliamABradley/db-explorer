@@ -30,7 +30,12 @@ impl DatabaseDriver for PostgresDriver {
   async fn connect(&self, id: &u32) -> Result<(), DriverError> {
     let configs = _CONFIGS.lock().await;
     if !configs.contains_key(id) {
-      return Result::Err(DriverError::NoConnectionError(*id));
+      return Result::Err(DriverError::NoConnectionError(
+        DriverManagerUnknownConnection {
+          connection_type: "Postgres".into(),
+          connection_id: *id,
+        },
+      ));
     }
     let connection_info = &configs[id];
     drop(&configs);
@@ -73,7 +78,12 @@ impl DatabaseDriver for PostgresDriver {
   async fn close(&self, id: &u32) -> Result<(), DriverError> {
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(id) {
-      return Result::Err(DriverError::NoConnectionError(*id));
+      return Result::Err(DriverError::NoConnectionError(
+        DriverManagerUnknownConnection {
+          connection_type: "Postgres".into(),
+          connection_id: *id,
+        },
+      ));
     }
     let connection = &instances[id];
     drop(&instances);
@@ -94,7 +104,12 @@ impl DatabaseDriver for PostgresDriver {
 
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
-      return Result::Err(DriverError::NoConnectionError(*id));
+      return Result::Err(DriverError::NoConnectionError(
+        DriverManagerUnknownConnection {
+          connection_type: "Postgres".into(),
+          connection_id: *id,
+        },
+      ));
     }
     let connection = &instances[id];
     drop(&instances);
@@ -121,7 +136,12 @@ impl DatabaseDriver for PostgresDriver {
 
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(&id) {
-      return Result::Err(DriverError::NoConnectionError(*id));
+      return Result::Err(DriverError::NoConnectionError(
+        DriverManagerUnknownConnection {
+          connection_type: "Postgres".into(),
+          connection_id: *id,
+        },
+      ));
     }
     let connection = &instances[id];
     drop(&instances);

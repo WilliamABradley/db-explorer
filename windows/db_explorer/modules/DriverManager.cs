@@ -1,39 +1,17 @@
 ﻿using Microsoft.ReactNative.Managed;
 using System;
-using System.Linq;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using db_explorer.modules.tunnel;
 using System.Collections.Generic;
-using Newtonsoft.Json.Converters;
+using System.Linq;
 
 namespace db_explorer.modules
 {
-    public enum DriverManagerResultType
-    {
-        Result,
-        Log,
-        Error,
-        FatalError,
-        NoConnectionError,
-        UnknownMessage
-    }
-
-    public struct DriverManagerResult
-    {
-        [JsonProperty("type")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public DriverManagerResultType Type { get; set; }
-
-        [JsonProperty("data")]
-        public object Data { get; set; }
-    }
-
     [ReactModule(nameof(DriverManager))]
-    public class DriverManager
+    public partial class DriverManager
     {
         public static DriverManager Current;
         public delegate void PostbackDelegate(IntPtr message);
@@ -59,12 +37,13 @@ namespace db_explorer.modules
         [ReactMethod("postMessage")]
         public Task<string> PostMessage(string message)
         {
-            return Task.Run(() => {
+            return Task.Run(() =>
+            {
                 // Check for forwarded classes.
                 var isForwarding = FORWARDED_CLASSES.Any(c => message.Contains($"\"class\":\"{c}\""));
 
                 // Forward message to lower level.
-                if(isForwarding)
+                if (isForwarding)
                 {
                     try
                     {
@@ -72,15 +51,15 @@ namespace db_explorer.modules
                         var result = PtrToString(ref resultPtr);
                         return result;
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         return JsonConvert.SerializeObject(new DriverManagerResult
                         {
-                            Type = DriverManagerResultType.FatalError,
-                            Data = e.Message
+                            Type = DriverManagerResultType.Error,
+                            Data = new DriverManagerDriverError(DriverManagerErrorType.FatalError, e.Message)
                         });
                     }
-                } 
+                }
                 // Process message on this level.
                 else
                 {
@@ -151,8 +130,8 @@ namespace db_explorer.modules
                     case "SSHTunnel":
                         DriverManagerResult noConnection(int id) => new DriverManagerResult
                         {
-                            Type = DriverManagerResultType.NoConnectionError,
-                            Data = $"No Tunnel exists with instance id {id}",
+                            Type = DriverManagerResultType.Error,
+                            Data = new DriverManagerDriverError(DriverManagerErrorType.NoConnectionError, new DriverManagerUnknownConnection("Tunnel", id)),
                         };
 
                         switch (payloadType)
@@ -212,25 +191,25 @@ namespace db_explorer.modules
                             default:
                                 return new DriverManagerResult
                                 {
-                                    Type = DriverManagerResultType.UnknownMessage,
-                                    Data = $"Unknown Message for SSHTunnel: {payloadType}"
+                                    Type = DriverManagerResultType.Error,
+                                    Data = new DriverManagerDriverError(DriverManagerErrorType.UnknownMessage, new DriverManagerUnknownType("SSH Tunnel", payloadType)),
                                 };
                         }
 
                     default:
                         return new DriverManagerResult
                         {
-                            Type = DriverManagerResultType.UnknownMessage,
-                            Data = $"Unknown Message Class: {messageClass}"
+                            Type = DriverManagerResultType.Error,
+                            Data = new DriverManagerDriverError(DriverManagerErrorType.UnknownMessage, new DriverManagerUnknownType("Message Class", messageClass)),
                         };
                 }
-            } 
-            catch(Exception e)
+            }
+            catch (Exception e)
             {
                 return new DriverManagerResult
                 {
-                    Type = DriverManagerResultType.FatalError,
-                    Data = $"{e.Message}\n{e.StackTrace}"
+                    Type = DriverManagerResultType.Error,
+                    Data = new DriverManagerDriverError(DriverManagerErrorType.FatalError, $"{e.Message}\n{e.StackTrace}")
                 };
             }
         }
