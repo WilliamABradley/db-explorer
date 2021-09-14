@@ -11,7 +11,7 @@ pub enum DriverType {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct DatabaseConnectionInfo {
   pub host: String,
-  pub port: String,
+  pub port: i32,
   pub ssl: bool,
   pub username: Option<String>,
   pub password: Option<String>,

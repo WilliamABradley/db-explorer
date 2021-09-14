@@ -6,7 +6,7 @@ export enum SSHTunnelAuthenticationMethod {
 
 type SSHTunnelInfoBase = {
   host: string;
-  port: string;
+  port: number;
   username: string;
   authenticationMethod: SSHTunnelAuthenticationMethod;
   password?: string;
@@ -26,10 +26,6 @@ export type SSHTunnelConfiguration = SSHTunnelInfoBase & {
 
 export type SSHTunnelPortForward = {
   remoteHost: String;
-  remotePort: String;
-  localPort?: String;
-};
-
-export type SSHTunnelConnection = {
-  localPort: String;
+  remotePort: number;
+  localPort?: number;
 };

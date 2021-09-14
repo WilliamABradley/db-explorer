@@ -50,14 +50,15 @@ namespace db_explorer.modules.tunnel
             Client.Disconnect();
         }
 
-        public void Connect(SSHTunnelPortForward target)
+        public int Connect(SSHTunnelPortForward target)
         {
             Client.KeepAliveInterval = new TimeSpan(0, 0, 30);
             Client.ConnectionInfo.Timeout = new TimeSpan(0, 0, 60);
             Client.Connect();
 
             localPort = target.LocalPort;
-            Port = new ForwardedPortLocal("127.0.0.1", Convert.ToUInt32(target.LocalPort), target.RemoteHost, Convert.ToUInt32(target.RemotePort));
+            var boundPort = Convert.ToUInt32(target.LocalPort);
+            Port = new ForwardedPortLocal("127.0.0.1", boundPort, target.RemoteHost, Convert.ToUInt32(target.RemotePort));
             Client.AddForwardedPort(Port);
 
             Client.ErrorOccurred += Client_ErrorOccurred;
@@ -68,6 +69,7 @@ namespace db_explorer.modules.tunnel
             {
                 Logger.Info($"Opening SSH Port Forward 127.0.0.1:{target.LocalPort} > {target.RemoteHost}:{target.RemotePort}");
                 Port.Start();
+                boundPort = Port.BoundPort;
             }
             catch (Exception e)
             {

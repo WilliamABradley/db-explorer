@@ -17,7 +17,7 @@ namespace db_explorer.modules.tunnel
         public string Host { get; set; }
 
         [JsonProperty("port")]
-        public string Port { get; set; }
+        public int Port { get; set; }
 
         [JsonProperty("username")]
         public string Username { get; set; }
@@ -41,9 +41,9 @@ namespace db_explorer.modules.tunnel
         public string RemoteHost { get; set; }
 
         [JsonProperty("remotePort")]
-        public string RemotePort { get; set; }
+        public int RemotePort { get; set; }
 
         [JsonProperty("localPort")]
-        public string LocalPort { get; set; }
+        public int LocalPort { get; set; }
     }
 }

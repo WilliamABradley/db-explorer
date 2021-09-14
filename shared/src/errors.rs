@@ -17,7 +17,7 @@ pub enum DriverError {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DriverManagerUnknownConnection {
   pub connection_type: String,
-  pub connection_id: u32,
+  pub connection_id: i32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

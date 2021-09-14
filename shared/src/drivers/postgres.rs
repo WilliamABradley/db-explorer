@@ -11,8 +11,8 @@ use std::collections::HashMap;
 use std::str;
 
 lazy_static! {
-  static ref _CONFIGS: Mutex<HashMap<u32, DatabaseConnectionInfo>> = Mutex::new(HashMap::new());
-  static ref _INSTANCES: Mutex<HashMap<u32, sqlx::Pool<Postgres>>> = Mutex::new(HashMap::new());
+  static ref _CONFIGS: Mutex<HashMap<i32, DatabaseConnectionInfo>> = Mutex::new(HashMap::new());
+  static ref _INSTANCES: Mutex<HashMap<i32, sqlx::Pool<Postgres>>> = Mutex::new(HashMap::new());
 }
 
 #[derive(Debug)]
@@ -20,14 +20,14 @@ pub struct PostgresDriver;
 
 #[async_trait]
 impl DatabaseDriver for PostgresDriver {
-  async fn create(&self, connection_info: &DatabaseConnectionInfo) -> Result<u32, DriverError> {
+  async fn create(&self, connection_info: &DatabaseConnectionInfo) -> Result<i32, DriverError> {
     let mut configs = _CONFIGS.lock().await;
-    let id = configs.keys().len() as u32;
+    let id = configs.keys().len() as i32;
     configs.insert(id, connection_info.clone());
     return Result::Ok(id);
   }
 
-  async fn connect(&self, id: &u32) -> Result<(), DriverError> {
+  async fn connect(&self, id: &i32) -> Result<(), DriverError> {
     let configs = _CONFIGS.lock().await;
     if !configs.contains_key(id) {
       return Result::Err(DriverError::NoConnectionError(
@@ -54,7 +54,7 @@ impl DatabaseDriver for PostgresDriver {
     }
     connection_string.push_str(&connection_info.host);
     connection_string.push_str(":");
-    connection_string.push_str(&connection_info.port);
+    connection_string.push_str(&connection_info.port.to_string());
     if connection_info.database.is_some() {
       connection_string.push_str("/");
       connection_string.push_str(&connection_info.database.as_ref().unwrap());
@@ -75,7 +75,7 @@ impl DatabaseDriver for PostgresDriver {
     return Result::Ok(());
   }
 
-  async fn close(&self, id: &u32) -> Result<(), DriverError> {
+  async fn close(&self, id: &i32) -> Result<(), DriverError> {
     let instances = _INSTANCES.lock().await;
     if !instances.contains_key(id) {
       return Result::Err(DriverError::NoConnectionError(
@@ -94,7 +94,7 @@ impl DatabaseDriver for PostgresDriver {
 
   async fn execute(
     &self,
-    id: &u32,
+    id: &i32,
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<u64, DriverError> {
@@ -126,7 +126,7 @@ impl DatabaseDriver for PostgresDriver {
 
   async fn query(
     &self,
-    id: &u32,
+    id: &i32,
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<DatabaseQueryResult, DriverError> {
@@ -192,7 +192,7 @@ impl DatabaseDriver for PostgresDriver {
     let mut configs = _CONFIGS.lock().await;
     let mut instances = _INSTANCES.lock().await;
 
-    let key_count = instances.keys().len() as u32;
+    let key_count = instances.keys().len() as i32;
     for index in 0..key_count {
       let id = index + 1;
       let _ = self.close(&id).await;

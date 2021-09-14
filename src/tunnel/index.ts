@@ -8,7 +8,6 @@ import {
 } from '../utils/driverManager';
 import {
   SSHTunnelConfiguration,
-  SSHTunnelConnection,
   SSHTunnelInfo,
   SSHTunnelPortForward,
 } from './types';
@@ -56,7 +55,7 @@ export default class SSHTunnel {
   #instance: Promise<number>;
   #instanceId: number = -1;
   public connected: boolean = false;
-  public connection: SSHTunnelConnection | null = null;
+  public localPort: number | null = null;
 
   private sendDriverMessage<TType extends DriverManagerTunnelMessageType>(
     type: TType,
@@ -78,25 +77,22 @@ export default class SSHTunnel {
     console.debug(`Tested Tunnel Auth: ${this.#instanceId}`);
   }
 
-  public async connect(
-    forward: SSHTunnelPortForward,
-  ): Promise<SSHTunnelConnection> {
+  public async connect(forward: SSHTunnelPortForward): Promise<number> {
     await this.#instance;
-    const localPort =
-      forward.localPort ||
-      (await FindFreePort.getFirstStartingFrom(1024)).toString();
 
     console.debug(
-      `Connecting Tunnel: ${this.#instanceId} to Port ${localPort}`,
+      `Connecting Tunnel: ${this.#instanceId} to Port ${
+        forward.localPort || 0
+      }`,
     );
-    await this.sendDriverMessage(DriverManagerTunnelMessageType.Connect, {
-      ...forward,
-      localPort,
-    });
+    this.localPort = await this.sendDriverMessage(
+      DriverManagerTunnelMessageType.Connect,
+      forward,
+    );
     this.connected = true;
-    console.debug(`Connected Tunnel: ${this.#instanceId}`);
+    console.debug(`Connected Tunnel: ${this.#instanceId} on ${this.localPort}`);
 
-    return {localPort};
+    return this.localPort;
   }
 
   public async testPort(): Promise<boolean> {

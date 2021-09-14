@@ -1,6 +1,6 @@
 export default interface DatabaseConnectionInfo {
   host: string;
-  port: string;
+  port: number;
   ssl: boolean;
   username?: string;
   password?: string;

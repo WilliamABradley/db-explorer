@@ -9,7 +9,10 @@ export type SSHTunnelModalProps = {
   visible: boolean;
   changeVisibleTo: (visible: boolean) => void;
   getExistingSSHTunnelInfo?: () => Promise<SSHTunnelInfo | null>;
-  onSetTunnel: (info: SSHTunnelInfo | null) => Promise<Error | undefined>;
+  onSetTunnel: (
+    info: SSHTunnelInfo | null,
+    test: boolean,
+  ) => Promise<Error | undefined>;
 };
 
 export default function SSHTunnelModal(
@@ -29,7 +32,7 @@ export default function SSHTunnelModal(
     props.getExistingSSHTunnelInfo?.().then(info => {
       if (info) {
         setHost(info.host);
-        setPort(info.port);
+        setPort(info.port.toString());
         setUsername(info.username);
         setPrivateKey(info.privateKey);
         setPassphrase(info.passphrase);
@@ -113,14 +116,15 @@ export default function SSHTunnelModal(
             <Button
               title="Save"
               onPress={async () => {
-                const error = await props.onSetTunnel({
+                const info: SSHTunnelInfo = {
                   host: host!,
                   username: username!,
-                  port: port!,
+                  port: parseInt(port!, 10),
                   authenticationMethod: SSHTunnelAuthenticationMethod.PublicKey,
                   privateKey: privateKey!,
                   passphrase: passphrase!,
-                });
+                };
+                const error = await props.onSetTunnel(info, true);
 
                 props.changeVisibleTo(false);
 
@@ -132,6 +136,9 @@ export default function SSHTunnelModal(
                     [
                       {
                         text: 'Ignore',
+                        onPress: async () => {
+                          await props.onSetTunnel(info, false);
+                        },
                       },
                       {
                         text: 'Cancel',
@@ -165,7 +172,7 @@ export default function SSHTunnelModal(
             <Button
               title="Delete"
               onPress={async () => {
-                await props.onSetTunnel(null);
+                await props.onSetTunnel(null, false);
                 props.changeVisibleTo(false);
 
                 // reset form

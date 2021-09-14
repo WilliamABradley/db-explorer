@@ -8,18 +8,18 @@ use types::*;
 
 #[async_trait]
 pub trait DatabaseDriver {
-  async fn create(&self, connection_info: &DatabaseConnectionInfo) -> Result<u32, DriverError>;
-  async fn connect(&self, id: &u32) -> Result<(), DriverError>;
-  async fn close(&self, id: &u32) -> Result<(), DriverError>;
+  async fn create(&self, connection_info: &DatabaseConnectionInfo) -> Result<i32, DriverError>;
+  async fn connect(&self, id: &i32) -> Result<(), DriverError>;
+  async fn close(&self, id: &i32) -> Result<(), DriverError>;
   async fn execute(
     &self,
-    id: &u32,
+    id: &i32,
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<u64, DriverError>;
   async fn query(
     &self,
-    id: &u32,
+    id: &i32,
     sql: &str,
     variables: &Option<HashMap<String, String>>,
   ) -> Result<DatabaseQueryResult, DriverError>;

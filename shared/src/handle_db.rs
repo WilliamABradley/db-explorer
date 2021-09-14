@@ -22,7 +22,7 @@ pub async fn handle_database_message(message: &DatabaseDriverMessagePayload) -> 
       log(LogData::Error("Instance id not provided!".into()));
     }
 
-    return message.id.unwrap_or(u32::MAX);
+    return message.id.unwrap_or(-1);
   };
 
   let message_data = &message.data;

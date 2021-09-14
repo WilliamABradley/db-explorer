@@ -13,12 +13,23 @@ import {
 const flushDictionary: string[] = [];
 const FLUSH = false;
 
+export type DatabaseEngineOptions = {
+  hostFormatter?: (address: string) => string;
+};
+
 export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver {
-  constructor(driver: string, connectionInfo: DatabaseConnectionInfo) {
+  constructor(
+    driver: string,
+    connectionInfo: DatabaseConnectionInfo,
+    options?: DatabaseEngineOptions,
+  ) {
     super(connectionInfo);
     this.#driverName = driver;
 
     console.debug(`Aquiring Native ${this.#driverName} Instance`);
+    if (options?.hostFormatter) {
+      connectionInfo.host = options.hostFormatter(connectionInfo.host);
+    }
 
     const getInstance = async () => {
       console.debug(`Initialising ${this.#driverName}`);

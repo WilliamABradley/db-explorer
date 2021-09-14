@@ -7,98 +7,18 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import FindFreePort from 'react-native-find-free-port';
 import StorybookUI from '../Storybook';
 import TableView from './components/molecules/TableView';
 import Editor from './components/atoms/Editor';
 import SSHTunnelModal from './components/organisms/SSHTunnelModal';
 import DatabaseConnectionModal from './components/organisms/DatabaseConnectionModal';
-import DatabaseDriver from './drivers/DatabaseDriver';
 import DatabaseQueryResult from './drivers/models/DatabaseQueryResult';
-import PostgresDriver from './drivers/postgres';
-import SSHTunnel, {SSHTunnelInfo} from './tunnel';
-import DatabaseConnectionInfo from './drivers/models/DatabaseConnectionInfo';
-import {
-  deleteSecureData,
-  getSecureData,
-  setSecureData,
-} from './utils/secureStorage';
+import SSHTunnel from './tunnel';
 import {
   registerEventEmitter,
   unregisterEventEmitter,
 } from './utils/driverManager';
-
-const DRIVER_KEY = 'database_connection';
-const TUNNEL_KEY = 'tunnel_configuration';
-
-let _driver: DatabaseDriver | null = null;
-let _driver_info: DatabaseConnectionInfo | null = null;
-let _tunnel: SSHTunnel | null = null;
-let _tunnel_port: string | null = null;
-
-const getTunnel = async (): Promise<SSHTunnel | null> => {
-  if (!_tunnel) {
-    const tunnelInfo = await getSecureData<SSHTunnelInfo>(TUNNEL_KEY);
-    if (tunnelInfo) {
-      _tunnel = new SSHTunnel(tunnelInfo);
-      _tunnel_port = '3000'; //(await FindFreePort.getFirstStartingFrom(1024)).toString();
-    }
-  }
-  return _tunnel;
-};
-
-const setTunnel = async (
-  tunnelInfo: SSHTunnelInfo | null,
-): Promise<SSHTunnel | null> => {
-  if (tunnelInfo !== null) {
-    await setSecureData(TUNNEL_KEY, tunnelInfo);
-    _tunnel = new SSHTunnel(tunnelInfo);
-  } else {
-    await deleteSecureData(TUNNEL_KEY);
-    _tunnel = null;
-  }
-
-  // re-register driver.
-  if (_driver) {
-    await _driver.close();
-    await getDriver();
-  }
-  return _tunnel;
-};
-
-const getDriver = async (
-  info?: DatabaseConnectionInfo,
-): Promise<DatabaseDriver | null> => {
-  if (!_driver) {
-    _driver_info =
-      info || (await getSecureData<DatabaseConnectionInfo>(DRIVER_KEY));
-    if (_driver_info) {
-      if (_tunnel_port) {
-        _driver = new PostgresDriver({
-          ..._driver_info,
-          host: '127.0.0.1',
-          port: _tunnel_port,
-        });
-      } else {
-        _driver = new PostgresDriver(_driver_info);
-      }
-    }
-  }
-  return _driver;
-};
-
-const setDriver = async (
-  connectionInfo: DatabaseConnectionInfo | null,
-): Promise<DatabaseDriver | null> => {
-  if (connectionInfo !== null) {
-    await setSecureData(DRIVER_KEY, connectionInfo);
-    _driver = await getDriver();
-  } else {
-    await deleteSecureData(DRIVER_KEY);
-    _driver = null;
-  }
-  return _driver;
-};
+import DatabaseConnection, {LoadConnection} from './connection';
 
 export default function App() {
   const [openSSHTunnelModal, setOpenSSHTunnelModal] = React.useState(false);
@@ -112,7 +32,7 @@ export default function App() {
 
   React.useEffect(() => {
     registerEventEmitter();
-    return () => unregisterEventEmitter();
+    //return () => unregisterEventEmitter();
   });
 
   if (showStorybook) {
@@ -136,28 +56,24 @@ export default function App() {
           visible={openSSHTunnelModal}
           changeVisibleTo={setOpenSSHTunnelModal}
           getExistingSSHTunnelInfo={() =>
-            getSecureData<SSHTunnelInfo>(TUNNEL_KEY)
+            LoadConnection().then(c => c.config.tunnel)
           }
-          onSetTunnel={async info => {
-            const existingTunnel = await getTunnel();
+          onSetTunnel={async (info, test) => {
+            const existingConnection = await LoadConnection();
+            // Close existing connections
+            await existingConnection.close();
 
-            // Close existing tunnel.
-            if (existingTunnel) {
-              await existingTunnel.close();
-            }
-
-            if (info) {
-              const newTunnel = await setTunnel(info);
-              if (newTunnel) {
-                try {
-                  await newTunnel.testAuth();
-                } catch (e: any) {
-                  return e;
-                }
+            // Test connection.
+            if (info && test) {
+              const testTunnel = new SSHTunnel(info);
+              try {
+                await testTunnel.testAuth();
+              } catch (e: any) {
+                return e;
               }
-            } else {
-              await setTunnel(null);
             }
+
+            await existingConnection.setTunnel(info);
             return undefined;
           }}
         />
@@ -165,38 +81,31 @@ export default function App() {
           visible={openDatabaseConnectionModal}
           changeVisibleTo={setOpenDatabaseConnectionModal}
           getExistingConnection={() =>
-            getSecureData<DatabaseConnectionInfo>(DRIVER_KEY)
+            LoadConnection().then(c => c.config.database)
           }
           onSetDatabaseConnection={async info => {
-            const existingDriver = await getDriver();
+            const existingConnection = await LoadConnection();
+            // Close existing connections
+            await existingConnection.close();
 
-            // Close existing driver.
-            if (existingDriver?.connected) {
-              await existingDriver.close();
-            }
-
-            if (info) {
-              const tunnel = await getTunnel();
-              const newDriver = await setDriver(info);
-
-              if (newDriver) {
-                try {
-                  if (tunnel) {
-                    await tunnel.connect({
-                      remoteHost: info.host,
-                      remotePort: info.port,
-                      localPort: _tunnel_port || undefined,
-                    });
-                  }
-
-                  await newDriver.connect();
-                } catch (e: any) {
-                  return e;
-                }
+            // Test connection.
+            if (info && test) {
+              const testConnection = new DatabaseConnection(
+                {
+                  ...existingConnection.config,
+                  database: info,
+                },
+                true,
+              );
+              try {
+                const testDriver = await testConnection.getConnectedDriver();
+                await testDriver.close();
+              } catch (e: any) {
+                return e;
               }
-            } else {
-              await setDriver(null);
             }
+
+            await existingConnection.setDatabase(info);
             return undefined;
           }}
         />
@@ -227,32 +136,32 @@ export default function App() {
             <Button
               title="Open Tunnel for Port"
               onPress={async () => {
+                const connection = await LoadConnection();
+                if (!connection.config.tunnel) {
+                  Alert.alert(
+                    'Error',
+                    'No SSH connection has been configured.',
+                  );
+                  return;
+                }
+                if (!connection.config.database) {
+                  Alert.alert(
+                    'Error',
+                    'No database connection has been configured.',
+                  );
+                  return;
+                }
+
                 try {
-                  const tunnel = await getTunnel();
-                  await getDriver();
-
-                  if (!_driver_info) {
-                    Alert.alert(
-                      'Error',
-                      'No database connection has been configured.',
-                    );
-                    return;
-                  }
-
-                  if (tunnel && !tunnel.connected) {
-                    try {
-                      await tunnel.connect({
-                        remoteHost: _driver_info.host,
-                        remotePort: _driver_info.port,
-                        localPort: _tunnel_port || undefined,
-                      });
-                    } catch (e: any) {
-                      Alert.alert('SSH Tunnel Connection Failed', e.message);
-                      return;
-                    }
-                  }
+                  const tunnel = new SSHTunnel(connection.config.tunnel);
+                  await tunnel.connect({
+                    remoteHost: connection.config.database.host,
+                    remotePort: connection.config.database.port,
+                    localPort: 0,
+                  });
                 } catch (e: any) {
-                  Alert.alert('SSH Tunnel Failed', e.message);
+                  Alert.alert('SSH Tunnel Connection Failed', e.message);
+                  return;
                 }
               }}
             />
@@ -261,17 +170,19 @@ export default function App() {
             <Button
               title="Test Port"
               onPress={async () => {
+                const connection = await LoadConnection();
+                const tunnel = connection.getTunnel();
+                if (!tunnel) {
+                  Alert.alert('Tunnel not configured');
+                  return;
+                }
+
                 try {
-                  const tunnel = await getTunnel();
-                  if (tunnel) {
-                    const isOpen = await tunnel.testPort();
-                    Alert.alert(
-                      'Tunnel Status',
-                      isOpen ? 'Tunnel is Open' : "Tunnel can't be reached",
-                    );
-                  } else {
-                    Alert.alert('Tunnel not configured');
-                  }
+                  const isOpen = await tunnel.testPort();
+                  Alert.alert(
+                    'Tunnel Status',
+                    isOpen ? 'Tunnel is Open' : "Tunnel can't be reached",
+                  );
                 } catch (e: any) {
                   Alert.alert('SSH Tunnel Port Test Failed', e.message);
                 }
@@ -282,41 +193,24 @@ export default function App() {
             <Button
               title="Run"
               onPress={async () => {
-                const tunnel = await getTunnel();
-                const driver = await getDriver();
+                const connection = await LoadConnection();
+                const driver = await connection
+                  .getConnectedDriver()
+                  .catch(e => {
+                    Alert.alert('Driver Connection Failed', e.message);
+                    return undefined;
+                  });
 
-                if (!_driver_info) {
+                if (driver === undefined) {
+                  return;
+                }
+
+                if (driver === null) {
                   Alert.alert(
                     'Error',
                     'No database connection has been configured.',
                   );
                   return;
-                }
-
-                if (tunnel && !tunnel.connected) {
-                  try {
-                    await tunnel.connect({
-                      remoteHost: _driver_info.host,
-                      remotePort: _driver_info.port,
-                      localPort: _tunnel_port || undefined,
-                    });
-                  } catch (e: any) {
-                    Alert.alert('SSH Tunnel Connection Failed', e.message);
-                    return;
-                  }
-                }
-
-                if (!driver) {
-                  throw new Error('Invalid state');
-                }
-
-                if (!driver.connected) {
-                  try {
-                    await driver.connect();
-                  } catch (e: any) {
-                    Alert.alert('Driver Connection Failed', e.message);
-                    return;
-                  }
                 }
 
                 driver

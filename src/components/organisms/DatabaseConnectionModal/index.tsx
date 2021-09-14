@@ -10,6 +10,7 @@ export type DatabaseConnectionModalProps = {
   getExistingConnection?: () => Promise<DatabaseConnectionInfo | null>;
   onSetDatabaseConnection: (
     info: DatabaseConnectionInfo | null,
+    test: boolean,
   ) => Promise<Error | undefined>;
 };
 
@@ -29,7 +30,7 @@ export default function DatabaseConnectionModal(
     props.getExistingConnection?.().then(connection => {
       if (connection) {
         setHost(connection.host);
-        setPort(connection.port);
+        setPort(connection.port.toString());
         setUsername(connection.username);
         setPassword(connection.password);
         setSSL(connection.ssl);
@@ -98,14 +99,15 @@ export default function DatabaseConnectionModal(
             <Button
               title="Save"
               onPress={async () => {
-                const error = await props.onSetDatabaseConnection({
+                const info: DatabaseConnectionInfo = {
                   host: host!,
-                  port: port!,
+                  port: parseInt(port!, 10),
                   username: username!,
                   password: password!,
                   ssl,
                   database: database!,
-                });
+                };
+                const error = await props.onSetDatabaseConnection(info, true);
 
                 props.changeVisibleTo(false);
 
@@ -115,6 +117,12 @@ export default function DatabaseConnectionModal(
                     {
                       text: 'OK',
                       onPress: () => props.changeVisibleTo(true),
+                    },
+                    {
+                      text: 'Ignore',
+                      onPress: async () => {
+                        await props.onSetDatabaseConnection(info, false);
+                      },
                     },
                   ]);
                 } else {
@@ -143,7 +151,7 @@ export default function DatabaseConnectionModal(
             <Button
               title="Delete"
               onPress={async () => {
-                await props.onSetDatabaseConnection(null);
+                await props.onSetDatabaseConnection(null, false);
                 props.changeVisibleTo(false);
 
                 // reset form

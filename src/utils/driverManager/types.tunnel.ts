@@ -40,7 +40,7 @@ export type DriverManagerTunnelMessage =
 export type DriverManagerTunnelMessageResult = {
   [DriverManagerTunnelMessageType.Create]: number;
   [DriverManagerTunnelMessageType.TestAuth]: void;
-  [DriverManagerTunnelMessageType.Connect]: void;
+  [DriverManagerTunnelMessageType.Connect]: number;
   [DriverManagerTunnelMessageType.TestPort]: boolean;
   [DriverManagerTunnelMessageType.Close]: void;
   [DriverManagerTunnelMessageType.Flush]: void;

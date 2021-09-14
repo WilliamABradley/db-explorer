@@ -7752,6 +7752,11 @@ react-native-codegen@^0.0.7:
     jscodeshift "^0.11.0"
     nullthrows "^1.1.1"
 
+react-native-dns-lookup@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-dns-lookup/-/react-native-dns-lookup-1.0.3.tgz#db7c40edcb810e249753c45bd85b1924a1d337a0"
+  integrity sha512-hl3Ine+PpfmsjYPM+vwrMGu0J1oSLFB4KXLhEz0Ujd3f0+v1US7okFHZSIIkE5PWtELrF2vp0ZehcepV2ZSBIQ==
+
 react-native-document-picker@^6.0.4:
   version "6.0.4"
   resolved "https://registry.yarnpkg.com/react-native-document-picker/-/react-native-document-picker-6.0.4.tgz#21cbe2b3e8a1aff4aafcb81e06f09494b45e62f8"
