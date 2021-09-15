@@ -2,6 +2,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Networking;
@@ -81,7 +83,18 @@ namespace db_explorer.modules.tunnel
 
         public bool TestPort()
         {
-            return FindFreePort.IsPortOpen(localPort);
+            try
+            {
+                var tcpClient = new TcpClient();
+                tcpClient.Connect("127.0.0.1", localPort);
+                tcpClient.Close();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e.Message);
+                return false;
+            }
         }
 
         public void Close()
