@@ -159,8 +159,8 @@ namespace db_explorer.modules
                                     return noConnection(connectId);
                                 }
                                 var forward = data.ToObject<SSHTunnelPortForward>();
-                                connectingTunnel.Connect(forward);
-                                return asResult(null);
+                                var port = connectingTunnel.Connect(forward);
+                                return asResult(port);
 
                             case "TestPort":
                                 var testId = getId();

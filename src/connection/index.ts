@@ -88,7 +88,7 @@ export default class DatabaseConnection {
     return this._driver;
   }
 
-  public async setDatabase(database: DatabaseConnectionInfo) {
+  public async setDatabase(database: DatabaseConnectionInfo | null) {
     this.config.database = database;
     await this.update();
   }
@@ -132,6 +132,8 @@ export async function LoadConnection(): Promise<DatabaseConnection> {
       return new DatabaseConnection();
     },
   );
+
+  return _connection;
 }
 
 export async function StoreConnection(connection: DatabaseConnection) {

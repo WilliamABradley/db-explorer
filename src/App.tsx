@@ -83,7 +83,7 @@ export default function App() {
           getExistingConnection={() =>
             LoadConnection().then(c => c.config.database)
           }
-          onSetDatabaseConnection={async info => {
+          onSetDatabaseConnection={async (info, test) => {
             const existingConnection = await LoadConnection();
             // Close existing connections
             await existingConnection.close();
@@ -99,7 +99,7 @@ export default function App() {
               );
               try {
                 const testDriver = await testConnection.getConnectedDriver();
-                await testDriver.close();
+                await testDriver?.close();
               } catch (e: any) {
                 return e;
               }
@@ -178,7 +178,14 @@ export default function App() {
                 }
 
                 try {
+                  const port = await tunnel.connect({
+                    remoteHost: 'localhost',
+                    remotePort: 0,
+                    localPort: 0,
+                  });
+                  console.debug('Testing Port: ', port);
                   const isOpen = await tunnel.testPort();
+                  await tunnel.close();
                   Alert.alert(
                     'Tunnel Status',
                     isOpen ? 'Tunnel is Open' : "Tunnel can't be reached",

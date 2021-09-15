@@ -33,17 +33,18 @@ namespace db_explorer.modules
             });
         }
 
-        private bool IsPortOpen(int port)
+        public static bool IsPortOpen(int port)
         {
             try
             {
-                TcpListener tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
+                var tcpListener = new TcpListener(IPAddress.Parse("127.0.0.1"), port);
                 tcpListener.Start();
                 tcpListener.Stop();
                 return true;
             }
-            catch
+            catch (Exception e)
             {
+                Logger.Error(e.Message);
                 return false;
             }
         }

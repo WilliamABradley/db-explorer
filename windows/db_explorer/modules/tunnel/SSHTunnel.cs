@@ -42,7 +42,7 @@ namespace db_explorer.modules.tunnel
         public SSHTunnelConfiguration Configuration { get; }
         private SshClient Client { get; }
         private ForwardedPortLocal Port { get; set; }
-        private string localPort;
+        private int localPort;
 
         public void TestAuth()
         {
@@ -57,8 +57,7 @@ namespace db_explorer.modules.tunnel
             Client.Connect();
 
             localPort = target.LocalPort;
-            var boundPort = Convert.ToUInt32(target.LocalPort);
-            Port = new ForwardedPortLocal("127.0.0.1", boundPort, target.RemoteHost, Convert.ToUInt32(target.RemotePort));
+            Port = new ForwardedPortLocal("127.0.0.1", (uint)target.LocalPort, target.RemoteHost, (uint)target.RemotePort);
             Client.AddForwardedPort(Port);
 
             Client.ErrorOccurred += Client_ErrorOccurred;
@@ -67,9 +66,10 @@ namespace db_explorer.modules.tunnel
 
             try
             {
-                Logger.Info($"Opening SSH Port Forward 127.0.0.1:{target.LocalPort} > {target.RemoteHost}:{target.RemotePort}");
                 Port.Start();
-                boundPort = Port.BoundPort;
+                localPort = (int)Port.BoundPort;
+                Logger.Info($"Opened SSH Port Forward 127.0.0.1:{localPort} > {target.RemoteHost}:{target.RemotePort}");
+                return localPort;
             }
             catch (Exception e)
             {
@@ -81,22 +81,7 @@ namespace db_explorer.modules.tunnel
 
         public bool TestPort()
         {
-            return Task.Run(async () =>
-            {
-                try
-                {
-                    using (var ss = new StreamSocket())
-                    {
-                        await ss.ConnectAsync(new HostName("127.0.0.1"), localPort);
-                        return true;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Logger.Error(e.Message);
-                    return false;
-                }
-            }).Result;
+            return FindFreePort.IsPortOpen(localPort);
         }
 
         public void Close()

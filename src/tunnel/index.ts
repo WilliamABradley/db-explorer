@@ -45,7 +45,7 @@ export default class SSHTunnel {
     } else {
       this.#instance = getInstance();
     }
-
+1
     this.#instance.then(id => {
       this.#instanceId = id;
       console.debug('Native Tunnel Instance: ', id);
@@ -55,7 +55,7 @@ export default class SSHTunnel {
   #instance: Promise<number>;
   #instanceId: number = -1;
   public connected: boolean = false;
-  public localPort: number | null = null;
+  public localPort: number = 0;
 
   private sendDriverMessage<TType extends DriverManagerTunnelMessageType>(
     type: TType,
@@ -72,6 +72,8 @@ export default class SSHTunnel {
   }
 
   public async testAuth(): Promise<void> {
+    await this.#instance;
+
     console.debug(`Testing Tunnel Auth: ${this.#instanceId}`);
     await this.sendDriverMessage(DriverManagerTunnelMessageType.TestAuth);
     console.debug(`Tested Tunnel Auth: ${this.#instanceId}`);
