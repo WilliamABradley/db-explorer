@@ -10,7 +10,6 @@ use errors::{DriverError, DriverManagerUnknownType};
 use futures::executor::block_on;
 use io::*;
 use lazy_static::*;
-use logger::{log, LogData};
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;
@@ -42,19 +41,28 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
     let message_clone = message_str.unwrap().clone();
 
     let trace = Backtrace::new();
-    let outbound_message: OutboundMessage;
 
     let result = panic::catch_unwind(|| {
         let future = handle_message(message_clone);
-        return block_on(future);
+        let outbound_message = block_on(future);
+
+        let serialize_result = serde_json::to_string(&outbound_message);
+        if serialize_result.is_err() {
+            return to_cchar(
+                serde_json::to_string(&OutboundMessage::Error(DriverError::SerializeError(
+                    format!("{}", serialize_result.err().unwrap()),
+                )))
+                .unwrap(),
+            );
+        }
+        return to_cchar(serialize_result.unwrap());
     });
 
     // Validate that we didn't panic
     if result.is_ok() {
-        outbound_message = result.unwrap();
+        return result.unwrap();
     } else {
         let err = result.unwrap_err();
-        log(LogData::Fatal("Panic!".into()));
 
         // Try and capture the error message.
         let err_message: String = match err.downcast_ref::<&'static str>() {
@@ -62,17 +70,9 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
             _ => format!("Unknown Error: {:?}\n{:?}", err, trace),
         };
 
-        outbound_message = OutboundMessage::Error(DriverError::FatalError(err_message));
+        let error = OutboundMessage::Error(DriverError::FatalError(err_message));
+        return to_cchar(serde_json::to_string(&error).unwrap());
     }
-
-    let serialize_result = serde_json::to_string(&outbound_message);
-    let response = serialize_result.unwrap_or_else(|err| {
-        serde_json::to_string(&OutboundMessage::Error(DriverError::SerializeError(
-            format!("{}", err),
-        )))
-        .unwrap()
-    });
-    return to_cchar(response);
 }
 
 #[no_mangle]
