@@ -178,14 +178,20 @@ export default function App() {
                 }
 
                 try {
-                  const port = await tunnel.connect({
-                    remoteHost: 'localhost',
-                    remotePort: 0,
-                    localPort: 0,
-                  });
-                  console.debug('Testing Port: ', port);
+                  let tempOpen = false;
+                  if (!tunnel.connected) {
+                    tempOpen = true;
+                    await tunnel.connect({
+                      remoteHost: 'localhost',
+                      remotePort: 0,
+                      localPort: 0,
+                    });
+                  }
+                  console.debug('Testing Port: ', tunnel.localPort);
                   const isOpen = await tunnel.testPort();
-                  await tunnel.close();
+                  if (tempOpen) {
+                    await tunnel.close();
+                  }
                   Alert.alert(
                     'Tunnel Status',
                     isOpen ? 'Tunnel is Open' : "Tunnel can't be reached",

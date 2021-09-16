@@ -1,7 +1,7 @@
 import DatabaseDriver from '../drivers/DatabaseDriver';
 import DatabaseConnectionInfo from '../drivers/models/DatabaseConnectionInfo';
 import PostgresDriver from '../drivers/postgres';
-import SSHTunnel, {SSHTunnelInfo} from '../tunnel';
+import SSHTunnel, { SSHTunnelInfo } from '../tunnel';
 import {
   deleteSecureData,
   getSecureData,
@@ -99,12 +99,12 @@ export default class DatabaseConnection {
   }
 
   public async close() {
-    if (this._driver) {
+    if (this._driver?.connected) {
       await this._driver.close();
       this._driver = null;
     }
 
-    if (this._tunnel) {
+    if (this._tunnel?.connected) {
       await this._tunnel.close();
       this._tunnel = null;
     }
