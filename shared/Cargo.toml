@@ -26,6 +26,7 @@ sentry = "0.23.0"
 sentry-core = "0.23.0"
 sentry-backtrace = "0.23.0"
 sentry-panic = "0.23.0"
+base64 = "0.13.0"
 
 [features]
 default = ["sqlx/runtime-async-std-rustls"]

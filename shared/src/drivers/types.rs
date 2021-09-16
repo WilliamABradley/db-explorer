@@ -37,17 +37,17 @@ fn row_serialize<S>(x: &Vec<Vec<Option<Vec<u8>>>>, s: S) -> Result<S::Ok, S::Err
 where
   S: Serializer,
 {
-  let mut rows: Vec<Vec<Option<&str>>> = Vec::new();
+  let mut rows: Vec<Vec<Option<String>>> = Vec::new();
   let source_rows = x;
 
   for row_index in 0..source_rows.len() {
     let cols = &source_rows[row_index];
-    let mut data: Vec<Option<&str>> = Vec::new();
+    let mut data: Vec<Option<String>> = Vec::new();
 
     for col_index in 0..cols.len() {
       let bytes = &cols[col_index];
       data.push(match bytes {
-        Some(bytes) => Some(unsafe { str::from_utf8_unchecked(&bytes) }),
+        Some(bytes) => Some(base64::encode(bytes)),
         None => None,
       });
     }

@@ -7,7 +7,6 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 import {Table, Row} from 'react-native-table-component';
-import {TextEncoder} from 'text-encoding';
 import Convert from '../../../dialects/postgres/types/Convert';
 import PgTypeInfo from '../../../dialects/postgres/types/PgTypeInfo';
 import DatabaseQueryResult from '../../../drivers/models/DatabaseQueryResult';
@@ -40,9 +39,8 @@ export default function TableView(props: {
     return r.reduce((row, c, i) => {
       const col = data.columns[i];
       const pgType = new PgTypeInfo(col.dataType);
-      const encoder = new TextEncoder();
       const rawVal =
-        c !== null ? Buffer.from(encoder.encode(c as unknown as string)) : c;
+        c !== null ? Buffer.from(c as unknown as string, 'base64') : c;
       let val = rawVal;
       if (val !== null) {
         val = Convert(val, pgType);
