@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using db_explorer.modules.tunnel;
 using System.Collections.Generic;
 using System.Linq;
+using SSH.Core;
 
 namespace db_explorer.modules
 {
@@ -19,6 +19,7 @@ namespace db_explorer.modules
         private static readonly string[] FORWARDED_CLASSES = new string[] { "DatabaseDriver" };
         private static readonly Dictionary<int, SSHTunnel> TUNNELS = new Dictionary<int, SSHTunnel>();
 
+        private static readonly Logger Logger = new Logger();
         private ReactContext _reactContext;
         private PostbackDelegate _postbackHandle;
 
@@ -139,7 +140,7 @@ namespace db_explorer.modules
                             case "Create":
                                 var configuration = data.ToObject<SSHTunnelConfiguration>();
                                 var creationId = TUNNELS.Count;
-                                var createdTunnel = new SSHTunnel(configuration);
+                                var createdTunnel = new SSHTunnel(configuration, Logger);
                                 TUNNELS.Add(creationId, createdTunnel);
                                 return asResult(creationId);
 

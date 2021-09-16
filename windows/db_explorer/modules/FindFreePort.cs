@@ -9,6 +9,8 @@ namespace db_explorer.modules
     [ReactModule("FindFreePort")]
     public class FindFreePort
     {
+        private static readonly Logger Logger = new Logger();
+
         [ReactMethod("getFirstStartingFrom")]
         public Task<int> GetFirstStartingFrom(int port)
         {

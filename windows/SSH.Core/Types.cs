@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace db_explorer.modules.tunnel
+namespace SSH.Core
 {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SSHTunnelAuthenticationMethod

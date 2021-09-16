@@ -5,12 +5,13 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
-namespace db_explorer.modules.tunnel
+namespace SSH.Core
 {
     public class SSHTunnel : IDisposable
     {
-        public SSHTunnel(SSHTunnelConfiguration configuration)
+        public SSHTunnel(SSHTunnelConfiguration configuration, ILogger logger)
         {
+            Logger = logger;
             Configuration = configuration;
 
             AuthenticationMethod authenticationMethod;
@@ -41,6 +42,7 @@ namespace db_explorer.modules.tunnel
         private SshClient Client { get; }
         private ForwardedPortLocal Port { get; set; }
         private int localPort;
+        private ILogger Logger;
 
         public void TestAuth()
         {

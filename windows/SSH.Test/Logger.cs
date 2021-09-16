@@ -1,19 +1,15 @@
-﻿namespace db_explorer.modules
+﻿using SSH.Core;
+using System;
+
+namespace SSH.Test
 {
-    public class Logger : ILogger, SSH.Core.ILogger
+    public class Logger : ILogger
     {
         public void Log(string level, string message)
         {
-            System.Diagnostics.Debug.WriteLine($"[{level}] {message}");
-            DriverManager.Current?.Emit(new DriverManager.DriverManagerResult
-            {
-                Type = DriverManager.DriverManagerResultType.Log,
-                Data = new
-                {
-                    level,
-                    message
-                },
-            });;
+            var output = $"[{level}] {message}";
+            System.Diagnostics.Debug.WriteLine(output);
+            Console.WriteLine(output);
         }
 
         public void Debug(string message)
