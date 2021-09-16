@@ -9,3 +9,11 @@ ar = "aarch64-linux-android-ar"
 [target.x86_64-linux-android]
 linker = "x86_64-linux-android-clang.cmd"
 ar = "x86_64-linux-android-ar"
+
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe"
+rustflags = ["-Zshare-generics=off"]
+
+[target.aarch64-pc-windows-msvc]
+linker = "rust-lld.exe"
+rustflags = ["-Zshare-generics=off"]

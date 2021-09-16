@@ -5,11 +5,12 @@ pub mod io;
 pub mod logger;
 pub mod utils;
 
-use backtrace::Backtrace;
 use errors::{DriverError, DriverManagerUnknownType};
 use futures::executor::block_on;
 use io::*;
 use lazy_static::*;
+use sentry_backtrace::current_stacktrace;
+use sentry_core::protocol::{Event, Exception, Level, Mechanism};
 use std::ffi::CStr;
 use std::ffi::CString;
 use std::os::raw::c_char;
@@ -21,6 +22,26 @@ type PostbackHandler = unsafe extern "C" fn(*mut c_char);
 
 lazy_static! {
     static ref POSTBACK_HANDLER: Arc<Mutex<Option<PostbackHandler>>> = Arc::new(Mutex::new(None));
+    static ref SENTRY_GUARD: Arc<Mutex<Option<sentry::ClientInitGuard>>> =
+        Arc::new(Mutex::new(None));
+}
+
+#[no_mangle]
+pub extern "C" fn init() -> () {
+    let mut guard = SENTRY_GUARD.lock().unwrap();
+    *guard = Some(sentry::init((
+        "https://cf847f25a00e442e807ceda8a0e6bc37@o1002516.ingest.sentry.io/5962755",
+        sentry::ClientOptions {
+            release: sentry::release_name!(),
+            ..Default::default()
+        },
+    )));
+}
+
+#[no_mangle]
+pub extern "C" fn deinit() -> () {
+    let mut guard = SENTRY_GUARD.lock().unwrap();
+    *guard = None;
 }
 
 #[no_mangle]
@@ -40,17 +61,17 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
     // Copy the message incase the pointer is taken away.
     let message_clone = message_str.unwrap().clone();
 
-    let trace = Backtrace::new();
-
     let result = panic::catch_unwind(|| {
         let future = handle_message(message_clone);
         let outbound_message = block_on(future);
 
         let serialize_result = serde_json::to_string(&outbound_message);
         if serialize_result.is_err() {
+            let err = serialize_result.err().unwrap();
+            sentry::capture_error(&err);
             return to_cchar(
                 serde_json::to_string(&OutboundMessage::Error(DriverError::SerializeError(
-                    format!("{}", serialize_result.err().unwrap()),
+                    format!("{}", &err),
                 )))
                 .unwrap(),
             );
@@ -65,12 +86,32 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
         let err = result.unwrap_err();
 
         // Try and capture the error message.
-        let err_message: String = match err.downcast_ref::<&'static str>() {
-            Some(e) => format!("{}\n{:?}", e, trace),
-            _ => format!("Unknown Error: {:?}\n{:?}", err, trace),
+        let err_message: &str = match err.downcast_ref::<&'static str>() {
+            Some(s) => *s,
+            None => "Unresolvable Error",
         };
 
-        let error = OutboundMessage::Error(DriverError::FatalError(err_message));
+        let err_string = err_message.to_string();
+
+        // Send to Sentry.
+        sentry::capture_event(Event {
+            exception: vec![Exception {
+                ty: "panic".into(),
+                mechanism: Some(Mechanism {
+                    ty: "panic".into(),
+                    handled: Some(false),
+                    ..Default::default()
+                }),
+                value: Some(err_string.clone()),
+                stacktrace: current_stacktrace(),
+                ..Default::default()
+            }]
+            .into(),
+            level: Level::Fatal,
+            ..Default::default()
+        });
+
+        let error = OutboundMessage::Error(DriverError::FatalError(err_string));
         return to_cchar(serde_json::to_string(&error).unwrap());
     }
 }

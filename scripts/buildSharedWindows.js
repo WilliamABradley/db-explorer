@@ -13,7 +13,8 @@ for (const [target, info] of Object.entries(windowsConfig.targets)) {
   }
   console.log(`Building Windows ${target}`);
 
-  exec(`cargo build --features "windows" --no-default-features --target ${target}${isRelease ? ' --release' : ''}`, {
+  // Nightly is required for disabling the shared generics in dev.
+  exec(`cargo +nightly build --features "windows" --no-default-features --target ${target}${isRelease ? ' --release' : ''}`, {
     cwd: rust.dir,
   });
 

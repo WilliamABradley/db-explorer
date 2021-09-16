@@ -13,6 +13,20 @@ namespace db_explorer.modules
     [ReactModule(nameof(DriverManager))]
     public partial class DriverManager
     {
+        public DriverManager()
+        {
+            init_lib();
+
+            _postbackHandle = new PostbackDelegate(ReceiveMessage);
+            var postbackHandlePtr = Marshal.GetFunctionPointerForDelegate(_postbackHandle);
+            register_postback_handler(postbackHandlePtr);
+        }
+
+        ~DriverManager()
+        {
+            deinit_lib();
+        }
+
         public static DriverManager Current;
         public delegate void PostbackDelegate(IntPtr message);
 
@@ -29,10 +43,6 @@ namespace db_explorer.modules
             Current = this;
             _reactContext = reactContext;
             Logger.Info("Registered DriverManager Handler");
-
-            _postbackHandle = new PostbackDelegate(ReceiveMessage);
-            var postbackHandlePtr = Marshal.GetFunctionPointerForDelegate(_postbackHandle);
-            register_postback_handler(postbackHandlePtr);
         }
 
         [ReactMethod("postMessage")]
@@ -100,6 +110,18 @@ namespace db_explorer.modules
             return result;
         }
 
+        // Initialise Library Helpers.
+        [DllImport("db_explorer_shared.dll", EntryPoint = "init")]
+        private static extern void init_lib();
+
+        // De-Initialise Library Helpers, preparing for shutdown.
+        [DllImport("db_explorer_shared.dll", EntryPoint = "deinit")]
+        private static extern void deinit_lib();
+
+        // Receive Async Message from Library.
+        [DllImport("db_explorer_shared.dll", EntryPoint = "register_postback_handler")]
+        private static extern void register_postback_handler(IntPtr postbackHandlePtr);
+
         // Post Message to library with Message Results.
         [DllImport("db_explorer_shared.dll", EntryPoint = "receive_message")]
         private static extern IntPtr post_message(string message);
@@ -107,10 +129,6 @@ namespace db_explorer.modules
         // Free Message from library.
         [DllImport("db_explorer_shared.dll", EntryPoint = "free_message")]
         private static extern void free_message(IntPtr messagePtr);
-
-        // Receive Async Message from Library.
-        [DllImport("db_explorer_shared.dll", EntryPoint = "register_postback_handler")]
-        private static extern void register_postback_handler(IntPtr postbackHandlePtr);
 
         private static DriverManagerResult HandleMessage(string messageClass, JObject payload)
         {
