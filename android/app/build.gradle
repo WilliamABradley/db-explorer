@@ -135,7 +135,6 @@ android {
 
     sourceSets { 
         main {
-            java.srcDirs += 'src/main/kotlin'
             assets.srcDirs = ['../../assets'] 
         } 
     }
@@ -227,6 +226,7 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:2.5.0"
     implementation 'com.google.code.gson:gson:2.8.5'
     implementation 'net.java.dev.jna:jna:5.9.0@aar'
+    implementation 'com.hierynomus:sshj:0.31.0'
 }
 
 // Run this once to be able to run the application with BUCK
