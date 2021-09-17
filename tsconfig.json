@@ -28,6 +28,9 @@
       "./src/@types"
     ]
   },
+  "include": [
+    "src"
+  ],
   "exclude": [
     "node_modules",
     "babel.config.js",

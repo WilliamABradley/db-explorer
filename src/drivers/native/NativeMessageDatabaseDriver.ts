@@ -66,7 +66,7 @@ export default abstract class NativeMessageDatabaseDriver extends DatabaseDriver
     type: TType,
     data?: ({type: TType} & DriverManagerDatabaseMessage)['data'],
   ): Promise<DriverManagerDatabaseMessageResult[TType]> {
-    return sendManagerMessage({
+    return sendManagerMessage('driver', {
       class: DriverManagerMessageClass.DatabaseDriver,
       payload: <DriverManagerDatabaseMessage>{
         driver: this.#driverName,

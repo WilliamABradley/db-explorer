@@ -45,7 +45,6 @@ export default class SSHTunnel {
     } else {
       this.#instance = getInstance();
     }
-1
     this.#instance.then(id => {
       this.#instanceId = id;
       console.debug('Native Tunnel Instance: ', id);
@@ -61,7 +60,7 @@ export default class SSHTunnel {
     type: TType,
     data?: ({type: TType} & DriverManagerTunnelMessage)['data'],
   ): Promise<DriverManagerTunnelMessageResult[TType]> {
-    return sendManagerMessage({
+    return sendManagerMessage('platform', {
       class: DriverManagerMessageClass.SSHTunnel,
       payload: <DriverManagerTunnelMessage>{
         id: this.#instanceId,

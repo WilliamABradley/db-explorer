@@ -1,4 +1,4 @@
-export interface INativeMessageDatabaseDriver {
+export interface INativeMessageDriver {
   postMessage(message: string): Promise<string>;
 }
 

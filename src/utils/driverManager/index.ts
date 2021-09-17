@@ -8,67 +8,100 @@ import {
   DriverManagerMessagePayload,
   DriverManagerOutboundMessage,
   DriverManagerOutboundMessageType,
-  INativeMessageDatabaseDriver,
+  INativeMessageDriver,
 } from './types';
 
 export * from './types';
 
-const manager: INativeMessageDatabaseDriver = NativeModules.DriverManager;
+const driverManager: INativeMessageDriver = NativeModules.DriverManager;
+const platformDriverManager: INativeMessageDriver =
+  NativeModules.PlatformDriverManager;
 
-if (manager === undefined || manager === null) {
+if (driverManager === undefined || driverManager === null) {
   throw new Error('Native Module for DriverManager is not registered');
 }
 
-let emitter: NativeEventEmitter | null = null;
-let eventEmitterSubscription: EmitterSubscription | null = null;
+if (platformDriverManager === undefined || platformDriverManager === null) {
+  throw new Error('Native Module for Platform DriverManager is not registered');
+}
 
-export function registerEventEmitter() {
-  emitter = new NativeEventEmitter(NativeModules.DriverManager);
-  eventEmitterSubscription = emitter.addListener(
-    'DriverManagerEvent',
-    event => {
-      const result: DriverManagerOutboundMessage = JSON.parse(event);
-      switch (result.type) {
-        case DriverManagerOutboundMessageType.Log:
-          let level = result.data.level.toLowerCase();
-          let message = result.data.message;
+let driverEmitter: NativeEventEmitter | null = null;
+let driverEventEmitterSubscription: EmitterSubscription | null = null;
 
-          // Fatal doesn't exist in console.
-          if (level === 'fatal') {
-            level = 'error';
-            message = `Fatal: ${message}`;
-          }
-          (<any>console)[level](message);
-          break;
+let platformEmitter: NativeEventEmitter | null = null;
+let platformEventEmitterSubscription: EmitterSubscription | null = null;
 
-        case DriverManagerOutboundMessageType.Error:
-          throw new Error(getErrorMessage(result.data));
+function onReceive(event: string) {
+  const result: DriverManagerOutboundMessage = JSON.parse(event);
+  switch (result.type) {
+    case DriverManagerOutboundMessageType.Log:
+      let level = result.data.level.toLowerCase();
+      let message = result.data.message;
 
-        default:
-          throw new Error(
-            `Received ${result.type} from Driver Manager: ${JSON.stringify(
-              result.data,
-              null,
-              2,
-            )}`,
-          );
+      // Fatal doesn't exist in console.
+      if (level === 'fatal') {
+        level = 'error';
+        message = `Fatal: ${message}`;
       }
-    },
+      (<any>console)[level](message);
+      break;
+
+    case DriverManagerOutboundMessageType.Error:
+      throw new Error(getErrorMessage(result.data));
+
+    default:
+      throw new Error(
+        `Received ${result.type} from Driver Manager: ${JSON.stringify(
+          result.data,
+          null,
+          2,
+        )}`,
+      );
+  }
+}
+
+export function registerEventEmitters() {
+  driverEmitter = new NativeEventEmitter(NativeModules.DriverManager);
+  driverEventEmitterSubscription = driverEmitter.addListener(
+    'DriverManagerEvent',
+    onReceive,
+  );
+
+  platformEmitter = new NativeEventEmitter(NativeModules.PlatformDriverManager);
+  platformEventEmitterSubscription = platformEmitter.addListener(
+    'DriverManagerEvent',
+    onReceive,
   );
 }
 
-export function unregisterEventEmitter() {
-  if (emitter && eventEmitterSubscription) {
-    emitter.removeSubscription(eventEmitterSubscription);
+export function unregisterEventEmitters() {
+  if (driverEmitter && driverEventEmitterSubscription) {
+    driverEmitter.removeSubscription(driverEventEmitterSubscription);
+  }
+
+  if (platformEmitter && platformEventEmitterSubscription) {
+    platformEmitter.removeSubscription(platformEventEmitterSubscription);
   }
 }
 
 export async function sendManagerMessage<T = undefined>(
+  to: 'driver' | 'platform',
   message: DriverManagerMessagePayload,
 ): Promise<T> {
   const payload = <any>message.payload;
   if (payload.id === -1) {
     delete payload.id;
+  }
+
+  let manager: INativeMessageDriver;
+  switch (to) {
+    case 'driver':
+      manager = driverManager;
+      break;
+
+    case 'platform':
+      manager = platformDriverManager;
+      break;
   }
 
   console.debug('Sending:', message);

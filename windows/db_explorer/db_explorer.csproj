@@ -83,6 +83,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="modules\DriverManager.Platform.cs" />
     <Compile Include="modules\DriverManager.Types.cs" />
     <Compile Include="modules\DnsLookup.cs" />
     <Compile Include="modules\ILogger.cs" />

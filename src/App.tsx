@@ -15,8 +15,8 @@ import DatabaseConnectionModal from './components/organisms/DatabaseConnectionMo
 import DatabaseQueryResult from './drivers/models/DatabaseQueryResult';
 import SSHTunnel from './tunnel';
 import {
-  registerEventEmitter,
-  unregisterEventEmitter,
+  registerEventEmitters,
+  unregisterEventEmitters,
 } from './utils/driverManager';
 import DatabaseConnection, {LoadConnection} from './connection';
 
@@ -31,8 +31,8 @@ export default function App() {
   );
 
   React.useEffect(() => {
-    registerEventEmitter();
-    //return () => unregisterEventEmitter();
+    registerEventEmitters();
+    //return () => unregisterEventEmitters();
   });
 
   if (showStorybook) {
