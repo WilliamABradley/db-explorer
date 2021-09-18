@@ -33,6 +33,7 @@ let platformEventEmitterSubscription: EmitterSubscription | null = null;
 
 function onReceive(event: string) {
   const result: DriverManagerOutboundMessage = JSON.parse(event);
+
   switch (result.type) {
     case DriverManagerOutboundMessageType.Log:
       let level = result.data.level.toLowerCase();

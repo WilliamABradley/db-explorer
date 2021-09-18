@@ -35,18 +35,28 @@ export default function SSHTunnelModal(
   const [passphrase, setPassphrase] = React.useState<string | undefined>(
     undefined,
   );
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    props.getExistingSSHTunnelInfo?.().then(info => {
-      if (info) {
-        setHost(info.host);
-        setPort(info.port.toString());
-        setUsername(info.username);
-        setPrivateKey(info.privateKey);
-        setPassphrase(info.passphrase);
-      }
-    });
-  }, [props.getExistingSSHTunnelInfo]);
+    props
+      .getExistingSSHTunnelInfo?.()
+      .then(info => {
+        if (info) {
+          setHost(info.host);
+          setPort(info.port.toString());
+          setUsername(info.username);
+          setPrivateKey(info.privateKey);
+          setPassphrase(info.passphrase);
+        }
+      })
+      .finally(() => {
+        setLoaded(true);
+      });
+  }, [props.getExistingSSHTunnelInfo, setLoaded]);
+
+  if (!loaded) {
+    return <></>;
+  }
 
   return (
     <Modal visible={props.visible} style={styles.modalContainer}>

@@ -7,13 +7,8 @@ import com.facebook.soloader.SoLoader
 import com.facebook.react.*
 import android.webkit.WebView
 import java.security.Security
-import org.spongycastle.jce.provider.BouncyCastleProvider;
 
 class MainApplication : Application(), ReactApplication {
-    init {
-        Security.insertProviderAt(BouncyCastleProvider(), 1)
-    }
-
     override fun getReactNativeHost(): ReactNativeHost {
         return object : ReactNativeHost(this) {
             override fun getUseDeveloperSupport(): Boolean {
@@ -44,6 +39,11 @@ class MainApplication : Application(), ReactApplication {
     }
 
     companion object {
+        init {
+            Security.removeProvider("BC");
+            Security.insertProviderAt(org.bouncycastle.jce.provider.BouncyCastleProvider(), 0);
+        }
+
         /**
          * Loads Flipper in React Native templates. Call this in the onCreate method with something like
          * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());

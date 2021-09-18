@@ -34,19 +34,29 @@ export default function DatabaseConnectionModal(
   const [database, setDatabase] = React.useState<string | undefined>(
     'postgres',
   );
+  const [loaded, setLoaded] = React.useState(false);
 
   React.useEffect(() => {
-    props.getExistingConnection?.().then(connection => {
-      if (connection) {
-        setHost(connection.host);
-        setPort(connection.port.toString());
-        setUsername(connection.username);
-        setPassword(connection.password);
-        setSSL(connection.ssl);
-        setDatabase(connection.database);
-      }
-    });
-  }, [props.getExistingConnection]);
+    props
+      .getExistingConnection?.()
+      .then(connection => {
+        if (connection) {
+          setHost(connection.host);
+          setPort(connection.port.toString());
+          setUsername(connection.username);
+          setPassword(connection.password);
+          setSSL(connection.ssl);
+          setDatabase(connection.database);
+        }
+      })
+      .finally(() => {
+        setLoaded(true);
+      });
+  }, [props.getExistingConnection, setLoaded]);
+
+  if (!loaded) {
+    return <></>;
+  }
 
   return (
     <Modal visible={props.visible} style={styles.modalContainer}>
@@ -124,14 +134,14 @@ export default function DatabaseConnectionModal(
                 if (error) {
                   Alert.alert('Failed to Connect to Database', error.message, [
                     {
-                      text: 'OK',
-                      onPress: () => props.changeVisibleTo(true),
-                    },
-                    {
                       text: 'Ignore',
                       onPress: async () => {
                         await props.onSetDatabaseConnection(info, false);
                       },
+                    },
+                    {
+                      text: 'Cancel',
+                      onPress: () => props.changeVisibleTo(true),
                     },
                   ]);
                 } else {

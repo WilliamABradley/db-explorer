@@ -10,14 +10,14 @@ import net.schmizz.sshj.transport.verification.PromiscuousVerifier
 import net.schmizz.sshj.userauth.password.PasswordFinder
 import net.schmizz.sshj.userauth.password.Resource
 import java.io.IOException
-import java.net.ConnectException
-import java.net.InetSocketAddress
-import java.net.ServerSocket
-import java.net.Socket
+import java.net.*
 
 class SSHTunnel(val configuration: SSHTunnelConfiguration) {
     val clientConfig: Config = DefaultConfig()
     val client: SSHClient = SSHClient(clientConfig)
+
+    val localHost = "127.0.0.1"
+    var localPort: Int = 0
 
     init {
         client.addHostKeyVerifier(PromiscuousVerifier())
@@ -66,10 +66,17 @@ class SSHTunnel(val configuration: SSHTunnelConfiguration) {
     }
 
     fun connect(target: SSHTunnelPortForward): Int {
+        logger.debug("Connecting SSH Tunnel")
         connectClient()
-        tunnel = TunnelHandler(this, target)
-        tunnel?.start()
-        return 0
+
+        val socket = ServerSocket()
+        socket.reuseAddress = true
+        socket.bind(InetSocketAddress(localHost, target.localPort))
+        localPort = socket.localPort
+
+        tunnel = TunnelHandler(this, socket, target)
+        tunnel!!.start()
+        return localPort
     }
 
     fun testPort(): Boolean {
@@ -79,7 +86,7 @@ class SSHTunnel(val configuration: SSHTunnelConfiguration) {
 
         return try {
             val socket = Socket()
-            socket.connect(InetSocketAddress(tunnel!!.localPort), 500)
+            socket.connect(InetSocketAddress(localPort), 500)
             socket.close()
             true
         } catch (ce: ConnectException) {
@@ -98,31 +105,23 @@ class SSHTunnel(val configuration: SSHTunnelConfiguration) {
         closeClient()
     }
 
-    private class TunnelHandler(val tunnel: SSHTunnel, val target: SSHTunnelPortForward) : Thread() {
+    private class TunnelHandler(val tunnel: SSHTunnel, val socket: ServerSocket, val target: SSHTunnelPortForward) : Thread() {
         val logger = tunnel.logger
-        var localHost = ""
-        var localPort = -1
         var portForwarder: LocalPortForwarder? = null
 
         override fun run() {
             name = "SSH Tunnel"
             try {
-                logger.info("Opening SSH Port Forward ${localHost}:${localPort} > ${target.remoteHost}:${target.remotePort}")
-                val socket = ServerSocket()
-                socket.reuseAddress = true
-                socket.bind(InetSocketAddress(target.localPort))
-                localHost = socket.localSocketAddress.toString()
-                localPort = socket.localPort
+                 logger.info("Opening SSH Port Forward ${tunnel.localHost}:${tunnel.localPort} > ${target.remoteHost}:${target.remotePort}")
 
                 portForwarder = tunnel.client.newLocalPortForwarder(Parameters(
-                    localHost,
-                    localPort,
+                    tunnel.localHost,
+                    tunnel.localPort,
                     target.remoteHost,
                     target.remotePort,
                 ), socket)
 
                 portForwarder?.listen()
-                logger.info("Opened SSH Port Forward ${localHost}:${localPort} > ${target.remoteHost}:${target.remotePort}")
             } catch (e: IOException) {
                 logger.error("SSH Tunnel Error: ${e.message.toString()}")
                 throw e

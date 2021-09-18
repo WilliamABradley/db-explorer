@@ -224,15 +224,11 @@ dependencies {
 
     // Utils
     implementation "androidx.work:work-runtime-ktx:2.5.0"
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.5'
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.12.5"
     implementation "com.fasterxml.jackson.module:jackson-module-kotlin:2.13.+"
-    implementation 'net.java.dev.jna:jna:5.9.0@aar'
-    implementation('com.hierynomus:sshj:0.31.0') {
-        exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
-    }
-    implementation 'com.madgag.spongycastle:core:1.58.0.0'
-    implementation 'com.madgag.spongycastle:prov:1.58.0.0'
-    implementation 'com.madgag.spongycastle:bcpkix-jdk15on:1.58.0.0'
+    implementation "net.java.dev.jna:jna:5.9.0@aar"
+    implementation "org.bouncycastle:bcprov-jdk15on:1.64"
+    implementation "com.hierynomus:sshj:0.31.0"
 }
 
 // Run this once to be able to run the application with BUCK
