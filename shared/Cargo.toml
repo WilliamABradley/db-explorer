@@ -22,7 +22,7 @@ strum_macros = "0.21.1"
 futures = "0.3"
 sqlx = { git = "https://github.com/williamabradley/sqlx", branch = "exposed-driver", default_features = false, features = [ "postgres", "offline" ], optional = true }
 bstr = "0.2"
-sentry = { version = "0.23.0", default_features = false, features = [ "rustls", "backtrace", "contexts", "panic" ] }
+sentry = { version = "0.23.0", default_features = false, features = [ "backtrace", "contexts", "panic", "reqwest", "rustls" ] }
 sentry-core = "0.23.0"
 sentry-backtrace = "0.23.0"
 sentry-panic = "0.23.0"

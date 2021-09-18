@@ -11,6 +11,7 @@ namespace db_explorer.modules
     {
         public DriverManager()
         {
+            Logger.Info("Initialising DriverManager");
             init_lib();
 
             _postbackHandle = new PostbackDelegate(ReceiveMessage);
@@ -20,6 +21,7 @@ namespace db_explorer.modules
 
         ~DriverManager()
         {
+            Logger.Info("Closing DriverManager");
             deinit_lib();
         }
 
@@ -35,7 +37,6 @@ namespace db_explorer.modules
         {
             Current = this;
             _reactContext = reactContext;
-            Logger.Info("Registered DriverManager Handler");
         }
 
         [ReactMethod("postMessage")]

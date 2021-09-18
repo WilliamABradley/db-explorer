@@ -23,7 +23,6 @@ namespace db_explorer.modules
         {
             Current = this;
             _reactContext = reactContext;
-            Logger.Info("Registered Platform DriverManager Handler");
         }
 
         [ReactMethod("postMessage")]
