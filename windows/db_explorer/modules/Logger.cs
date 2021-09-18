@@ -5,9 +5,9 @@
         public void Log(string level, string message)
         {
             System.Diagnostics.Debug.WriteLine($"[{level}] {message}");
-            PlatformDriverManager.Current?.Emit(new DriverManagerResult
+            PlatformDriverManager.Current?.Emit(new DriverManagerOutboundMessage
             {
-                Type = DriverManagerResultType.Log,
+                Type = DriverManagerOutboundMessageType.Log,
                 Data = new
                 {
                     level,

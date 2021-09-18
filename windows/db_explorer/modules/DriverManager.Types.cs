@@ -4,17 +4,17 @@ using Newtonsoft.Json.Converters;
 namespace db_explorer.modules
 {
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum DriverManagerResultType
+    public enum DriverManagerOutboundMessageType
     {
         Result,
         Log,
         Error,
     }
 
-    public struct DriverManagerResult
+    public struct DriverManagerOutboundMessage
     {
         [JsonProperty("type")]
-        public DriverManagerResultType Type { get; set; }
+        public DriverManagerOutboundMessageType Type { get; set; }
 
         [JsonProperty("data")]
         public object Data { get; set; }

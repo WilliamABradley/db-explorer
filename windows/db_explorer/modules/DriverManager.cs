@@ -51,9 +51,9 @@ namespace db_explorer.modules
                 }
                 catch (Exception e)
                 {
-                    return JsonConvert.SerializeObject(new DriverManagerResult
+                    return JsonConvert.SerializeObject(new DriverManagerOutboundMessage
                     {
-                        Type = DriverManagerResultType.Error,
+                        Type = DriverManagerOutboundMessageType.Error,
                         Data = new DriverManagerDriverError(DriverManagerErrorType.FatalError, e.Message)
                     });
                 }

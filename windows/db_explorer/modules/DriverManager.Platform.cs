@@ -43,12 +43,12 @@ namespace db_explorer.modules
             });
         }
 
-        public void Emit(DriverManagerResult result)
+        public void Emit(DriverManagerOutboundMessage result)
         {
             _reactContext.EmitJSEvent("RCTDeviceEventEmitter", "DriverManagerEvent", JsonConvert.SerializeObject(result));
         }
 
-        private static DriverManagerResult HandleMessage(string messageClass, JObject payload)
+        private static DriverManagerOutboundMessage HandleMessage(string messageClass, JObject payload)
         {
             try
             {
@@ -56,18 +56,18 @@ namespace db_explorer.modules
                 var data = payload["data"];
 
                 int getId() => payload.Value<int>("id");
-                DriverManagerResult asResult(object result) => new DriverManagerResult
+                DriverManagerOutboundMessage asResult(object result) => new DriverManagerOutboundMessage
                 {
-                    Type = DriverManagerResultType.Result,
+                    Type = DriverManagerOutboundMessageType.Result,
                     Data = result
                 };
 
                 switch (messageClass)
                 {
                     case "SSHTunnel":
-                        DriverManagerResult noConnection(int id) => new DriverManagerResult
+                        DriverManagerOutboundMessage noConnection(int id) => new DriverManagerOutboundMessage
                         {
-                            Type = DriverManagerResultType.Error,
+                            Type = DriverManagerOutboundMessageType.Error,
                             Data = new DriverManagerDriverError(DriverManagerErrorType.NoConnectionError, new DriverManagerUnknownConnection("Tunnel", id)),
                         };
 
@@ -126,26 +126,26 @@ namespace db_explorer.modules
                                 return asResult(null);
 
                             default:
-                                return new DriverManagerResult
+                                return new DriverManagerOutboundMessage
                                 {
-                                    Type = DriverManagerResultType.Error,
+                                    Type = DriverManagerOutboundMessageType.Error,
                                     Data = new DriverManagerDriverError(DriverManagerErrorType.UnknownMessage, new DriverManagerUnknownType("SSH Tunnel", payloadType)),
                                 };
                         }
 
                     default:
-                        return new DriverManagerResult
+                        return new DriverManagerOutboundMessage
                         {
-                            Type = DriverManagerResultType.Error,
+                            Type = DriverManagerOutboundMessageType.Error,
                             Data = new DriverManagerDriverError(DriverManagerErrorType.UnknownMessage, new DriverManagerUnknownType("Message Class", messageClass)),
                         };
                 }
             }
             catch (Exception e)
             {
-                return new DriverManagerResult
+                return new DriverManagerOutboundMessage
                 {
-                    Type = DriverManagerResultType.Error,
+                    Type = DriverManagerOutboundMessageType.Error,
                     Data = new DriverManagerDriverError(DriverManagerErrorType.FatalError, $"{e.Message}\n{e.StackTrace}")
                 };
             }
