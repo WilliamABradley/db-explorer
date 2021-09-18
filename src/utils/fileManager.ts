@@ -22,11 +22,7 @@ export async function RetrieveFileFromUri(
   uri: string,
   encoding: FileEncoding,
 ): Promise<string> {
-  if (await exists(uri)) {
-    return await readFile(uri, encoding);
-  } else {
-    throw new Error('File not found');
-  }
+  return await readFile(uri, encoding);
 }
 
 async function PickFileBase(
@@ -77,6 +73,7 @@ export async function PickFileData(
       };
     } else {
       const uri = response.fileCopyUri || response.uri;
+      console.debug(`Retrieving ${uri}`);
       const data = await RetrieveFileFromUri(uri, encoding);
       return {
         uri,

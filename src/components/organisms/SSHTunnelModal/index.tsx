@@ -1,6 +1,14 @@
 import path from 'path';
 import * as React from 'react';
-import {View, Button, Text, TextInput, Alert, StyleSheet} from 'react-native';
+import {
+  View,
+  Button,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  Platform,
+} from 'react-native';
 import Modal from 'react-native-root-modal';
 import {SSHTunnelAuthenticationMethod, SSHTunnelInfo} from '../../../tunnel';
 import {FileData, PickFileData} from '../../../utils/fileManager';
@@ -200,10 +208,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modal: {
+    overflow: 'hidden',
     width: 300,
-    backgroundColor: '#404040',
     borderRadius: 10,
     padding: 10,
+    ...Platform.select({
+      ios: {
+        backgroundColor: '#d1d1d1',
+      },
+      android: {
+        backgroundColor: '#d1d1d1',
+      },
+      default: {
+        backgroundColor: '#404040',
+      },
+    }),
   },
   modalEntry: {
     marginBottom: 10,

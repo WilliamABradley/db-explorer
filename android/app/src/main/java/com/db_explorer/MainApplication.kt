@@ -6,8 +6,14 @@ import android.app.Application
 import com.facebook.soloader.SoLoader
 import com.facebook.react.*
 import android.webkit.WebView
+import java.security.Security
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 
 class MainApplication : Application(), ReactApplication {
+    init {
+        Security.insertProviderAt(BouncyCastleProvider(), 1)
+    }
+
     override fun getReactNativeHost(): ReactNativeHost {
         return object : ReactNativeHost(this) {
             override fun getUseDeveloperSupport(): Boolean {

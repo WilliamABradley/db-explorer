@@ -202,42 +202,40 @@ export default function App() {
               }}
             />
           </View>
-          <View style={styles.appBarButton}>
-            <Button
-              title="Run"
-              onPress={async () => {
-                const connection = await LoadConnection();
-                const driver = await connection
-                  .getConnectedDriver()
-                  .catch(e => {
-                    Alert.alert('Driver Connection Failed', e.message);
-                    return undefined;
-                  });
-
-                if (driver === undefined) {
-                  return;
-                }
-
-                if (driver === null) {
-                  Alert.alert(
-                    'Error',
-                    'No database connection has been configured.',
-                  );
-                  return;
-                }
-
-                driver
-                  .query(sql)
-                  .then(setResponse)
-                  .catch(e => {
-                    console.error(e);
-                    Alert.alert('Query Failed', e.message);
-                  });
-              }}
-            />
-          </View>
         </View>
         <Editor value={sql} onChange={setSQL} />
+        <View>
+          <Button
+            title="Run"
+            onPress={async () => {
+              const connection = await LoadConnection();
+              const driver = await connection.getConnectedDriver().catch(e => {
+                Alert.alert('Driver Connection Failed', e.message);
+                return undefined;
+              });
+
+              if (driver === undefined) {
+                return;
+              }
+
+              if (driver === null) {
+                Alert.alert(
+                  'Error',
+                  'No database connection has been configured.',
+                );
+                return;
+              }
+
+              driver
+                .query(sql)
+                .then(setResponse)
+                .catch(e => {
+                  console.error(e);
+                  Alert.alert('Query Failed', e.message);
+                });
+            }}
+          />
+        </View>
         <View style={styles.dataView}>
           <TableView data={response} />
         </View>

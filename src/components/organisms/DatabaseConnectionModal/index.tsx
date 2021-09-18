@@ -1,5 +1,14 @@
 import * as React from 'react';
-import {View, Button, Text, TextInput, Alert, StyleSheet} from 'react-native';
+import {
+  View,
+  Button,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  Platform,
+  PlatformColor,
+} from 'react-native';
 import Modal from 'react-native-root-modal';
 import CheckBox from '@react-native-community/checkbox';
 import DatabaseConnectionInfo from '../../../drivers/models/DatabaseConnectionInfo';
@@ -180,10 +189,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   modal: {
+    overflow: 'hidden',
     width: 300,
-    backgroundColor: '#404040',
     borderRadius: 10,
     padding: 10,
+    ...Platform.select({
+      ios: {
+        backgroundColor: '#d1d1d1',
+      },
+      android: {
+        backgroundColor: '#d1d1d1',
+      },
+      default: {
+        backgroundColor: '#404040',
+      },
+    }),
   },
   modalEntry: {
     marginBottom: 10,
