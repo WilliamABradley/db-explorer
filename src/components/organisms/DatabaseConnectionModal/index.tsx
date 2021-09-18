@@ -69,6 +69,7 @@ export default function DatabaseConnectionModal(
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <Text>Port</Text>
         <TextInput
@@ -78,6 +79,7 @@ export default function DatabaseConnectionModal(
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <Text>Username</Text>
         <TextInput
@@ -87,6 +89,7 @@ export default function DatabaseConnectionModal(
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <Text>Password</Text>
         <TextInput
@@ -97,6 +100,7 @@ export default function DatabaseConnectionModal(
           secureTextEntry={true}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <Text>Use SSL</Text>
         <CheckBox value={ssl} onValueChange={setSSL} />
@@ -108,6 +112,7 @@ export default function DatabaseConnectionModal(
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <View style={styles.modalActions}>
           <View

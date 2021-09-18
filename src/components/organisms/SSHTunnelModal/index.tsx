@@ -69,6 +69,7 @@ export default function SSHTunnelModal(
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <Text>SSH Port</Text>
         <TextInput
@@ -78,6 +79,7 @@ export default function SSHTunnelModal(
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <Text>Username</Text>
         <TextInput
@@ -87,6 +89,7 @@ export default function SSHTunnelModal(
           style={styles.modalEntry}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <Text>Private Key</Text>
         <View
@@ -124,6 +127,7 @@ export default function SSHTunnelModal(
           secureTextEntry={true}
           autoCorrect={false}
           spellCheck={false}
+          autoCapitalize="none"
         />
         <View style={styles.modalActions}>
           <View
