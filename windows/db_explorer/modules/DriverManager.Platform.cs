@@ -42,9 +42,9 @@ namespace db_explorer.modules
             });
         }
 
-        public void Emit(DriverManagerOutboundMessage result)
+        public void Emit(DriverManagerOutboundMessage message)
         {
-            _reactContext.EmitJSEvent("RCTDeviceEventEmitter", "DriverManagerEvent", JsonConvert.SerializeObject(result));
+            _reactContext.EmitJSEvent("RCTDeviceEventEmitter", "DriverManagerEvent", JsonConvert.SerializeObject(message));
         }
 
         private static DriverManagerOutboundMessage HandleMessage(string messageClass, JObject payload)
