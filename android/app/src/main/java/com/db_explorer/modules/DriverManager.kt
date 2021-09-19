@@ -23,15 +23,15 @@ class DriverManager(reactContext: ReactApplicationContext?) : ReactContextBaseJa
     init {
         logger.info("Initialising DriverManager")
         Native.setProtected(true)
-        DriverInterface.Current.init()
+        DriverInterface.Current.db_shared_init()
 
         // Register the postback handler.
-        DriverInterface.Current.register_postback_handler(postbackHandle)
+        DriverInterface.Current.db_shared_register_postback_handler(postbackHandle)
     }
 
     protected fun finalize() {
         logger.info("Closing DriverManager")
-        DriverInterface.Current.deinit()
+        DriverInterface.Current.db_shared_deinit()
     }
 
     override fun getName(): String {
@@ -40,7 +40,7 @@ class DriverManager(reactContext: ReactApplicationContext?) : ReactContextBaseJa
 
     @ReactMethod
     fun postMessage(data: String, promise: Promise) {
-        val resultPtr = DriverInterface.Current.receive_message(data)
+        val resultPtr = DriverInterface.Current.db_shared_receive_message(data)
         val result = ptrToString(resultPtr)
         promise.resolve(result)
     }
@@ -53,7 +53,7 @@ class DriverManager(reactContext: ReactApplicationContext?) : ReactContextBaseJa
 
     private fun ptrToString(strPtr: Pointer): String {
         val result = strPtr.getString(0)
-        DriverInterface.Current.free_message(strPtr)
+        DriverInterface.Current.db_shared_free_message(strPtr)
         return result
     }
 
@@ -63,11 +63,11 @@ class DriverManager(reactContext: ReactApplicationContext?) : ReactContextBaseJa
             fun invoke(messagePtr: Pointer)
         }
 
-        fun init()
-        fun deinit()
-        fun register_postback_handler(postbackHandle: PostbackCallback)
-        fun receive_message(message: String): Pointer
-        fun free_message(messagePtr: Pointer)
+        fun db_shared_init()
+        fun db_shared_deinit()
+        fun db_shared_register_postback_handler(postbackHandle: PostbackCallback)
+        fun db_shared_receive_message(message: String): Pointer
+        fun db_shared_free_message(messagePtr: Pointer)
 
         companion object {
             var Current =

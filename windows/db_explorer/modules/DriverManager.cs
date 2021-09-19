@@ -80,23 +80,23 @@ namespace db_explorer.modules
         }
 
         // Initialise Library Helpers.
-        [DllImport("db_explorer_shared.dll", EntryPoint = "init")]
+        [DllImport("db_explorer_shared.dll", EntryPoint = "db_shared_init")]
         private static extern void init_lib();
 
         // De-Initialise Library Helpers, preparing for shutdown.
-        [DllImport("db_explorer_shared.dll", EntryPoint = "deinit")]
+        [DllImport("db_explorer_shared.dll", EntryPoint = "db_shared_deinit")]
         private static extern void deinit_lib();
 
         // Receive Async Message from Library.
-        [DllImport("db_explorer_shared.dll", EntryPoint = "register_postback_handler")]
+        [DllImport("db_explorer_shared.dll", EntryPoint = "db_shared_register_postback_handler")]
         private static extern void register_postback_handler(IntPtr postbackHandlePtr);
 
         // Post Message to library with Message Results.
-        [DllImport("db_explorer_shared.dll", EntryPoint = "receive_message")]
+        [DllImport("db_explorer_shared.dll", EntryPoint = "db_shared_receive_message")]
         private static extern IntPtr post_message(string message);
 
         // Free Message from library.
-        [DllImport("db_explorer_shared.dll", EntryPoint = "free_message")]
+        [DllImport("db_explorer_shared.dll", EntryPoint = "db_shared_free_message")]
         private static extern void free_message(IntPtr messagePtr);
     }
 }

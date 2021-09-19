@@ -27,7 +27,7 @@ lazy_static! {
 }
 
 #[no_mangle]
-pub extern "C" fn init() -> () {
+pub extern "C" fn db_shared_init() -> () {
     let mut guard = SENTRY_GUARD.lock().unwrap();
     *guard = Some(sentry::init((
         "https://cf847f25a00e442e807ceda8a0e6bc37@o1002516.ingest.sentry.io/5962755",
@@ -39,19 +39,19 @@ pub extern "C" fn init() -> () {
 }
 
 #[no_mangle]
-pub extern "C" fn deinit() -> () {
+pub extern "C" fn db_shared_deinit() -> () {
     let mut guard = SENTRY_GUARD.lock().unwrap();
     *guard = None;
 }
 
 #[no_mangle]
-pub extern "C" fn register_postback_handler(callback: PostbackHandler) -> () {
+pub extern "C" fn db_shared_register_postback_handler(callback: PostbackHandler) -> () {
     let mut postback_handler = POSTBACK_HANDLER.lock().unwrap();
     *postback_handler = Some(callback);
 }
 
 #[no_mangle]
-pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
+pub extern "C" fn db_shared_receive_message(message: *const c_char) -> *mut c_char {
     let c_str = unsafe { CStr::from_ptr(message) };
     let message_str = c_str.to_str();
     // Return null if no message was passed.
@@ -117,7 +117,7 @@ pub extern "C" fn receive_message(message: *const c_char) -> *mut c_char {
 }
 
 #[no_mangle]
-pub extern "C" fn free_message(s: *mut c_char) -> () {
+pub extern "C" fn db_shared_free_message(s: *mut c_char) -> () {
     unsafe {
         if s.is_null() {
             return;
