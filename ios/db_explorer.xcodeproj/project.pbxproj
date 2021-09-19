@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* db_explorerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* db_explorerTests.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
-		21519AC526D673DD003B0409 /* NativeDatabaseDriver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */; };
 		21519ACB26DA0033003B0409 /* libresolv.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 21519ACA26DA0018003B0409 /* libresolv.tbd */; };
 		21519ACF26DA0155003B0409 /* DriverManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21519ACE26DA0155003B0409 /* DriverManager.swift */; };
 		21519AD326DA0472003B0409 /* DriverManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 21519AD226DA0472003B0409 /* DriverManager.m */; };
@@ -39,7 +38,6 @@
 		13B07F961A680F5B00A75B9A /* db_explorer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = db_explorer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = db_explorer/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = db_explorer/Info.plist; sourceTree = "<group>"; };
-		21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NativeDatabaseDriver.swift; sourceTree = "<group>"; };
 		21519AC926D9FFEE003B0409 /* libshared.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libshared.a; path = ../shared/target/universal/release/libshared.a; sourceTree = "<group>"; };
 		21519ACA26DA0018003B0409 /* libresolv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libresolv.tbd; path = usr/lib/libresolv.tbd; sourceTree = SDKROOT; };
 		21519ACE26DA0155003B0409 /* DriverManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverManager.swift; sourceTree = "<group>"; };
@@ -100,7 +98,7 @@
 		13B07FAE1A68108700A75B9A /* db_explorer */ = {
 			isa = PBXGroup;
 			children = (
-				21519AB926D66555003B0409 /* drivers */,
+				21519AB926D66555003B0409 /* modules */,
 				21B708BB26D5126000A27C5B /* db_explorer-Bridging-Header.h */,
 				21C45ECE26DE5502005BE6BB /* db_explorer_shared.h */,
 				21F6AB3926D147D00093BEC5 /* editor.bundle */,
@@ -112,15 +110,14 @@
 			name = db_explorer;
 			sourceTree = "<group>";
 		};
-		21519AB926D66555003B0409 /* drivers */ = {
+		21519AB926D66555003B0409 /* modules */ = {
 			isa = PBXGroup;
 			children = (
-				21519AC426D673DD003B0409 /* NativeDatabaseDriver.swift */,
 				21519ACE26DA0155003B0409 /* DriverManager.swift */,
 				21519AD226DA0472003B0409 /* DriverManager.m */,
 			);
-			name = drivers;
-			path = db_explorer/drivers;
+			name = modules;
+			path = db_explorer/modules;
 			sourceTree = "<group>";
 		};
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
@@ -444,7 +441,6 @@
 				21519AD326DA0472003B0409 /* DriverManager.m in Sources */,
 				21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */,
 				21519ACF26DA0155003B0409 /* DriverManager.swift in Sources */,
-				21519AC526D673DD003B0409 /* NativeDatabaseDriver.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
