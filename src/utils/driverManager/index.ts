@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import {
   DriverErrors,
-  DriverManagerMessagePayload,
+  DriverManagerInboundMessage,
   DriverManagerOutboundMessage,
   DriverManagerOutboundMessageType,
   INativeMessageDriver,
@@ -87,7 +87,7 @@ export function unregisterEventEmitters() {
 
 export async function sendManagerMessage<T = undefined>(
   to: 'driver' | 'platform',
-  message: DriverManagerMessagePayload,
+  message: DriverManagerInboundMessage,
 ): Promise<T> {
   const payload = <any>message.payload;
   if (payload.id === -1) {
