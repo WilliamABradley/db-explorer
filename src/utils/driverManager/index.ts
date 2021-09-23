@@ -22,7 +22,7 @@ if (driverManager === undefined || driverManager === null) {
 }
 
 if (platformDriverManager === undefined || platformDriverManager === null) {
-  throw new Error('Native Module for Platform DriverManager is not registered');
+  throw new Error('Native Module for PlatformDriverManager is not registered');
 }
 
 let driverEmitter: NativeEventEmitter | null = null;

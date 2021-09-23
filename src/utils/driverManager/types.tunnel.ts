@@ -30,6 +30,7 @@ export type DriverManagerTunnelMessage =
       SSHTunnelConfiguration
     >
   | DriverManagerTunnelMessageTemplate<DriverManagerTunnelMessageType.Flush>
+  | DriverManagerTunnelMessageTemplate<DriverManagerTunnelMessageType.TestAuth>
   | DriverManagerTunnelMessageInstanceTemplate<
       DriverManagerTunnelMessageType.Connect,
       SSHTunnelPortForward

@@ -6,7 +6,7 @@ export enum DriverManagerMessageClass {
   SSHTunnel = 'SSHTunnel',
 }
 
-type DriverManagerMessagePayloadTemplate<
+type DriverManagerInboundMessageTemplate<
   TClass extends DriverManagerMessageClass,
   TPayload,
 > = {
@@ -14,12 +14,12 @@ type DriverManagerMessagePayloadTemplate<
   payload: TPayload;
 };
 
-export type DriverManagerMessagePayload =
-  | DriverManagerMessagePayloadTemplate<
+export type DriverManagerInboundMessage =
+  | DriverManagerInboundMessageTemplate<
       DriverManagerMessageClass.DatabaseDriver,
       DriverManagerDatabaseMessage
     >
-  | DriverManagerMessagePayloadTemplate<
+  | DriverManagerInboundMessageTemplate<
       DriverManagerMessageClass.SSHTunnel,
       DriverManagerTunnelMessage
     >;
