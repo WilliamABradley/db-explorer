@@ -271,8 +271,6 @@ PODS:
   - React-jsinspector (0.65.1)
   - react-native-document-picker (6.0.4):
     - React-Core
-  - react-native-find-free-port (1.0.0):
-    - React-Core
   - react-native-sensitive-info (6.0.0-alpha.9):
     - React-Core
   - react-native-slider (4.1.6):
@@ -397,7 +395,6 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
-  - react-native-find-free-port (from `../node_modules/react-native-find-free-port`)
   - react-native-sensitive-info (from `../node_modules/react-native-sensitive-info`)
   - "react-native-slider (from `../node_modules/@react-native-community/slider`)"
   - react-native-webview (from `../node_modules/react-native-webview`)
@@ -471,8 +468,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
-  react-native-find-free-port:
-    :path: "../node_modules/react-native-find-free-port"
   react-native-sensitive-info:
     :path: "../node_modules/react-native-sensitive-info"
   react-native-slider:
@@ -547,7 +542,6 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 43f2542aed3c26e42175b339f8d37fe3dd683765
   React-jsinspector: 41e58e5b8e3e0bf061fdf725b03f2144014a8fb0
   react-native-document-picker: a7950caaee8587002c9acbc7fe497a342094d93a
-  react-native-find-free-port: c417e6fdd0dc0bfdd5edbb9c3fd70380ea69efc4
   react-native-sensitive-info: d44e909d065f9c0e15734245e5dd6a24b82e3dcd
   react-native-slider: c983657bf7d95450c8d64cceb4b318452b24ccd0
   react-native-webview: 133a6a5149f963259646e710b4545c67ef35d7c9

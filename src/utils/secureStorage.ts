@@ -2,7 +2,7 @@ import SecureInfo from 'react-native-sensitive-info';
 
 export async function getSecureData<T>(key: string): Promise<T | null> {
   const entry = await SecureInfo.getItem(key, {}).catch(_ => null);
-  if (entry !== null) {
+  if (entry) {
     return JSON.parse(entry);
   }
   return null;

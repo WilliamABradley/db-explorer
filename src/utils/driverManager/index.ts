@@ -28,9 +28,6 @@ if (platformDriverManager === undefined || platformDriverManager === null) {
 let driverEmitter: NativeEventEmitter | null = null;
 let driverEventEmitterSubscription: EmitterSubscription | null = null;
 
-let platformEmitter: NativeEventEmitter | null = null;
-let platformEventEmitterSubscription: EmitterSubscription | null = null;
-
 function onReceive(event: string) {
   const result: DriverManagerOutboundMessage = JSON.parse(event);
 
@@ -62,14 +59,8 @@ function onReceive(event: string) {
 }
 
 export function registerEventEmitters() {
-  driverEmitter = new NativeEventEmitter(NativeModules.DriverManager);
+  driverEmitter = new NativeEventEmitter(NativeModules.RNEventEmitter);
   driverEventEmitterSubscription = driverEmitter.addListener(
-    'DriverManagerEvent',
-    onReceive,
-  );
-
-  platformEmitter = new NativeEventEmitter(NativeModules.PlatformDriverManager);
-  platformEventEmitterSubscription = platformEmitter.addListener(
     'DriverManagerEvent',
     onReceive,
   );
@@ -78,10 +69,6 @@ export function registerEventEmitters() {
 export function unregisterEventEmitters() {
   if (driverEmitter && driverEventEmitterSubscription) {
     driverEmitter.removeSubscription(driverEventEmitterSubscription);
-  }
-
-  if (platformEmitter && platformEventEmitterSubscription) {
-    platformEmitter.removeSubscription(platformEventEmitterSubscription);
   }
 }
 

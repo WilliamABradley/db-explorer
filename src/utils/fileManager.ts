@@ -30,7 +30,6 @@ async function PickFileBase(
 ): Promise<DocumentPickerResponse | null> {
   try {
     const response = await pick(<any>{
-      mode: 'open',
       readContent: true,
       type: options?.types ?? [types.allFiles],
     });

@@ -1,7 +1,7 @@
 class Logger {
   func Log(_ level: String, _ message: String) {
     let outboundMessage = DriverManagerOutboundMessage.Log(DriverManagerLogData(level: level, message: message))
-    PlatformDriverManager.Current?.emit(outboundMessage)
+    PlatformDriverManager.shared?.emit(outboundMessage)
   }
   
   func Info(_ message: String) {

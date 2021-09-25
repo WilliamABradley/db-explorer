@@ -1,7 +1,6 @@
 #import <React/RCTBridgeModule.h>
-#import "React/RCTEventEmitter.h"
 
-@interface RCT_EXTERN_MODULE(DriverManager, RCTEventEmitter)
+@interface RCT_EXTERN_MODULE(DriverManager, NSObject)
 
 RCT_EXTERN_METHOD(postMessage:(NSString *)data
                   resolve:(RCTPromiseResolveBlock)resolve

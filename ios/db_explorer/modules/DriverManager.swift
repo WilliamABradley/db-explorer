@@ -1,17 +1,17 @@
 @objc(DriverManager)
-class DriverManager : RCTEventEmitter {
-  static var Current: DriverManager? = nil
+class DriverManager : NSObject {
+  public static var shared: DriverManager?
   let logger = Logger()
   
   override init() {
     super.init()
-    DriverManager.Current = self
+    DriverManager.shared = self
     
     logger.Info("Initialising DriverManager")
     db_shared_init()
     
     db_shared_register_postback_handler { messagePtr in
-      DriverManager.Current?.receiveMessage(messagePtr)
+      DriverManager.shared?.receiveMessage(messagePtr)
     }
   }
   
@@ -20,7 +20,7 @@ class DriverManager : RCTEventEmitter {
     db_shared_deinit()
   }
   
-  @objc override static func requiresMainQueueSetup() -> Bool {
+  @objc static func requiresMainQueueSetup() -> Bool {
     return false
   }
   
@@ -41,11 +41,7 @@ class DriverManager : RCTEventEmitter {
   }
   
   func emit(message: String) -> Void {
-    sendEvent(withName: "DriverManagerEvent", body: message)
-  }
-  
-  override func supportedEvents() -> [String]! {
-    return ["DriverManagerEvent"]
+    RNEventEmitter.shared.sendEvent(withName: "DriverManagerEvent", body: message)
   }
   
   private func ptrToString(ptr: UnsafePointer<CChar>?) -> String {

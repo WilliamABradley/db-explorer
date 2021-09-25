@@ -1,17 +1,17 @@
 @objc(PlatformDriverManager)
-class PlatformDriverManager : RCTEventEmitter {
-  static var Current: PlatformDriverManager? = nil
+class PlatformDriverManager : NSObject {
+  public static var shared: PlatformDriverManager?
   static var TUNNELS: [Int : SSHTunnel] = [:]
   let logger = Logger()
   let encoder = JSONEncoder()
   let decoder = JSONDecoder()
-  
+
   override init() {
     super.init()
-    PlatformDriverManager.Current = self
+    PlatformDriverManager.shared = self
   }
   
-  @objc override static func requiresMainQueueSetup() -> Bool {
+  @objc static func requiresMainQueueSetup() -> Bool {
     return false
   }
   
@@ -51,11 +51,7 @@ class PlatformDriverManager : RCTEventEmitter {
   }
   
   func emit(_ message: DriverManagerOutboundMessage) -> Void {
-    sendEvent(withName: "DriverManagerEvent", body: try! toJSON(message))
-  }
-  
-  override func supportedEvents() -> [String]! {
-    return ["DriverManagerEvent"]
+    RNEventEmitter.shared.sendEvent(withName: "DriverManagerEvent", body: try! toJSON(message))
   }
   
   private func fromJSON(_ data: String) throws -> DriverManagerInboundMessage {

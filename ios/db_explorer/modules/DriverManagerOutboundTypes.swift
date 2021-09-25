@@ -38,7 +38,10 @@ extension DriverManagerOutboundMessage: Encodable {
   
   func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(String(reflecting: self), forKey: .type)
+    
+    let mirror = Mirror(reflecting: self)
+    let type = mirror.children.first?.label ?? String(describing: self)
+    try container.encode(type, forKey: .type)
     
     switch self {
       case .Result(let data):
@@ -61,7 +64,10 @@ extension DriverManagerError: Encodable {
   
   func encode(to encoder: Encoder) throws {
     var container = encoder.container(keyedBy: CodingKeys.self)
-    try container.encode(String(reflecting: self), forKey: .error_type)
+    
+    let mirror = Mirror(reflecting: self)
+    let type = mirror.children.first?.label ?? String(describing: self)
+    try container.encode(type, forKey: .error_type)
     
     switch self {
       case .Error(let data):

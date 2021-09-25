@@ -1,4 +1,3 @@
-import FindFreePort from 'react-native-find-free-port';
 import {
   DriverManagerMessageClass,
   DriverManagerTunnelMessage,
