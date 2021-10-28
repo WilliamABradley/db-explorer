@@ -1,7 +1,7 @@
-import DatabaseDriver from '../drivers/DatabaseDriver';
-import DatabaseConnectionInfo from '../drivers/models/DatabaseConnectionInfo';
-import PostgresDriver from '../drivers/postgres';
-import SSHTunnel, { SSHTunnelInfo } from '../tunnel';
+import DatabaseDriver from '../database/DatabaseDriver';
+import DatabaseConnectionInfo from '../database/models/DatabaseConnectionInfo';
+import PostgresDriver from '../database/postgres';
+import SSHTunnel, {SSHTunnelInfo} from '../tunnel';
 import {
   deleteSecureData,
   getSecureData,

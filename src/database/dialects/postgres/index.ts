@@ -1,5 +1,5 @@
 import IDatabaseDialect from '../interfaces/IDatabaseDialect';
-import DatabaseDriver from '../../drivers/DatabaseDriver';
+import DatabaseDriver from '../../DatabaseDriver';
 import PgTypeInfo from './types/PgTypeInfo';
 import Convert from './types/Convert';
 

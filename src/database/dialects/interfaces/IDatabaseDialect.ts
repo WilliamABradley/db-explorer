@@ -1,4 +1,4 @@
-import DatabaseDriver from '../../drivers/DatabaseDriver';
+import DatabaseDriver from '../../DatabaseDriver';
 import {IDBTypeInfo} from './IDBTypeInfo';
 
 export default interface IDatabaseDialect<T extends IDBTypeInfo> {

@@ -79,23 +79,6 @@ class SSHTunnel(val configuration: SSHTunnelConfiguration) {
         return localPort
     }
 
-    fun testPort(): Boolean {
-        if (tunnel == null) {
-            return false
-        }
-
-        return try {
-            val socket = Socket()
-            socket.connect(InetSocketAddress(localPort), 500)
-            socket.close()
-            true
-        } catch (ce: ConnectException) {
-            false
-        } catch (ex: java.lang.Exception) {
-            false
-        }
-    }
-
     fun close() {
         if (tunnel != null) {
             tunnel?.close()

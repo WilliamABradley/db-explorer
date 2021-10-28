@@ -1,6 +1,5 @@
-use crate::drivers::types::DatabaseConnectionInfo;
+use crate::database::types::{DatabaseConnectionInfo, DatabaseQueryData};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::fmt::Debug;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -20,10 +19,4 @@ pub enum DatabaseDriverMessage {
   Execute(DatabaseQueryData),
   Query(DatabaseQueryData),
   Flush,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct DatabaseQueryData {
-  pub sql: String,
-  pub variables: Option<HashMap<String, String>>,
 }

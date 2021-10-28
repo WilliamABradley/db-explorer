@@ -4,7 +4,6 @@ export enum DriverManagerTunnelMessageType {
   Create = 'Create',
   TestAuth = 'TestAuth',
   Connect = 'Connect',
-  TestPort = 'TestPort',
   Close = 'Close',
   Flush = 'Flush',
 }
@@ -13,6 +12,7 @@ type DriverManagerTunnelMessageTemplate<
   TType extends DriverManagerTunnelMessageType,
   TData = never,
 > = {
+  driver: string;
   type: TType;
   data: TData;
 };
@@ -35,14 +35,12 @@ export type DriverManagerTunnelMessage =
       DriverManagerTunnelMessageType.Connect,
       SSHTunnelPortForward
     >
-  | DriverManagerTunnelMessageInstanceTemplate<DriverManagerTunnelMessageType.TestPort>
   | DriverManagerTunnelMessageInstanceTemplate<DriverManagerTunnelMessageType.Close>;
 
 export type DriverManagerTunnelMessageResult = {
   [DriverManagerTunnelMessageType.Create]: number;
   [DriverManagerTunnelMessageType.TestAuth]: void;
   [DriverManagerTunnelMessageType.Connect]: number;
-  [DriverManagerTunnelMessageType.TestPort]: boolean;
   [DriverManagerTunnelMessageType.Close]: void;
   [DriverManagerTunnelMessageType.Flush]: void;
 };

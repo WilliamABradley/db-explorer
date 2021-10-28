@@ -62,6 +62,7 @@ export default class SSHTunnel {
     return sendManagerMessage('platform', {
       class: DriverManagerMessageClass.SSHTunnel,
       payload: <DriverManagerTunnelMessage>{
+        driver: 'LIBSSH2',
         id: this.#instanceId,
         type,
         data,
@@ -97,11 +98,9 @@ export default class SSHTunnel {
 
   public async testPort(): Promise<boolean> {
     console.debug(`Testing Tunnel: ${this.#instanceId}`);
-    const result = await this.sendDriverMessage(
-      DriverManagerTunnelMessageType.TestPort,
-    );
-    console.debug(`Tested Tunnel: ${this.#instanceId}`);
-    return result;
+    throw new Error('Not implemented');
+    //console.debug(`Tested Tunnel: ${this.#instanceId}`);
+    //return result;
   }
 
   public async close(): Promise<void> {

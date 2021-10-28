@@ -1,4 +1,4 @@
-enum DriverManagerInboundMessage {
+senum DriverManagerInboundMessage {
   case Unknown(String)
 }
 

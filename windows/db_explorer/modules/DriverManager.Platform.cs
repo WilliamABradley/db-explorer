@@ -98,15 +98,6 @@ namespace db_explorer.modules
                                 var port = connectingTunnel.Connect(forward);
                                 return asResult(port);
 
-                            case "TestPort":
-                                var testId = getId();
-                                if (!TUNNELS.TryGetValue(testId, out SSHTunnel testingTunnel))
-                                {
-                                    return noConnection(testId);
-                                }
-                                var isOpen = testingTunnel.TestPort();
-                                return asResult(isOpen);
-
                             case "Close":
                                 var closeId = getId();
                                 if (!TUNNELS.TryGetValue(closeId, out SSHTunnel closingTunnel))

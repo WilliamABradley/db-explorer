@@ -1,9 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const { copy, optExtension, platforms: { android: androidConfig } } = require('.');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import {copy, optExtension, platforms} from './index.mjs';
 
-const ndkHome = process.env.NDK;
+const {android: androidConfig} = platforms;
+
+export const ndkHome = process.env.NDK;
 
 if (!fs.existsSync(ndkHome)) {
   throw new Error('NDK Toolchain not found in environment variables!');
@@ -24,26 +26,41 @@ switch (os.platform()) {
     break;
 
   default:
-    throw new Error('Unknown prebuilt see: https://developer.android.com/ndk/guides/other_build_systems');
+    throw new Error(
+      'Unknown prebuilt see: https://developer.android.com/ndk/guides/other_build_systems',
+    );
 }
 
-const toolchainsPrebuiltDir = path.resolve(ndkHome, 'toolchains', 'llvm', 'prebuilt');
-const toolchainsDir = path.resolve(toolchainsPrebuiltDir, platformBinaryFolder);
-const toolchainBinaryDir = path.resolve(toolchainsDir, 'bin');
+export const toolchainsPrebuiltDir = path.resolve(
+  ndkHome,
+  'toolchains',
+  'llvm',
+  'prebuilt',
+);
+export const toolchainsDir = path.resolve(
+  toolchainsPrebuiltDir,
+  platformBinaryFolder,
+);
+export const toolchainBinaryDir = path.resolve(toolchainsDir, 'bin');
 
 const gradleData = fs.readFileSync(androidConfig.gradle.root, 'utf-8');
-const targetSDKVersionMatcher = gradleData.matchAll(/targetSdkVersion ?= ?(.*)/g);
-const androidTargetSDKVersion = targetSDKVersionMatcher.next().value[1];
+const targetSDKVersionMatcher = gradleData.matchAll(
+  /targetSdkVersion ?= ?(.*)/g,
+);
+export const androidTargetSDKVersion = targetSDKVersionMatcher.next().value[1];
 
-function prepareNDK() {
+export function prepareNDK() {
   console.log(`Android SDK Target Version: ${androidTargetSDKVersion}`);
 
   // Get the expected tools for cargo in the expected place.
   console.log('Strategically copying desired binaries');
   for (const target of Object.values(androidConfig.targets)) {
-    const { ndkName } = target;
+    const {ndkName} = target;
     const clangTool = `${ndkName}${androidTargetSDKVersion}-clang`;
-    let sourceFile = path.resolve(toolchainBinaryDir, optExtension(clangTool, '.cmd'));
+    let sourceFile = path.resolve(
+      toolchainBinaryDir,
+      optExtension(clangTool, '.cmd'),
+    );
 
     // This adds .cmd regardless of platform, it seems cargo refuses to give configurable platform based options.
     // Also windows refuses to execute a .cmd without it's extension
@@ -56,12 +73,3 @@ function prepareNDK() {
     console.log(`Add "${toolchainBinaryDir}" to your PATH`);
   }
 }
-
-module.exports = {
-  prepareNDK,
-  ndkHome,
-  toolchainsPrebuiltDir,
-  toolchainsDir,
-  toolchainBinaryDir,
-  androidTargetSDKVersion,
-};

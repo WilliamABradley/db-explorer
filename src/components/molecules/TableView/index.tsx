@@ -7,9 +7,9 @@ import {
   LayoutChangeEvent,
 } from 'react-native';
 import {Table, Row} from 'react-native-table-component';
-import Convert from '../../../dialects/postgres/types/Convert';
-import PgTypeInfo from '../../../dialects/postgres/types/PgTypeInfo';
-import DatabaseQueryResult from '../../../drivers/models/DatabaseQueryResult';
+import Convert from '../../../database/dialects/postgres/types/Convert';
+import PgTypeInfo from '../../../database/dialects/postgres/types/PgTypeInfo';
+import DatabaseQueryResult from '../../../database/models/DatabaseQueryResult';
 
 export default function TableView(props: {
   data: DatabaseQueryResult | null;

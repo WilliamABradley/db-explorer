@@ -1,6 +1,6 @@
-import DatabaseConnectionInfo from '../../drivers/models/DatabaseConnectionInfo';
-import DatabaseQueryResult from '../../drivers/models/DatabaseQueryResult';
-import DatabaseQueryData from '../../drivers/models/DatabaseQueryData';
+import DatabaseConnectionInfo from '../../database/models/DatabaseConnectionInfo';
+import DatabaseQueryResult from '../../database/models/DatabaseQueryResult';
+import DatabaseQueryData from '../../database/models/DatabaseQueryData';
 
 export enum DriverManagerDatabaseMessageType {
   Create = 'Create',
@@ -15,6 +15,7 @@ type DriverManagerDatabaseMessageTemplate<
   TType extends DriverManagerDatabaseMessageType,
   TData = never,
 > = {
+  driver: string;
   type: TType;
   data: TData;
 };
@@ -23,7 +24,6 @@ type DriverManagerDatabaseMessageInstanceTemplate<
   TType extends DriverManagerDatabaseMessageType,
   TData = never,
 > = DriverManagerDatabaseMessageTemplate<TType, TData> & {
-  driver: string;
   id: number;
 };
 

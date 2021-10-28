@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-root-modal';
 import CheckBox from '@react-native-community/checkbox';
-import DatabaseConnectionInfo from '../../../drivers/models/DatabaseConnectionInfo';
+import DatabaseConnectionInfo from '../../../database/models/DatabaseConnectionInfo';
 
 export type DatabaseConnectionModalProps = {
   visible: boolean;

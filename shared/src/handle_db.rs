@@ -1,5 +1,5 @@
-use crate::drivers;
-use crate::drivers::DatabaseDriver;
+use crate::database;
+use crate::database::DatabaseDriver;
 use crate::errors::*;
 use crate::io::database::*;
 use crate::io::*;
@@ -8,7 +8,7 @@ use crate::utils::*;
 
 pub async fn handle_database_message(message: &DatabaseDriverMessagePayload) -> OutboundMessage {
   // Can we find the driver?
-  let driver_result = drivers::get_driver(&message.driver);
+  let driver_result = database::get_driver(&message.driver);
   if driver_result.is_none() {
     return OutboundMessage::Error(DriverError::UnknownDriver(DriverManagerUnknownType {
       unknown_from: "Database Driver".into(),

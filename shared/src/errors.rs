@@ -14,6 +14,12 @@ pub enum DriverError {
   UnknownError,
 }
 
+impl std::convert::From<std::io::Error> for DriverError {
+  fn from(error: std::io::Error) -> Self {
+    return DriverError::Error(format!("{}", error));
+  }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DriverManagerUnknownConnection {
   pub connection_type: String,

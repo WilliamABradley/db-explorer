@@ -1,5 +1,6 @@
 ﻿using SSH.Core;
 using System;
+using System.Net.Sockets;
 
 namespace SSH.Test
 {
@@ -144,7 +145,18 @@ namespace SSH.Test
                                 LocalPort = 0,
                             });
                             Logger.Info($"Started on Port {testPort}");
-                            var portAccess = tunnel.TestPort();
+                            var portAccess = false;
+                            try
+                            {
+                                var tcpClient = new TcpClient();
+                                tcpClient.Connect("127.0.0.1", testPort);
+                                tcpClient.Close();
+                                portAccess = true;
+                            }
+                            catch (Exception e)
+                            {
+                                Logger.Error(e.Message);
+                            }
                             var accessResult = portAccess ? "accessible" : "inaccessible";
                             Logger.Info($"Tunnel is {accessResult}");
                             tunnel.Close();
