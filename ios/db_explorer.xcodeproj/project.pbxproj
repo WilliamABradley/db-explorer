@@ -18,7 +18,6 @@
 		2192FA4F26FC54E7007F1208 /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2192FA4E26FC54E7007F1208 /* Logger.swift */; };
 		2192FA5126FC58AF007F1208 /* DriverManagerInboundMessageTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2192FA5026FC58AF007F1208 /* DriverManagerInboundMessageTypes.swift */; };
 		2192FA5326FC6B01007F1208 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2192FA5226FC6B01007F1208 /* Utils.swift */; };
-		2192FA5526FC706B007F1208 /* SSHTunnel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2192FA5426FC706B007F1208 /* SSHTunnel.swift */; };
 		2192FA5726FEA4D5007F1208 /* RNEventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2192FA5626FEA4D5007F1208 /* RNEventEmitter.swift */; };
 		2192FA5926FEA4F8007F1208 /* RNEventEmitter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2192FA5826FEA4F8007F1208 /* RNEventEmitter.m */; };
 		21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21B708B926D5123700A27C5B /* AppDelegate.swift */; };
@@ -57,7 +56,6 @@
 		2192FA4E26FC54E7007F1208 /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
 		2192FA5026FC58AF007F1208 /* DriverManagerInboundMessageTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DriverManagerInboundMessageTypes.swift; sourceTree = "<group>"; };
 		2192FA5226FC6B01007F1208 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Utils.swift; path = db_explorer/Utils.swift; sourceTree = "<group>"; };
-		2192FA5426FC706B007F1208 /* SSHTunnel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SSHTunnel.swift; sourceTree = "<group>"; };
 		2192FA5626FEA4D5007F1208 /* RNEventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitter.swift; sourceTree = "<group>"; };
 		2192FA5826FEA4F8007F1208 /* RNEventEmitter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNEventEmitter.m; sourceTree = "<group>"; };
 		21B708B926D5123700A27C5B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = db_explorer/AppDelegate.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 				2192FA4826F6ECFD007F1208 /* PlatformDriverManager.swift */,
 				2192FA4A26F6ED12007F1208 /* PlatformDriverManager.m */,
 				2192FA4E26FC54E7007F1208 /* Logger.swift */,
-				2192FA5426FC706B007F1208 /* SSHTunnel.swift */,
 			);
 			name = modules;
 			path = db_explorer/modules;
@@ -467,7 +464,6 @@
 			files = (
 				21519AD326DA0472003B0409 /* DriverManager.m in Sources */,
 				2192FA5126FC58AF007F1208 /* DriverManagerInboundMessageTypes.swift in Sources */,
-				2192FA5526FC706B007F1208 /* SSHTunnel.swift in Sources */,
 				2192FA5326FC6B01007F1208 /* Utils.swift in Sources */,
 				2192FA4D26F6ED87007F1208 /* DriverManagerOutboundTypes.swift in Sources */,
 				21B708BA26D5123700A27C5B /* AppDelegate.swift in Sources */,

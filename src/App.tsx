@@ -132,7 +132,10 @@ export default function App() {
               }}
             />
           </View>
-          <View style={styles.appBarButton}>
+        </View>
+        <Editor value={sql} onChange={setSQL} />
+        <View>
+          <View>
             <Button
               title="Open Tunnel for Port"
               onPress={async () => {
@@ -166,7 +169,7 @@ export default function App() {
               }}
             />
           </View>
-          <View style={styles.appBarButton}>
+          <View>
             <Button
               title="Test Port"
               onPress={async () => {
@@ -202,9 +205,6 @@ export default function App() {
               }}
             />
           </View>
-        </View>
-        <Editor value={sql} onChange={setSQL} />
-        <View>
           <Button
             title="Run"
             onPress={async () => {
