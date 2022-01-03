@@ -1,4 +1,4 @@
-const { exec, rust, platforms } = require('./utils');
+const {exec, rust, platforms} = require('./utils');
 
 console.log(`Building iOS universal`);
 

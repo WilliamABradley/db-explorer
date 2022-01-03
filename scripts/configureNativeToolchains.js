@@ -1,8 +1,8 @@
 const os = require('os');
-const { exec, platforms, isWindows } = require('./utils');
+const {exec, platforms, isWindows} = require('./utils');
 const ndk = require('./utils/ndk');
 
-const addTargets = (platform) => {
+const addTargets = platform => {
   for (const target of Object.keys(platform.targets)) {
     exec(`rustup target add ${target}`);
   }
@@ -12,11 +12,11 @@ const ensurePerl = () => {
   let perlPath;
   switch (os.platform()) {
     case 'win32':
-      perlPath = exec('where.exe perl', { stdio: 'pipe' });
+      perlPath = exec('where.exe perl', {stdio: 'pipe'});
       break;
 
     default:
-      perlPath = exec('which perl', { stdio: 'pipe' });
+      perlPath = exec('which perl', {stdio: 'pipe'});
       break;
   }
 
@@ -41,4 +41,3 @@ switch (os.platform()) {
     addTargets(platforms.ios);
     break;
 }
-

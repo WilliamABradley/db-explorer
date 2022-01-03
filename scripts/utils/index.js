@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { execSync } = require('child_process');
+const {execSync} = require('child_process');
 
 const rootDir = path.resolve(__dirname, '..', '..');
 const isWindows = os.platform() === 'win32';
@@ -27,17 +27,17 @@ const platforms = {
       },
       'aarch64-pc-windows-msvc': {
         platform: 'ARM64',
-      }
+      },
     },
   },
   android: {
     dir: androidDir,
     gradle: {
-      root: path.resolve(androidDir, 'build.gradle')
+      root: path.resolve(androidDir, 'build.gradle'),
     },
     ndk: {
       version_long: '21.4.7075529',
-      version: 'r21e'
+      version: 'r21e',
     },
     targets: {
       'armv7-linux-androideabi': {
@@ -56,9 +56,9 @@ const platforms = {
         platform: 'x86_64',
         ndkName: 'x86_64-linux-android',
         abiName: 'x86_64',
-        libName: 'x86_64-linux-android'
-      }
-    }
+        libName: 'x86_64-linux-android',
+      },
+    },
   },
   ios: {
     dir: iosDir,
@@ -75,8 +75,8 @@ for (const platform of Object.values(platforms)) {
 }
 
 /**
- * @param {string} command 
- * @param {import('child_process').ExecFileOptionsWithStringEncoding | undefined} options 
+ * @param {string} command
+ * @param {import('child_process').ExecFileOptionsWithStringEncoding | undefined} options
  */
 const exec = (command, options) => {
   console.log(command);
@@ -98,7 +98,7 @@ const exec = (command, options) => {
 const copy = (source, dest) => {
   console.log(`Copying ${source} > ${dest}`);
   if (fs.statSync(source).isDirectory()) {
-    fs.mkdirSync(dest, { recursive: true });
+    fs.mkdirSync(dest, {recursive: true});
     for (const item of fs.readdirSync(source)) {
       copy(path.resolve(source, item), path.resolve(dest, item));
     }
@@ -110,7 +110,7 @@ const copy = (source, dest) => {
 const link = (source, dest) => {
   console.log(`Linking ${source} > ${dest}`);
   if (fs.statSync(source).isDirectory()) {
-    fs.mkdirSync(dest, { recursive: true });
+    fs.mkdirSync(dest, {recursive: true});
     for (const item of fs.readdirSync(source)) {
       link(path.resolve(source, item), path.resolve(dest, item));
     }
@@ -119,10 +119,10 @@ const link = (source, dest) => {
   }
 };
 
-const rmIfExists = (source) => {
+const rmIfExists = source => {
   if (fs.existsSync(source)) {
     console.log(`Deleting existing ${source}`);
-    fs.rmSync(source, { recursive: true, force: true });
+    fs.rmSync(source, {recursive: true, force: true});
   }
 };
 
