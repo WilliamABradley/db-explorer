@@ -1,4 +1,4 @@
-const {exec, rust, platforms} = require('./utils');
+import {exec, rust, platforms} from './utils/index.mjs';
 
 console.log(`Building iOS universal`);
 

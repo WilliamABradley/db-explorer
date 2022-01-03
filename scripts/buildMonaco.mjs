@@ -1,7 +1,7 @@
-const fs = require('fs');
-const path = require('path');
-const rimraf = require('rimraf');
-const babel = require('@babel/core');
+import fs from 'fs';
+import path from 'path';
+import rimraf from 'rimraf';
+import babel from '@babel/core';
 
 const monacoDir = 'node_modules/monaco-editor';
 const bundleDir = 'assets/editor.bundle';

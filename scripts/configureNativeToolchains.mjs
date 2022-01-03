@@ -1,6 +1,6 @@
-const os = require('os');
-const {exec, platforms, isWindows} = require('./utils');
-const ndk = require('./utils/ndk');
+import os from 'os';
+import {exec, platforms} from './utils/index.mjs';
+import ndk from './utils/ndk.mjs';
 
 const addTargets = platform => {
   for (const target of Object.keys(platform.targets)) {

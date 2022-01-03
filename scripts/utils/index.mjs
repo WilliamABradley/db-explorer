@@ -1,24 +1,28 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const {execSync} = require('child_process');
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+import * as url from 'url';
+import {execSync} from 'child_process';
 
-const rootDir = path.resolve(__dirname, '..', '..');
-const isWindows = os.platform() === 'win32';
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const sharedDir = path.resolve(rootDir, 'shared');
-const rustDir = sharedDir;
-const libsDir = path.resolve(sharedDir, '.libs');
-const windowsDir = path.resolve(rootDir, 'windows');
-const androidDir = path.resolve(rootDir, 'android');
-const iosDir = path.resolve(rootDir, 'ios');
+export const rootDir = path.resolve(__dirname, '..', '..');
+export const isWindows = os.platform() === 'win32';
 
-const rust = {
+export const sharedDir = path.resolve(rootDir, 'shared');
+export const rustDir = sharedDir;
+export const libsDir = path.resolve(sharedDir, '.libs');
+export const windowsDir = path.resolve(rootDir, 'windows');
+export const androidDir = path.resolve(rootDir, 'android');
+export const iosDir = path.resolve(rootDir, 'ios');
+
+export const rust = {
   dir: rustDir,
   libName: 'libdb_explorer_shared',
 };
 
-const platforms = {
+export const platforms = {
   windows: {
     dir: windowsDir,
     targets: {
@@ -78,7 +82,7 @@ for (const platform of Object.values(platforms)) {
  * @param {string} command
  * @param {import('child_process').ExecFileOptionsWithStringEncoding | undefined} options
  */
-const exec = (command, options) => {
+export const exec = (command, options) => {
   console.log(command);
   try {
     return execSync(command, {
@@ -95,7 +99,7 @@ const exec = (command, options) => {
   }
 };
 
-const copy = (source, dest) => {
+export const copy = (source, dest) => {
   console.log(`Copying ${source} > ${dest}`);
   if (fs.statSync(source).isDirectory()) {
     fs.mkdirSync(dest, {recursive: true});
@@ -107,7 +111,7 @@ const copy = (source, dest) => {
   }
 };
 
-const link = (source, dest) => {
+export const link = (source, dest) => {
   console.log(`Linking ${source} > ${dest}`);
   if (fs.statSync(source).isDirectory()) {
     fs.mkdirSync(dest, {recursive: true});
@@ -119,31 +123,16 @@ const link = (source, dest) => {
   }
 };
 
-const rmIfExists = source => {
+export const rmIfExists = source => {
   if (fs.existsSync(source)) {
     console.log(`Deleting existing ${source}`);
     fs.rmSync(source, {recursive: true, force: true});
   }
 };
 
-const optExtension = (path, ext) => {
+export const optExtension = (path, ext) => {
   if (os.platform() === 'win32') {
     return path + ext;
   }
   return path;
-};
-
-module.exports = {
-  isWindows,
-  rootDir,
-  rust,
-  sharedDir,
-  libsDir,
-  platforms,
-  allTargets,
-  exec,
-  copy,
-  link,
-  rmIfExists,
-  optExtension,
 };

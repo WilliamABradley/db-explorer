@@ -1,8 +1,6 @@
-const {
-  exec,
-  rust,
-  platforms: {windows: windowsConfig},
-} = require('./utils');
+import {exec, rust, platforms} from './utils/index.mjs';
+
+const {windows: windowsConfig} = platforms;
 const isRelease = !!process.env.npm_config_release;
 const isDebug = !isRelease && process.argv.includes('--debug');
 

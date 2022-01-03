@@ -1,13 +1,9 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const {
-  copy,
-  optExtension,
-  platforms: {android: androidConfig},
-} = require('.');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import {copy, optExtension} from './index.mjs';
 
-const ndkHome = process.env.NDK;
+export const ndkHome = process.env.NDK;
 
 if (!fs.existsSync(ndkHome)) {
   throw new Error('NDK Toolchain not found in environment variables!');
@@ -33,22 +29,25 @@ switch (os.platform()) {
     );
 }
 
-const toolchainsPrebuiltDir = path.resolve(
+export const toolchainsPrebuiltDir = path.resolve(
   ndkHome,
   'toolchains',
   'llvm',
   'prebuilt',
 );
-const toolchainsDir = path.resolve(toolchainsPrebuiltDir, platformBinaryFolder);
-const toolchainBinaryDir = path.resolve(toolchainsDir, 'bin');
+export const toolchainsDir = path.resolve(
+  toolchainsPrebuiltDir,
+  platformBinaryFolder,
+);
+export const toolchainBinaryDir = path.resolve(toolchainsDir, 'bin');
 
 const gradleData = fs.readFileSync(androidConfig.gradle.root, 'utf-8');
 const targetSDKVersionMatcher = gradleData.matchAll(
   /targetSdkVersion ?= ?(.*)/g,
 );
-const androidTargetSDKVersion = targetSDKVersionMatcher.next().value[1];
+export const androidTargetSDKVersion = targetSDKVersionMatcher.next().value[1];
 
-function prepareNDK() {
+export function prepareNDK() {
   console.log(`Android SDK Target Version: ${androidTargetSDKVersion}`);
 
   // Get the expected tools for cargo in the expected place.
@@ -72,12 +71,3 @@ function prepareNDK() {
     console.log(`Add "${toolchainBinaryDir}" to your PATH`);
   }
 }
-
-module.exports = {
-  prepareNDK,
-  ndkHome,
-  toolchainsPrebuiltDir,
-  toolchainsDir,
-  toolchainBinaryDir,
-  androidTargetSDKVersion,
-};

@@ -1,13 +1,8 @@
-const fs = require('fs');
-const path = require('path');
-const {
-  exec,
-  link,
-  rmIfExists,
-  rust,
-  platforms: {android: androidConfig},
-} = require('./utils');
+import fs from 'fs';
+import path from 'path';
+import {exec, link, rmIfExists, rust, platforms} from './utils/index.mjs';
 
+const {android: androidConfig} = platforms;
 const jniFolder = path.resolve(
   androidConfig.dir,
   'app',
