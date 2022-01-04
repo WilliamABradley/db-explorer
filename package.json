@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "config:toolchains": "node scripts/configureNativeToolchains.mjs",
+    "native:install": "node scripts/installNativeDeps.mjs",
     "build:monaco": "node scripts/buildMonaco.mjs",
     "postinstall": "rn-nodeify --yarn --hack --install \"process,path,stream,events,buffer\"",
     "prewindows": "node scripts/buildSharedWindows.mjs --debug",

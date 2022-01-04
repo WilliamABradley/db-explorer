@@ -27,6 +27,9 @@ for (const [target, info] of Object.entries(androidConfig.targets)) {
     `cargo build --features "android" --no-default-features --target ${target} --release`,
     {
       cwd: rust.dir,
+      env: {
+        OPENSSL_DIR: `${process.env.VCPKG_ROOT}/installed/${info.vcpkgName}`,
+      },
     },
   );
 

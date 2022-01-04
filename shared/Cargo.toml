@@ -17,19 +17,20 @@ serde_json = "1.0"
 lazy_static = "1.4.0"
 async-trait = "0.1.51"
 futures-util = "0.3"
-strum = "0.21.0"
-strum_macros = "0.21.1"
+strum = "0.23.0"
+strum_macros = "0.23.1"
 futures = "0.3"
 sqlx = { git = "https://github.com/williamabradley/sqlx", branch = "exposed-driver", default_features = false, features = [ "postgres", "offline" ], optional = true }
 bstr = "0.2"
-sentry = { version = "0.23.0", default_features = false, features = [ "backtrace", "contexts", "panic", "reqwest", "rustls" ] }
+sentry = { version = "0.23.0", default_features = false, features = [ "backtrace", "contexts", "panic", "reqwest", "native-tls" ] }
 sentry-core = "0.23.0"
 sentry-backtrace = "0.23.0"
 sentry-panic = "0.23.0"
 base64 = "0.13.0"
+ssh2 = { git = "https://github.com/williamabradley/ssh2-rs", branch = "windows-openssl-features", features = [ "openssl-on-win32" ] }
 
 [features]
-default = ["sqlx/runtime-async-std-rustls"]
-windows = ["sqlx/runtime-async-std-rustls"]
-ios = ["sqlx/runtime-async-std-rustls"]
-android = ["sqlx/runtime-async-std-rustls"]
+default = ["sqlx/runtime-async-std-native-tls"]
+windows = ["sqlx/runtime-async-std-native-tls"]
+ios = ["sqlx/runtime-async-std-native-tls"]
+android = ["sqlx/runtime-async-std-native-tls"]

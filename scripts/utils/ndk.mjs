@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import {copy, optExtension} from './index.mjs';
+import {copy, optExtension, platforms} from './index.mjs';
+
+const {android: androidConfig} = platforms;
 
 export const ndkHome = process.env.NDK;
 

@@ -28,9 +28,11 @@ export const platforms = {
     targets: {
       'x86_64-pc-windows-msvc': {
         platform: 'x64',
+        vcpkgName: 'x64-windows',
       },
       'aarch64-pc-windows-msvc': {
         platform: 'ARM64',
+        vcpkgName: 'arm64-windows',
       },
     },
   },
@@ -49,26 +51,33 @@ export const platforms = {
         ndkName: 'armv7a-linux-androideabi',
         abiName: 'armeabi-v7a',
         libName: 'arm-linux-androideabi',
+        vcpkgName: 'arm-android',
       },
       'aarch64-linux-android': {
         platform: 'arm64',
         ndkName: 'aarch64-linux-android',
         abiName: 'arm64-v8a',
         libName: 'aarch64-linux-android',
+        vcpkgName: 'arm64-android',
       },
       'x86_64-linux-android': {
         platform: 'x86_64',
         ndkName: 'x86_64-linux-android',
         abiName: 'x86_64',
         libName: 'x86_64-linux-android',
+        vcpkgName: 'x64-android',
       },
     },
   },
   ios: {
     dir: iosDir,
     targets: {
-      'aarch64-apple-ios': {},
-      'x86_64-apple-ios': {},
+      'aarch64-apple-ios': {
+        vcpkgName: 'arm64-ios',
+      },
+      'x86_64-apple-ios': {
+        vcpkgName: 'x64-ios',
+      },
     },
   },
 };
@@ -135,4 +144,18 @@ export const optExtension = (path, ext) => {
     return path + ext;
   }
   return path;
+};
+
+export const findExecutable = exe => {
+  let appPath;
+  switch (os.platform()) {
+    case 'win32':
+      appPath = exec(`where.exe ${exe}`, {stdio: 'pipe'}).toString('utf8');
+      break;
+
+    default:
+      appPath = exec(`which ${exe}`, {stdio: 'pipe'}).toString('utf8');
+      break;
+  }
+  return appPath;
 };
