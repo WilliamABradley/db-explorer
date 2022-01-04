@@ -1,3 +1,4 @@
+pub mod postgres;
 pub mod types;
 
 use crate::errors::*;
@@ -26,13 +27,11 @@ pub trait DatabaseDriver {
   async fn flush(&self) -> Result<(), DriverError>;
 }
 
-pub mod postgres;
-
 pub fn get_driver(driver_type: &str) -> Option<&impl DatabaseDriver> {
-  let type_enum = DriverType::from_str(driver_type).ok();
+  let type_enum = DatabaseDriverType::from_str(driver_type).ok();
 
   return match type_enum {
-    Some(DriverType::Postgres) => Some(&postgres::PostgresDriver {}),
+    Some(DatabaseDriverType::Postgres) => Some(&postgres::PostgresDatabaseDriver {}),
     _ => None,
   };
 }

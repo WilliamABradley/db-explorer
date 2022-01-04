@@ -1,8 +1,9 @@
-pub mod drivers;
+pub mod database;
 pub mod errors;
 pub mod handle_db;
 pub mod io;
 pub mod logger;
+pub mod tunnel;
 pub mod utils;
 
 use errors::{DriverError, DriverManagerUnknownType};

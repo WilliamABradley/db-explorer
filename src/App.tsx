@@ -12,7 +12,7 @@ import TableView from './components/molecules/TableView';
 import Editor from './components/atoms/Editor';
 import SSHTunnelModal from './components/organisms/SSHTunnelModal';
 import DatabaseConnectionModal from './components/organisms/DatabaseConnectionModal';
-import DatabaseQueryResult from './drivers/models/DatabaseQueryResult';
+import DatabaseQueryResult from './database/models/DatabaseQueryResult';
 import SSHTunnel from './tunnel';
 import {
   registerEventEmitters,

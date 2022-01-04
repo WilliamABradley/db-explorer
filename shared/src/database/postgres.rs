@@ -16,10 +16,10 @@ lazy_static! {
 }
 
 #[derive(Debug)]
-pub struct PostgresDriver;
+pub struct PostgresDatabaseDriver;
 
 #[async_trait]
-impl DatabaseDriver for PostgresDriver {
+impl DatabaseDriver for PostgresDatabaseDriver {
   async fn create(&self, connection_info: &DatabaseConnectionInfo) -> Result<i32, DriverError> {
     let mut configs = _CONFIGS.lock().await;
     let id = configs.keys().len() as i32;

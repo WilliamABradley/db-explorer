@@ -7,7 +7,6 @@ enum SSHTunnelMessage {
   case Create(configuration: SSHTunnelConfiguration)
   case TestAuth(_ id: Int)
   case Connect(_ id: Int, target: SSHTunnelPortForward)
-  case TestPort(_ id: Int)
   case Close(_ id: Int)
   case Flush
   case Unknown(String)
@@ -16,7 +15,7 @@ enum SSHTunnelMessage {
 struct SSHTunnelConfiguration {
   var host: String;
   var port: Int;
-  var username: String?;
+  var username: String;
   var authenticationMethod: SSHTunnelAuthenticationMethod;
 }
 
@@ -71,8 +70,6 @@ extension SSHTunnelMessage: Decodable {
         self = .TestAuth(id!)
       case "Connect":
         self = .Connect(id!, target: try container.decode(SSHTunnelPortForward.self, forKey: .data))
-      case "TestPort":
-        self = .TestPort(id!)
       case "Close":
         self = .Close(id!)
       case "Flush":

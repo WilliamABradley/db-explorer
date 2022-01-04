@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Net.Sockets;
 using System.Text;
 
 namespace SSH.Core
@@ -77,22 +76,6 @@ namespace SSH.Core
                 Client.RemoveForwardedPort(Port);
                 Client.Disconnect();
                 throw e;
-            }
-        }
-
-        public bool TestPort()
-        {
-            try
-            {
-                var tcpClient = new TcpClient();
-                tcpClient.Connect("127.0.0.1", localPort);
-                tcpClient.Close();
-                return true;
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e.Message);
-                return false;
             }
         }
 

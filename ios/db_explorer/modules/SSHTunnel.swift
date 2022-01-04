@@ -13,10 +13,6 @@ class SSHTunnel {
     return 0
   }
   
-  func TestPort() -> Bool {
-    return false
-  }
-  
   func Close() {
     
   }

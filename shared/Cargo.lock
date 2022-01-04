@@ -471,6 +471,8 @@ dependencies = [
 name = "db_explorer_shared"
 version = "0.1.0"
 dependencies = [
+ "async-executor",
+ "async-global-executor",
  "async-trait",
  "base64",
  "bstr",

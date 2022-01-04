@@ -1,10 +1,11 @@
 use serde::{Deserialize, Serialize, Serializer};
+use std::collections::HashMap;
 use std::fmt::Debug;
 use std::str;
 use strum_macros::EnumString;
 
 #[derive(strum_macros::Display, EnumString)]
-pub enum DriverType {
+pub enum DatabaseDriverType {
   Postgres,
 }
 
@@ -23,6 +24,12 @@ pub struct DatabaseColumnInfo {
   pub name: String,
   #[serde(rename = "dataType")]
   pub data_type: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct DatabaseQueryData {
+  pub sql: String,
+  pub variables: Option<HashMap<String, String>>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

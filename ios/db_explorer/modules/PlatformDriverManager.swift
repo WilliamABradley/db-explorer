@@ -118,15 +118,6 @@ class PlatformDriverManager : NSObject {
               return noConnection(id)
             }
             
-          case .TestPort(let id):
-            let tunnel = PlatformDriverManager.TUNNELS[id]
-            if let tunnel = tunnel {
-              let isOpen = tunnel.TestPort()
-              return DriverManagerOutboundMessage.Result(isOpen)
-            } else {
-              return noConnection(id)
-            }
-            
           case .Close(let id):
             let tunnel = PlatformDriverManager.TUNNELS[id]
             if let tunnel = tunnel {

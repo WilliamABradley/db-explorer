@@ -106,14 +106,6 @@ class PlatformDriverManager(reactContext: ReactApplicationContext?) : ReactConte
                             val port = Tunnels[id]?.connect(forward)
                             return asResult(port)
                         }
-                        "TestPort" -> {
-                            val id = getId()
-                            if (!Tunnels.containsKey(id)) {
-                                return noConnection(id)
-                            }
-                            val isOpen = Tunnels[id]?.testPort()
-                            return asResult(isOpen)
-                        }
                         "Close" -> {
                             val id = getId()
                             if (!Tunnels.containsKey(id)) {
