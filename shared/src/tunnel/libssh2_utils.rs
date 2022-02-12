@@ -172,9 +172,9 @@ async fn spawn_channel_streamers<'tunnel>(
     });
   });
 
-  log(LogData::Debug("Awaiting join handle".into()));
+  log(LogData::Debug("Starting Tunnel".into()));
   spawn_join_handle.await?;
-  log(LogData::Debug("Exited join handle".into()));
+  log(LogData::Debug("Tunnel Closed".into()));
 
   Ok((local_socket_addr, ssh_forwarder_rx))
 }
