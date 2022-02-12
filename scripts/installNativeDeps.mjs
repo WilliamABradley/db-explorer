@@ -1,11 +1,12 @@
-import { exec, platforms, isWindows, findExecutable } from './utils/index.mjs';
+import {exec, platforms, isWindows, findExecutable} from './utils/index.mjs';
 
 const addTargets = platform => {
   for (const [target, info] of Object.entries(platform.targets)) {
     exec(`rustup target add ${target}`);
 
     exec(
-      `vcpkg install openssl:${info.vcpkgName}${target.includes('windows') ? '-static-md' : ''
+      `vcpkg install openssl:${info.vcpkgName}${
+        target.includes('windows') ? '-static-md' : ''
       }`,
     );
   }
@@ -16,6 +17,17 @@ const ensureVCPKG = () => {
 
   if (!vcpkgPath) {
     console.error('vcpkg needs to be installed, and added to the PATH');
+    process.exit(-1);
+  }
+};
+
+const ensurePatchElf = () => {
+  const patchElfPath = findExecutable('patchelf', {wsl: true});
+
+  if (!patchElfPath) {
+    console.error(
+      'patchelf needs to be installed (WSL on Windows), and added to the PATH',
+    );
     process.exit(-1);
   }
 };
@@ -53,10 +65,12 @@ for (const target of targets) {
 
     case 'android':
       ensurePerl();
+      ensurePatchElf();
       addTargets(platforms.android);
 
       console.log();
       import('./utils/ndk.mjs').then(ndk => ndk.prepareNDK());
+
       break;
 
     case 'ios':

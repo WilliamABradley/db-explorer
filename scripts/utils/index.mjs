@@ -2,7 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as url from 'url';
-import { execSync } from 'child_process';
+import {execSync} from 'child_process';
 
 process.env.VCPKG_ROOT = process.env.VCPKG_ROOT ?? `${process.env.HOME}/vcpkg`;
 
@@ -116,7 +116,7 @@ export const exec = (command, options) => {
 export const copy = (source, dest) => {
   console.log(`Copying ${source} > ${dest}`);
   if (fs.statSync(source).isDirectory()) {
-    fs.mkdirSync(dest, { recursive: true });
+    fs.mkdirSync(dest, {recursive: true});
     for (const item of fs.readdirSync(source)) {
       copy(path.resolve(source, item), path.resolve(dest, item));
     }
@@ -128,7 +128,7 @@ export const copy = (source, dest) => {
 export const link = (source, dest) => {
   console.log(`Linking ${source} > ${dest}`);
   if (fs.statSync(source).isDirectory()) {
-    fs.mkdirSync(dest, { recursive: true });
+    fs.mkdirSync(dest, {recursive: true});
     for (const item of fs.readdirSync(source)) {
       link(path.resolve(source, item), path.resolve(dest, item));
     }
@@ -140,7 +140,7 @@ export const link = (source, dest) => {
 export const rmIfExists = source => {
   if (fs.existsSync(source)) {
     console.log(`Deleting existing ${source}`);
-    fs.rmSync(source, { recursive: true, force: true });
+    fs.rmSync(source, {recursive: true, force: true});
   }
 };
 
@@ -151,15 +151,20 @@ export const optExtension = (path, ext) => {
   return path;
 };
 
-export const findExecutable = exe => {
+export const findExecutable = (exe, {wsl = false}) => {
   let appPath;
   switch (os.platform()) {
     case 'win32':
-      appPath = exec(`where.exe ${exe}`, { stdio: 'pipe', throw: false })?.toString('utf8');
+      appPath = exec(wsl ? `bash -c "which ${exe}"` : `where.exe ${exe}`, {
+        stdio: 'pipe',
+        throw: false,
+      })?.toString('utf8');
       break;
 
     default:
-      appPath = exec(`which ${exe}`, { stdio: 'pipe', throw: false })?.toString('utf8');
+      appPath = exec(`which ${exe}`, {stdio: 'pipe', throw: false})?.toString(
+        'utf8',
+      );
       break;
   }
   return appPath;
