@@ -1,8 +1,5 @@
 package com.db_explorer.modules
 
-import com.db_explorer.modules.tunnel.SSHTunnel
-import com.db_explorer.modules.tunnel.SSHTunnelConfiguration
-import com.db_explorer.modules.tunnel.SSHTunnelPortForward
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
@@ -26,7 +23,6 @@ class PlatformDriverManager(reactContext: ReactApplicationContext?) : ReactConte
 
     companion object {
         var Current: PlatformDriverManager? = null
-        val Tunnels: HashMap<Int, SSHTunnel> = HashMap()
     }
 
     @ReactMethod
@@ -67,71 +63,6 @@ class PlatformDriverManager(reactContext: ReactApplicationContext?) : ReactConte
             }
 
             when (messageClass) {
-                "SSHTunnel" -> {
-                    fun noConnection(id: Int): DriverManagerOutboundMessage {
-                        return DriverManagerOutboundMessage(
-                            DriverManagerOutboundMessageType.Error,
-                            DriverManagerDriverError(
-                                DriverManagerErrorType.NoConnectionError,
-                                DriverManagerUnknownConnection(
-                                    "Tunnel",
-                                    id,
-                                ),
-                            ),
-                        )
-                    }
-
-                    when (payloadType) {
-                        "Create" -> {
-                            val configuration = json.treeToValue(data, SSHTunnelConfiguration::class.java)
-                            val id = Tunnels.count()
-                            val tunnel = SSHTunnel(configuration)
-                            Tunnels[id] = tunnel
-                            return asResult(id)
-                        }
-                        "TestAuth" -> {
-                            val id = getId()
-                            if (!Tunnels.containsKey(id)) {
-                                return noConnection(id)
-                            }
-                            Tunnels[id]?.testAuth()
-                            return asResult(null)
-                        }
-                        "Connect" -> {
-                            val id = getId()
-                            if (!Tunnels.containsKey(id)) {
-                                return noConnection(id)
-                            }
-                            val forward = json.treeToValue(data, SSHTunnelPortForward::class.java)
-                            val port = Tunnels[id]?.connect(forward)
-                            return asResult(port)
-                        }
-                        "Close" -> {
-                            val id = getId()
-                            if (!Tunnels.containsKey(id)) {
-                                return noConnection(id)
-                            }
-                            Tunnels[id]?.close()
-                            return asResult(null)
-                        }
-                        "Flush" -> {
-                            for (entry in HashMap(Tunnels)) {
-                                entry.value.close()
-                                Tunnels.remove(entry.key)
-                            }
-                            return asResult(null)
-                        }
-                        else -> {
-                            return DriverManagerOutboundMessage(
-                                DriverManagerOutboundMessageType.Error,
-                                DriverManagerDriverError(
-                                    DriverManagerErrorType.UnknownMessage,
-                                    DriverManagerUnknownType("SSH Tunnel", payloadType)
-                                )
-                            )
-                        }
-                    }
-                }
                 else -> {
                     return DriverManagerOutboundMessage(
                         DriverManagerOutboundMessageType.Error,
