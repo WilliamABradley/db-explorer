@@ -1,6 +1,6 @@
 ﻿namespace db_explorer.modules
 {
-    public class Logger : ILogger, SSH.Core.ILogger
+    public class Logger : ILogger
     {
         public void Log(string level, string message)
         {
