@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import {copy, optExtension, platforms} from './index.mjs';
+import { copy, optExtension, platforms } from './index.mjs';
 
-const {android: androidConfig} = platforms;
+const { android: androidConfig } = platforms;
 
 export const ndkHome = process.env.NDK;
 
@@ -55,7 +55,7 @@ export function prepareNDK() {
   // Get the expected tools for cargo in the expected place.
   console.log('Strategically copying desired binaries');
   for (const target of Object.values(androidConfig.targets)) {
-    const {ndkName} = target;
+    const { ndkName } = target;
     const clangTool = `${ndkName}${androidTargetSDKVersion}-clang`;
     let sourceFile = path.resolve(
       toolchainBinaryDir,
