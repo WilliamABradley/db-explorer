@@ -13,10 +13,7 @@ React Native Database Explorer, currently with support for iOS, Android, and Win
 * [x] Postgres Support
 * [ ] MySQL Support
 * [ ] SQL Server Support
-* [ ] SSH Tunnel Support
-  * [x] Windows SSH Tunnel Support
-  * [x] Android SSH Tunnel Support
-  * [ ] iOS SSH Tunnel Support
+* [x] SSH Tunnel Support (libssh2)
 * [ ] Database object explorer, e.g. DBeaver, Postico
 * [ ] Database ERD?
 
