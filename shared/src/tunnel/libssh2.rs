@@ -1,25 +1,12 @@
 use super::*;
 use crate::logger::*;
-use crate::RUNTIME;
-use async_executor::{Executor, LocalExecutor, Task};
-use async_io::Async;
 use async_session::SshSession;
 use async_trait::async_trait;
-use easy_parallel::Parallel;
-use futures::executor::block_on;
-use futures::future::FutureExt;
-use futures::select;
-use futures::{AsyncReadExt, AsyncWriteExt};
 use futures_util::lock::Mutex;
 use lazy_static::lazy_static;
 use libssh2_utils::{configure_session, run_port_forward};
-use ssh2::{Channel, Session};
-use std::borrow::Cow;
 use std::collections::HashMap;
-use std::env;
-use std::io::{Error, ErrorKind};
-use std::net::{TcpListener, TcpStream, ToSocketAddrs};
-use std::sync::Arc;
+use std::net::TcpListener;
 
 lazy_static! {
   static ref _CONFIGS: Mutex<HashMap<i32, SSHTunnelConfiguration>> = Mutex::new(HashMap::new());
@@ -141,11 +128,5 @@ impl TunnelDriver for SSH2TunnelDriver {
       configs.remove(&id);
     }
     return Result::Ok(());
-  }
-}
-
-impl std::convert::From<ssh2::Error> for DriverError {
-  fn from(error: ssh2::Error) -> Self {
-    return DriverError::Error(format!("{}", error));
   }
 }

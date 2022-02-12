@@ -481,18 +481,13 @@ dependencies = [
 name = "db_explorer_shared"
 version = "0.1.0"
 dependencies = [
- "async-channel",
- "async-executor",
- "async-global-executor",
  "async-io",
  "async-ssh2-lite",
  "async-trait",
  "base64",
  "bstr",
  "cargo-lipo",
- "easy-parallel",
  "futures",
- "futures-lite",
  "futures-util",
  "lazy_static",
  "sentry",
@@ -502,7 +497,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
- "ssh2",
  "strum",
  "strum_macros",
  "tokio",
@@ -552,12 +546,6 @@ name = "dotenv"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77c90badedccf4105eca100756a0b1289e191f6fcbdadd3cee1d2f614f97da8f"
-
-[[package]]
-name = "easy-parallel"
-version = "3.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6907e25393cdcc1f4f3f513d9aac1e840eb1cc341a0fccb01171f7d14d10b946"
 
 [[package]]
 name = "either"
