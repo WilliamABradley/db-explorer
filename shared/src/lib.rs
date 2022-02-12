@@ -101,7 +101,7 @@ pub extern "C" fn db_shared_receive_message(message: *const c_char) -> *mut c_ch
         // Try and capture the error message.
         let err_message: &str = match err.downcast_ref::<&'static str>() {
             Some(s) => *s,
-            None => "Unresolvable Error",
+            None => "handle_message: unwound panic",
         };
 
         let err_string = err_message.to_string();
