@@ -35,6 +35,7 @@ sentry-panic = "0.23.0"
 base64 = "0.13.0"
 async-ssh2-lite = { git = "https://github.com/williamabradley/async-ssh2-lite", branch = "windows-openssl-support", features = [ "openssl-on-win32" ] }
 ssh2 = { git = "https://github.com/williamabradley/ssh2-rs", branch = "windows-openssl-features", features = [ "openssl-on-win32" ] }
+tokio = { version = "1.16.1", features = ["full"] }
 
 [features]
 default = ["sqlx/runtime-async-std-native-tls"]

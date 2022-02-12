@@ -1,9 +1,9 @@
 use super::*;
 use crate::logger::*;
-use libssh2_utils::{configure_session, AsyncLibSSHSession};
-
+use crate::RUNTIME;
 use async_executor::{Executor, LocalExecutor, Task};
 use async_io::Async;
+use async_session::SshSession;
 use async_trait::async_trait;
 use easy_parallel::Parallel;
 use futures::executor::block_on;
@@ -12,7 +12,9 @@ use futures::select;
 use futures::{AsyncReadExt, AsyncWriteExt};
 use futures_util::lock::Mutex;
 use lazy_static::lazy_static;
+use libssh2_utils::{configure_session, run_port_forward};
 use ssh2::{Channel, Session};
+use std::borrow::Cow;
 use std::collections::HashMap;
 use std::env;
 use std::io::{Error, ErrorKind};
@@ -21,7 +23,7 @@ use std::sync::Arc;
 
 lazy_static! {
   static ref _CONFIGS: Mutex<HashMap<i32, SSHTunnelConfiguration>> = Mutex::new(HashMap::new());
-  static ref _INSTANCES: Mutex<HashMap<i32, AsyncLibSSHSession>> = Mutex::new(HashMap::new());
+  static ref _INSTANCES: Mutex<HashMap<i32, SshSession>> = Mutex::new(HashMap::new());
 }
 
 #[derive(Debug)]
@@ -100,21 +102,22 @@ impl TunnelDriver for SSH2TunnelDriver {
     let remote_host = &target.remote_host;
     let remote_port = target.remote_port;
 
-    let listener = TcpListener::bind(format!(
-      "localhost:{}",
-      target.local_port.or(Some(0)).unwrap()
-    ))?;
-    let local_port = listener.local_addr()?.port();
+    // Get Listen Address, this resolves the port if the port is 0 (Random).
+    let listen_addr = TcpListener::bind(format!("localhost:{}", target.local_port.unwrap_or(0)))
+      .unwrap()
+      .local_addr()
+      .unwrap();
+    let local_port = listen_addr.port();
 
     log(LogData::Info(format!(
-      "Opening SSH Port Forward 127.0.0.1:{} > {}:{}",
+      "Opening LIBSSH2 Port Forward 127.0.0.1:{} > {}:{}",
       local_port, remote_host, remote_port,
     )));
 
-    std::thread::spawn(move || for stream in listener.incoming() {});
+    run_port_forward(session, remote_host, remote_port, listen_addr).await?;
 
     log(LogData::Info(format!(
-      "Opened SSH Port Forward 127.0.0.1:{} > {}:{}",
+      "Opened LIBSSH2 Port Forward 127.0.0.1:{} > {}:{}",
       local_port, remote_host, remote_port,
     )));
 

@@ -1,7 +1,11 @@
 use super::types::{SSHTunnelAuthenticationMethod, SSHTunnelConfiguration, SSHTunnelPortForward};
 
+use super::async_session::SshSession;
+use crate::logger::*;
+use crate::RUNTIME;
 use async_executor::{Executor, LocalExecutor, Task};
 use async_io::Async;
+use async_ssh2_lite::SessionConfiguration;
 use easy_parallel::Parallel;
 use futures::executor::block_on;
 use futures::future::FutureExt;
@@ -12,9 +16,10 @@ use std::env;
 use std::io::{Error, ErrorKind, Result};
 use std::net::{SocketAddr, TcpListener, TcpStream, ToSocketAddrs};
 use std::sync::Arc;
+use tokio::sync::{oneshot, oneshot::Receiver};
 
-pub type AsyncLibSSHSession = async_ssh2_lite::AsyncSession<TcpStream>;
-pub type AsyncLibSSHChannel = async_ssh2_lite::AsyncChannel<TcpStream>;
+pub type AsyncSession = async_ssh2_lite::AsyncSession<TcpStream>;
+pub type AsyncChannel = async_ssh2_lite::AsyncChannel<TcpStream>;
 
 #[derive(Debug)]
 pub enum SshForwarderEnd {
@@ -43,14 +48,18 @@ pub enum SshForwarderEnd {
   ChannelReadErr(Error),
 }
 
-pub async fn configure_session(config: &SSHTunnelConfiguration) -> Result<AsyncLibSSHSession> {
+pub async fn configure_session(config: &SSHTunnelConfiguration) -> Result<SshSession> {
   let addr = format!("{}:{}", config.host, config.port)
     .to_socket_addrs()
     .unwrap()
     .next()
     .unwrap();
+
+  let mut session_configuration = SessionConfiguration::new();
+  session_configuration.set_compress(true);
+
   let stream = Async::<TcpStream>::connect(addr).await?;
-  let mut session = AsyncLibSSHSession::new(stream, None)?;
+  let mut session = AsyncSession::new(stream, Some(session_configuration))?;
   session.handshake().await?;
 
   let _ = match &config.authentication_method {
@@ -83,14 +92,15 @@ pub async fn configure_session(config: &SSHTunnelConfiguration) -> Result<AsyncL
     );
   }
 
-  return Result::Ok(session);
+  return Result::Ok(SshSession(session));
 }
 
 pub async fn configure_forward_channel(
-  session: &AsyncLibSSHSession,
-  target: &SSHTunnelPortForward,
-) -> Result<AsyncLibSSHChannel> {
-  let target_addr = format!("{}:{}", target.remote_host, target.remote_port)
+  session: &SshSession,
+  remote_host: &String,
+  remote_port: u16,
+) -> Result<AsyncChannel> {
+  let target_addr = format!("{}:{}", remote_host, remote_port)
     .to_socket_addrs()
     .unwrap()
     .next()
@@ -107,27 +117,105 @@ pub async fn configure_forward_channel(
   return Result::Ok(channel);
 }
 
+// based on ssh_jumper.
+async fn spawn_channel_streamers<'tunnel>(
+  local_socket: SocketAddr,
+  mut jump_host_channel: AsyncChannel,
+) -> Result<(SocketAddr, Receiver<SshForwarderEnd>)> {
+  let local_socket_addr = TcpListener::bind(local_socket)?.local_addr()?;
+  let local_socket_listener = Async::<TcpListener>::bind(local_socket_addr)?;
+  let (ssh_forwarder_tx, ssh_forwarder_rx) = oneshot::channel::<SshForwarderEnd>();
+
+  let spawn_join_handle = tokio::task::spawn(async move {
+    let _detached_task = tokio::task::spawn(async move {
+      let mut buf_jump_host_channel = vec![0; 2048];
+      let mut buf_forward_stream_r = vec![0; 2048];
+
+      match local_socket_listener.accept().await {
+        Ok((mut forward_stream_r, _)) => loop {
+          futures::select! {
+              ret_forward_stream_r = forward_stream_r.read(&mut buf_forward_stream_r).fuse() => match ret_forward_stream_r {
+                  Ok(0) => {
+                      let _send_result = ssh_forwarder_tx.send(SshForwarderEnd::LocalReadEof);
+                      break;
+                  },
+                  Ok(n) => {
+                      if let Err(e) = jump_host_channel.write(&buf_forward_stream_r[..n]).await.map(|_| ()).map_err(|err| {
+                          err
+                      }) {
+                          let _send_result = ssh_forwarder_tx.send(SshForwarderEnd::LocalToChannelWriteErr(e));
+                          break;
+                      }
+                  },
+                  Err(e) => {
+                      let _send_result = ssh_forwarder_tx.send(SshForwarderEnd::LocalReadErr(e));
+                      break;
+                  }
+              },
+              ret_jump_host_channel = jump_host_channel.read(&mut buf_jump_host_channel).fuse() => match ret_jump_host_channel {
+                  Ok(0) => {
+                      let _send_result = ssh_forwarder_tx.send(SshForwarderEnd::ChannelReadEof);
+                      break;
+                  },
+                  Ok(n) => {
+                      if let Err(e) = forward_stream_r.write(&buf_jump_host_channel[..n]).await.map(|_| ()).map_err(|err| {
+                          err
+                      }) {
+                          let _send_result = ssh_forwarder_tx.send(SshForwarderEnd::ChannelToLocalWriteErr(e));
+                          break;
+                      }
+                  },
+                  Err(e) => {
+                      let _send_result = ssh_forwarder_tx.send(SshForwarderEnd::ChannelReadErr(e));
+                      break;
+                  }
+              },
+          }
+        },
+        Err(e) => {
+          let _send_result = ssh_forwarder_tx.send(SshForwarderEnd::LocalConnectFail(e));
+        }
+      }
+    });
+  });
+
+  log(LogData::Debug("Awaiting join handle".into()));
+  spawn_join_handle.await?;
+  log(LogData::Debug("Exited join handle".into()));
+
+  Ok((local_socket_addr, ssh_forwarder_rx))
+}
+
 pub async fn run_port_forward(
-  ex: Arc<Executor<'_>>,
-  session: &AsyncLibSSHSession,
-  target: &SSHTunnelPortForward,
-) -> Result<(SocketAddr, Option<bool>)> {
+  session: &SshSession,
+  remote_host: &String,
+  remote_port: u16,
+  local_addr: SocketAddr,
+) -> Result<()> {
+  log(LogData::Debug("Configuring forward channel".into()));
+  let channel = configure_forward_channel(session, remote_host, remote_port).await?;
+
+  log(LogData::Debug("Spawning Tunnel".into()));
+  RUNTIME.spawn(spawn_channel_streamers(local_addr, channel));
+  return Result::Ok(());
+}
+
+/* pub async fn legacy_run_port_forward(
+  session: &SshSession,
+  remote_host: &String,
+  remote_port: u16,
+  local_addr: SocketAddr,
+) -> Result<()> {
   let mut receivers = vec![];
   let (listener_task_sender, receiver) = async_channel::unbounded();
   receivers.push(receiver);
   let (forwarder_task_sender, receiver) = async_channel::unbounded();
   receivers.push(receiver);
 
-  // Get Listen Address, this resolves the port if the port is 0 (Random).
-  let listen_addr = TcpListener::bind(format!("localhost:{}", target.local_port.unwrap_or(0)))
-    .unwrap()
-    .local_addr()
-    .unwrap();
-
-  let mut channel = configure_forward_channel(session, target).await?;
+  let mut channel = configure_forward_channel(session, remote_host, remote_port).await?;
 
   let listener_task: Task<Result<()>> = ex.clone().spawn(async move {
-    let listener = Async::<TcpListener>::bind(listen_addr)?;
+    let listener = Async::<TcpListener>::bind(local_addr)?;
     let (mut read_stream, _) = listener.accept().await?;
 
     let forwarder_task: Task<Result<()>> = ex.clone().spawn(async move {
@@ -135,46 +223,56 @@ pub async fn run_port_forward(
       let mut buf_read_stream = vec![0; 2048];
 
       loop {
-          select! {
-              ret_read_stream = read_stream.read(&mut buf_read_stream).fuse() => match ret_read_stream {
-                  Ok(n) if n == 0 => {
-                      println!("read_stream read 0");
-                      break
-                  },
-                  Ok(n) => {
-                      println!("read_stream read {}", n);
-                      channel.write(&buf_read_stream[..n]).await.map(|_| ()).map_err(|err| {
-                          eprintln!("channel write failed, err {:?}", err);
-                          err
-                      })?
-                  },
-                  Err(err) =>  {
-                      eprintln!("read_stream read failed, err {:?}", err);
-
-                      return Err(err);
-                  }
-              },
-              ret_channel = channel.read(&mut buf_channel).fuse() => match ret_channel {
-                  Ok(n) if n == 0 => {
-                      println!("channel read 0");
-                      break
-                  },
-                  Ok(n) => {
-                      println!("channel read {}", n);
-                      read_stream.write(&buf_channel[..n]).await.map(|_| ()).map_err(|err| {
-                          eprintln!("read_stream write failed, err {:?}", err);
-                          err
-                      })?
-                  },
-                  Err(err) => {
-                      eprintln!("channel read failed, err {:?}", err);
-
-                      return Err(err);
-                  }
-              },
-          }
+        log(LogData::Debug("Loop begin".into()));
+        select! {
+          ret_read_stream = read_stream.read(&mut buf_read_stream).fuse() => match ret_read_stream {
+            Ok(n) if n == 0 => {
+              log(LogData::Debug("read_stream read 0".into()));
+              break
+            },
+            Ok(n) => {
+              log(LogData::Debug(format!("read_stream read {}", n)));
+              channel.write(&buf_read_stream[..n]).await.map(|_| ()).map_err(|err| {
+                log(LogData::Error(format!(
+                  "channel write failed, err {:?}", err
+                )));
+                err
+              })?
+            },
+            Err(err) =>  {
+              log(LogData::Error(format!(
+                "read_stream read failed, err {:?}", err
+              )));
+              return Err(err);
+            }
+          },
+          ret_channel = channel.read(&mut buf_channel).fuse() => match ret_channel {
+            Ok(n) if n == 0 => {
+              log(LogData::Debug("channel read 0".into()));
+              break
+            },
+            Ok(n) => {
+              log(LogData::Debug(format!("channel read {}", n)));
+              read_stream.write(&buf_channel[..n]).await.map(|_| ()).map_err(|err| {
+                log(LogData::Error(format!(
+                  "read_stream write failed, err {:?}", err
+                )));
+                err
+              })?
+            },
+            Err(err) => {
+              log(LogData::Error(format!(
+                "channel read failed, err {:?}", err
+              )));
+              return Err(err);
+            }
+          },
+        }
       }
-      forwarder_task_sender.send("Closed Port Forward").await.unwrap();
+      forwarder_task_sender
+        .send("Closed Port Forward")
+        .await
+        .unwrap();
       Ok(())
     });
     forwarder_task.detach();
@@ -182,18 +280,23 @@ pub async fn run_port_forward(
     Ok(())
   });
 
+  log(LogData::Debug("Starting listener task".into()));
   listener_task.await.map_err(|err| {
-    eprintln!("listener_task run failed, err {:?}", err);
+    log(LogData::Error(format!(
+      "listener_task run failed, err {:?}",
+      err
+    )));
     err
   })?;
 
+  log(LogData::Debug("Processing receivers".into()));
   for receiver in receivers {
     let msg = receiver.recv().await.unwrap();
-    println!("{}", msg);
+    log(LogData::Debug(format!("{}", msg)));
   }
 
-  return Result::Ok((listen_addr, None));
-}
+  return Result::Ok(());
+} */
 
 /* async fn run(
   ex: Arc<Executor<'_>>,

@@ -59,7 +59,7 @@ export default class SSHTunnel {
     type: TType,
     data?: ({type: TType} & DriverManagerTunnelMessage)['data'],
   ): Promise<DriverManagerTunnelMessageResult[TType]> {
-    return sendManagerMessage('platform', {
+    return sendManagerMessage('driver', {
       class: DriverManagerMessageClass.SSHTunnel,
       payload: <DriverManagerTunnelMessage>{
         driver: 'LIBSSH2',

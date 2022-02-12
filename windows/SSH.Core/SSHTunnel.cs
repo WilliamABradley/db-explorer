@@ -65,10 +65,10 @@ namespace SSH.Core
 
             try
             {
-                Logger.Info($"Opening SSH Port Forward 127.0.0.1:{localPort} > {target.RemoteHost}:{target.RemotePort}");
+                Logger.Info($"Opening SSH.NET Port Forward 127.0.0.1:{localPort} > {target.RemoteHost}:{target.RemotePort}");
                 Port.Start();
                 localPort = (int)Port.BoundPort;
-                Logger.Info($"Opened SSH Port Forward 127.0.0.1:{localPort} > {target.RemoteHost}:{target.RemotePort}");
+                Logger.Info($"Opened SSH.NET Port Forward 127.0.0.1:{localPort} > {target.RemoteHost}:{target.RemotePort}");
                 return localPort;
             }
             catch (Exception e)
