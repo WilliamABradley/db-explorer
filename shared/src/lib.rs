@@ -1,6 +1,7 @@
 pub mod database;
 pub mod errors;
 pub mod handle_db;
+pub mod handle_tunnel;
 pub mod io;
 pub mod logger;
 pub mod tunnel;
@@ -8,6 +9,7 @@ pub mod utils;
 
 use errors::{DriverError, DriverManagerUnknownType};
 use futures::executor::block_on;
+use futures::future::pending;
 use io::*;
 use lazy_static::*;
 use sentry_backtrace::current_stacktrace;
@@ -17,6 +19,8 @@ use std::ffi::CString;
 use std::os::raw::c_char;
 use std::panic;
 use std::sync::{Arc, Mutex};
+use std::thread;
+use tokio::runtime;
 use utils::*;
 
 type PostbackHandler = unsafe extern "C" fn(*mut c_char);
@@ -25,10 +29,17 @@ lazy_static! {
     static ref POSTBACK_HANDLER: Arc<Mutex<Option<PostbackHandler>>> = Arc::new(Mutex::new(None));
     static ref SENTRY_GUARD: Arc<Mutex<Option<sentry::ClientInitGuard>>> =
         Arc::new(Mutex::new(None));
+    pub static ref RUNTIME: runtime::Handle = {
+        let rt = runtime::Runtime::new().unwrap();
+        let handle = rt.handle().clone();
+        thread::spawn(move || rt.block_on(pending::<()>()));
+        handle
+    };
 }
 
 #[no_mangle]
 pub extern "C" fn db_shared_init() -> () {
+    // Init Sentry
     let mut guard = SENTRY_GUARD.lock().unwrap();
     *guard = Some(sentry::init((
         "https://cf847f25a00e442e807ceda8a0e6bc37@o1002516.ingest.sentry.io/5962755",
@@ -41,6 +52,7 @@ pub extern "C" fn db_shared_init() -> () {
 
 #[no_mangle]
 pub extern "C" fn db_shared_deinit() -> () {
+    // De-init sentry
     let mut guard = SENTRY_GUARD.lock().unwrap();
     *guard = None;
 }
@@ -141,6 +153,9 @@ async fn handle_message(message_data: &str) -> OutboundMessage {
     match message {
         InboundMessage::DatabaseDriver(database_message) => {
             return handle_db::handle_database_message(&database_message).await;
+        }
+        InboundMessage::SSHTunnel(tunnel_message) => {
+            return handle_tunnel::handle_tunnel_message(&tunnel_message).await;
         }
         _ => {
             return OutboundMessage::Error(DriverError::UnknownMessage(DriverManagerUnknownType {

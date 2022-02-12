@@ -5,7 +5,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Linq;
-using SSH.Core;
 
 namespace db_explorer.modules
 {
@@ -13,7 +12,6 @@ namespace db_explorer.modules
     public partial class PlatformDriverManager
     {
         public static PlatformDriverManager Current;
-        private static readonly Dictionary<int, SSHTunnel> TUNNELS = new Dictionary<int, SSHTunnel>();
 
         private static readonly Logger Logger = new Logger();
         private ReactContext _reactContext;
@@ -63,66 +61,6 @@ namespace db_explorer.modules
 
                 switch (messageClass)
                 {
-                    case "SSHTunnel":
-                        DriverManagerOutboundMessage noConnection(int id) => new DriverManagerOutboundMessage
-                        {
-                            Type = DriverManagerOutboundMessageType.Error,
-                            Data = new DriverManagerDriverError(DriverManagerErrorType.NoConnectionError, new DriverManagerUnknownConnection("Tunnel", id)),
-                        };
-
-                        switch (payloadType)
-                        {
-                            case "Create":
-                                var configuration = data.ToObject<SSHTunnelConfiguration>();
-                                var creationId = TUNNELS.Count;
-                                var createdTunnel = new SSHTunnel(configuration, Logger);
-                                TUNNELS.Add(creationId, createdTunnel);
-                                return asResult(creationId);
-
-                            case "TestAuth":
-                                var testAuthId = getId();
-                                if (!TUNNELS.TryGetValue(testAuthId, out SSHTunnel testingAuthTunnel))
-                                {
-                                    return noConnection(testAuthId);
-                                }
-                                testingAuthTunnel.TestAuth();
-                                return asResult(null);
-
-                            case "Connect":
-                                var connectId = getId();
-                                if (!TUNNELS.TryGetValue(connectId, out SSHTunnel connectingTunnel))
-                                {
-                                    return noConnection(connectId);
-                                }
-                                var forward = data.ToObject<SSHTunnelPortForward>();
-                                var port = connectingTunnel.Connect(forward);
-                                return asResult(port);
-
-                            case "Close":
-                                var closeId = getId();
-                                if (!TUNNELS.TryGetValue(closeId, out SSHTunnel closingTunnel))
-                                {
-                                    return noConnection(closeId);
-                                }
-                                closingTunnel.Close();
-                                return asResult(null);
-
-                            case "Flush":
-                                foreach (var tunnel in TUNNELS.ToList())
-                                {
-                                    tunnel.Value.Close();
-                                    TUNNELS.Remove(tunnel.Key);
-                                }
-                                return asResult(null);
-
-                            default:
-                                return new DriverManagerOutboundMessage
-                                {
-                                    Type = DriverManagerOutboundMessageType.Error,
-                                    Data = new DriverManagerDriverError(DriverManagerErrorType.UnknownMessage, new DriverManagerUnknownType("SSH Tunnel", payloadType)),
-                                };
-                        }
-
                     default:
                         return new DriverManagerOutboundMessage
                         {

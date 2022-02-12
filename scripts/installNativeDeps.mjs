@@ -1,5 +1,4 @@
 import {exec, platforms, isWindows, findExecutable} from './utils/index.mjs';
-import * as ndk from './utils/ndk.mjs';
 
 const addTargets = platform => {
   for (const [target, info] of Object.entries(platform.targets)) {
@@ -18,6 +17,26 @@ const ensureVCPKG = () => {
 
   if (!vcpkgPath) {
     console.error('vcpkg needs to be installed, and added to the PATH');
+    process.exit(-1);
+  }
+};
+
+const ensurePatchElf = () => {
+  const patchElfPath = findExecutable('patchelf', {wsl: true});
+
+  if (!patchElfPath) {
+    console.error(
+      'patchelf needs to be installed (WSL on Windows), and added to the PATH',
+    );
+    process.exit(-1);
+  }
+};
+
+const ensurePkgConfig = () => {
+  const pkgConfigPath = findExecutable('pkg-config');
+
+  if (!pkgConfigPath) {
+    console.error('pkg-config needs to be installed, and added to the PATH');
     process.exit(-1);
   }
 };
@@ -46,13 +65,16 @@ for (const target of targets) {
 
     case 'android':
       ensurePerl();
+      ensurePatchElf();
       addTargets(platforms.android);
 
       console.log();
-      ndk.prepareNDK();
+      import('./utils/ndk.mjs').then(ndk => ndk.prepareNDK());
+
       break;
 
     case 'ios':
+      ensurePkgConfig();
       addTargets(platforms.ios);
       break;
 

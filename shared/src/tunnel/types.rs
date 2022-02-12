@@ -11,7 +11,7 @@ pub enum TunnelDriverType {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct SSHTunnelConfiguration {
   pub host: String,
-  pub port: String,
+  pub port: u16,
   pub username: String,
   #[serde(flatten)]
   pub authentication_method: SSHTunnelAuthenticationMethod,

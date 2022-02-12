@@ -39,11 +39,6 @@ class MainApplication : Application(), ReactApplication {
     }
 
     companion object {
-        init {
-            Security.removeProvider("BC");
-            Security.insertProviderAt(org.bouncycastle.jce.provider.BouncyCastleProvider(), 0);
-        }
-
         /**
          * Loads Flipper in React Native templates. Call this in the onCreate method with something like
          * initializeFlipper(this, getReactNativeHost().getReactInstanceManager());

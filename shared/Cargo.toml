@@ -15,8 +15,7 @@ cargo-lipo = "3.1.1"
 serde = "1.0"
 serde_json = "1.0"
 lazy_static = "1.4.0"
-async-executor = "1.4.1"
-async-global-executor = "2.0.2"
+async-io = "1.6.0"
 async-trait = "0.1.51"
 futures-util = "0.3"
 strum = "0.23.0"
@@ -29,7 +28,8 @@ sentry-core = "0.23.0"
 sentry-backtrace = "0.23.0"
 sentry-panic = "0.23.0"
 base64 = "0.13.0"
-ssh2 = { git = "https://github.com/williamabradley/ssh2-rs", branch = "windows-openssl-features", features = [ "openssl-on-win32" ] }
+async-ssh2-lite = { git = "https://github.com/williamabradley/async-ssh2-lite", branch = "windows-openssl-support", features = [ "openssl-on-win32" ] }
+tokio = { version = "1.16.1", features = ["full"] }
 
 [features]
 default = ["sqlx/runtime-async-std-native-tls"]

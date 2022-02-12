@@ -4,6 +4,8 @@ import * as os from 'os';
 import * as url from 'url';
 import {execSync} from 'child_process';
 
+process.env.VCPKG_ROOT = process.env.VCPKG_ROOT ?? `${process.env.HOME}/vcpkg`;
+
 const __filename = url.fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -103,8 +105,11 @@ export const exec = (command, options) => {
       },
     });
   } catch (e) {
-    console.error(e.message);
-    process.exit(e.code);
+    if (options?.throw !== false) {
+      console.error(e.message);
+      process.exit(e.code);
+    }
+    return null;
   }
 };
 
@@ -146,15 +151,20 @@ export const optExtension = (path, ext) => {
   return path;
 };
 
-export const findExecutable = exe => {
+export const findExecutable = (exe, {wsl = false}) => {
   let appPath;
   switch (os.platform()) {
     case 'win32':
-      appPath = exec(`where.exe ${exe}`, {stdio: 'pipe'}).toString('utf8');
+      appPath = exec(wsl ? `bash -c "which ${exe}"` : `where.exe ${exe}`, {
+        stdio: 'pipe',
+        throw: false,
+      })?.toString('utf8');
       break;
 
     default:
-      appPath = exec(`which ${exe}`, {stdio: 'pipe'}).toString('utf8');
+      appPath = exec(`which ${exe}`, {stdio: 'pipe', throw: false})?.toString(
+        'utf8',
+      );
       break;
   }
   return appPath;

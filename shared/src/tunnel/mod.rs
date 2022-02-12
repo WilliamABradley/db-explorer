@@ -1,4 +1,6 @@
+mod async_session;
 pub mod libssh2;
+mod libssh2_utils;
 pub mod types;
 
 use crate::errors::*;
