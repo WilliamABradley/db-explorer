@@ -5,6 +5,9 @@ using System.Collections.Generic;
 // Namespaces from @react-native-community/checkbox
 using CheckboxWindows;
 
+// Namespaces from @react-native-community/datetimepicker
+using DateTimePicker;
+
 // Namespaces from @react-native-community/slider
 using SliderWindows;
 
@@ -31,6 +34,8 @@ namespace Microsoft.ReactNative.Managed
         { 
             // IReactPackageProviders from @react-native-community/checkbox
             packageProviders.Add(new CheckboxWindows.ReactPackageProvider());
+            // IReactPackageProviders from @react-native-community/datetimepicker
+            packageProviders.Add(new DateTimePicker.ReactPackageProvider());
             // IReactPackageProviders from @react-native-community/slider
             packageProviders.Add(new SliderWindows.ReactPackageProvider());
             // IReactPackageProviders from react-native-document-picker
