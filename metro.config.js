@@ -27,6 +27,7 @@ module.exports = {
       /.*\.ProjectImports\.zip/,
       // Rust shared lib.
       /shared\/.*/,
+      /android\/app\/build\/.*/,
     ]),
   },
   transformer: {

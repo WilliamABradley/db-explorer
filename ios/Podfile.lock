@@ -345,8 +345,6 @@ PODS:
     - React-Core
   - RNCCheckbox (0.5.8):
     - React-Core
-  - RNDateTimePicker (3.5.2):
-    - React-Core
   - RNDnsLookup (1.0.3):
     - React
   - RNFS (2.18.0):
@@ -412,7 +410,6 @@ DEPENDENCIES:
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - "RNCCheckbox (from `../node_modules/@react-native-community/checkbox`)"
-  - "RNDateTimePicker (from `../node_modules/@react-native-community/datetimepicker`)"
   - RNDnsLookup (from `../node_modules/react-native-dns-lookup`)
   - RNFS (from `../node_modules/react-native-fs`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
@@ -502,8 +499,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNCCheckbox:
     :path: "../node_modules/@react-native-community/checkbox"
-  RNDateTimePicker:
-    :path: "../node_modules/@react-native-community/datetimepicker"
   RNDnsLookup:
     :path: "../node_modules/react-native-dns-lookup"
   RNFS:
@@ -559,7 +554,6 @@ SPEC CHECKSUMS:
   ReactCommon: eafed38eec7b591c31751bfa7494801618460459
   RNCAsyncStorage: 7102fe8985f889579a3ae148d957bbb3f308122b
   RNCCheckbox: 6bd119c26c6eb8264a29d59ff66cb70a14de3349
-  RNDateTimePicker: 7658208086d86d09e1627b5c34ba0cf237c60140
   RNDnsLookup: 9153bb6019b1a2001a66b35247f5c61ccee86923
   RNFS: 3ab21fa6c56d65566d1fb26c2228e2b6132e5e32
   Yoga: aa0cb45287ebe1004c02a13f279c55a95f1572f4

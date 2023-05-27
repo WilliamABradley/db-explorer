@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@react-native-community/checkbox": "^0.5.8",
-    "@react-native-community/datetimepicker": "^3.5.2",
     "@react-native-community/slider": "^4.1.6",
     "@types/react-native-table-component": "^1.2.1",
     "buffer": "^4.9.1",

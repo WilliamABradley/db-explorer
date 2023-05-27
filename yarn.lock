@@ -1589,13 +1589,6 @@
     sudo-prompt "^9.0.0"
     wcwidth "^1.0.1"
 
-"@react-native-community/datetimepicker@^3.5.2":
-  version "3.5.2"
-  resolved "https://registry.npmjs.org/@react-native-community/datetimepicker/-/datetimepicker-3.5.2.tgz"
-  integrity sha512-TWRuAtr/DnrEcRewqvXMLea2oB+YF+SbtuYLHguALLxNJQLl/RFB7aTNZeF+OoH75zKFqtXECXV1/uxQUpA+sg==
-  dependencies:
-    invariant "^2.2.4"
-
 "@react-native-community/eslint-config@^3.0.0":
   version "3.0.0"
   resolved "https://registry.npmjs.org/@react-native-community/eslint-config/-/eslint-config-3.0.0.tgz"
